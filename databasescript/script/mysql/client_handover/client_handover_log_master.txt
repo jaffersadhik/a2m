@@ -1,0 +1,7 @@
+CREATE TABLE `client_handover_log_master` (
+  `cli_id` bigint(20) NOT NULL,
+  `msg_id` varchar(25) NOT NULL,
+  `max_retry_count` int(11) NOT NULL,
+  `request_id` varchar(50) DEFAULT NULL,
+  `status` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

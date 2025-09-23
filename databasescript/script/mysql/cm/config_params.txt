@@ -1,0 +1,5 @@
+ CREATE TABLE `config_params` (
+  `key` varchar(100) DEFAULT NULL,
+  `value` varchar(500) DEFAULT NULL,
+  `key_desc` varchar(200) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

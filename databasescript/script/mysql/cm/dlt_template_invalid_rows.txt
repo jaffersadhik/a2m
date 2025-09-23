@@ -1,0 +1,7 @@
+CREATE TABLE `dlt_template_invalid_rows` (
+  `id` char(36) NOT NULL,
+  `dtf_id` char(36) NOT NULL COMMENT 'dlt_template_files id',
+  `data_json` text NOT NULL COMMENT 'data in json format',
+  `file_loc` varchar(550) NOT NULL COMMENT 'File with actual data',
+  `created_ts` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

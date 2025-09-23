@@ -1,0 +1,22 @@
+CREATE TABLE `platform_cluster_component_kafka_cluster_map` (
+  `seq_no` int(10) NOT NULL AUTO_INCREMENT,
+  `component_name` varchar(50) NOT NULL,
+  `platform_cluster_name` varchar(10) DEFAULT NULL,
+  `kafka_cluster_producer` varchar(20) NOT NULL,
+  `kafka_cluster_consumer` varchar(20) NOT NULL,
+  `consumer_group_name` varchar(50) NOT NULL,
+  `kafka_client_consumer_count` tinyint(2) NOT NULL DEFAULT 2,
+  `sleep_time_in_millis` int(6) NOT NULL DEFAULT 500,
+  `threads_count` tinyint(2) NOT NULL DEFAULT 2,
+  `intl_threads_count` tinyint(2) NOT NULL DEFAULT 1,
+  `max_producers_per_topic` tinyint(2) DEFAULT 2,
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_ts` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  PRIMARY KEY (`seq_no`),
+  UNIQUE KEY `platform_cluster_component_kafka_cluster_map_UN` (`component_name`,`platform_cluster_name`),
+  KEY `platform_cluster_component_kafka_cluster_map_FK` (`kafka_cluster_producer`) USING BTREE,
+  KEY `platform_cluster_component_kafka_cluster_map_FK_1` (`kafka_cluster_consumer`) USING BTREE,
+  KEY `platform_cluster_component_kafka_cluster_map_FK_2` (`consumer_group_name`),
+  CONSTRAINT `platform_cluster_component_kafka_cluster_map_FK` FOREIGN KEY (`component_name`) REFERENCES `kafka_component` (`component_name`),
+  CONSTRAINT `platform_cluster_component_kafka_cluster_map_FK_2` FOREIGN KEY (`consumer_group_name`) REFERENCES `kafka_consumer_group` (`kafka_consumer_group`)
+) ENGINE=InnoDB AUTO_INCREMENT=381 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

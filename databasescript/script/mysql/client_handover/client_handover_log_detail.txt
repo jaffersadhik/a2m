@@ -1,0 +1,11 @@
+CREATE TABLE `client_handover_log_detail` (
+  `request_id` varchar(50) DEFAULT NULL,
+  `cli_url` varchar(100) DEFAULT NULL,
+  `cli_hover_req_content` text DEFAULT NULL,
+  `ch_res` text DEFAULT NULL,
+  `ch_is_batch` tinyint(4) DEFAULT NULL,
+  `ch_sts_code` bigint(5) DEFAULT NULL,
+  `ch_res_time` bigint(20) DEFAULT NULL,
+  `cli_handover_start_time` datetime DEFAULT NULL,
+  `cli_handover_end_time` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

@@ -1,0 +1,11 @@
+CREATE TABLE `r3c_15` (
+  `shortner_id` varchar(6) NOT NULL COMMENT 'Url Shortner Id',
+  `cli_id` bigint(16) NOT NULL,
+  `file_id` varchar(25) NOT NULL,
+  `base_msg_id` varchar(25) NOT NULL,
+  `dest` bigint(15) NOT NULL,
+  `additional_info` text DEFAULT NULL,
+  `expiry_date` datetime(3) DEFAULT current_timestamp(3),
+  `created_ts` datetime(3) DEFAULT current_timestamp(3),
+  PRIMARY KEY (`shortner_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

@@ -1,0 +1,8 @@
+CREATE TABLE `dlrquery_response_master` (
+  `response_header_id` bigint(20) NOT NULL AUTO_INCREMENT,
+  `description` varchar(100) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_ts` datetime(3) DEFAULT current_timestamp(3),
+  `updated_ts` datetime(3) DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  PRIMARY KEY (`response_header_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

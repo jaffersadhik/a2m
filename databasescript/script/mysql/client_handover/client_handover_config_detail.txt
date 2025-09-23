@@ -1,0 +1,20 @@
+ CREATE TABLE `client_handover_config_detail` (
+  `handover_id` bigint(20) NOT NULL,
+  `handover_seq_no` int(3) NOT NULL COMMENT 'Sequence number for this handover',
+  `primary_url` varchar(500) NOT NULL,
+  `secondary_url` varchar(500) DEFAULT NULL COMMENT 'In case of Primary URL is not available, connect to the secondary URL',
+  `is_secured` int(1) NOT NULL DEFAULT 0 COMMENT '0 -> http, 1-> https, all other values are treated as http only',
+  `certificate_file_path` varchar(500) DEFAULT NULL COMMENT 'In case if url is using certificate file, then we use the file location.',
+  `certificate_pass_pharse` varchar(100) DEFAULT NULL COMMENT 'Password to open the certificate file.',
+  `http_method` int(1) NOT NULL DEFAULT 0 COMMENT '0 -> GET, 1 -> POST, Any other values treated as GET.',
+  `handover_template` varchar(2000) NOT NULL COMMENT 'template to send the message to the client',
+  `body_header` varchar(500) DEFAULT NULL,
+  `body_footer` varchar(500) DEFAULT NULL,
+  `con_wait_timeout_millis` int(11) NOT NULL DEFAULT 30000,
+  `read_timeout_millis` int(11) NOT NULL DEFAULT 30000,
+  `created_ts` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `updated_ts` datetime DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `batch_body_delimiter` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`handover_id`,`handover_seq_no`),
+  CONSTRAINT `client_handover_master_FK` FOREIGN KEY (`handover_id`) REFERENCES `client_handover_config_master` (`handover_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

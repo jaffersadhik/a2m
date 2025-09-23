@@ -1,0 +1,15 @@
+CREATE TABLE `query_async_queue` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `queue_id` char(36) NOT NULL,
+  `query_type` varchar(100) NOT NULL,
+  `requested_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `started_ts` datetime DEFAULT NULL,
+  `completed_ts` datetime DEFAULT NULL,
+  `current_status` varchar(15) NOT NULL,
+  `completed_status` varchar(15) DEFAULT NULL,
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `modified_ts` datetime DEFAULT NULL,
+  `record_count` int(16) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `queue_id` (`queue_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1467 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

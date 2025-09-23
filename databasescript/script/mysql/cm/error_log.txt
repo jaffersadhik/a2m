@@ -1,0 +1,13 @@
+ CREATE TABLE `error_log` (
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `user` varchar(50) NOT NULL COMMENT 'username',
+  `httpcode` varchar(10) NOT NULL COMMENT 'HTTP status code',
+  `route` varchar(300) NOT NULL COMMENT 'request route url',
+  `ip` varchar(20) DEFAULT NULL,
+  `err_msg` varchar(500) NOT NULL COMMENT 'the error message ',
+  `params` text NOT NULL COMMENT 'the req parameters',
+  `sessionid` varchar(50) NOT NULL COMMENT 'unique key to identify the token uniqueness',
+  `req_id` varchar(50) DEFAULT NULL,
+  `created_ts` datetime DEFAULT current_timestamp(),
+  `err_stack` text NOT NULL COMMENT 'the complete err stack'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

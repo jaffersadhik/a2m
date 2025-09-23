@@ -1,0 +1,14 @@
+CREATE TABLE `group_master` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `g_name` varchar(50) NOT NULL COMMENT '-- should be unique for this user',
+  `g_visibility` varchar(10) NOT NULL COMMENT 'private/shared',
+  `g_type` varchar(10) NOT NULL COMMENT 'normal/exclude',
+  `status` varchar(10) DEFAULT 'queued' COMMENT 'final group status. queued,completed/failed/inprocess',
+  `reason` varchar(100) DEFAULT NULL COMMENT 'the reason for failure or some desc',
+  `full_completion_yn` tinyint(4) NOT NULL DEFAULT 1 COMMENT '0-One or more group files have failed (after max retry) , 1- All the files have been completed',
+  `created_ts` datetime DEFAULT current_timestamp(),
+  `modified_ts` datetime DEFAULT NULL,
+  `description` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

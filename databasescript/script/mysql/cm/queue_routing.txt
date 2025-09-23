@@ -1,0 +1,5 @@
+CREATE TABLE `queue_routing` (
+  `max_count` decimal(10,0) NOT NULL,
+  `name` varchar(20) NOT NULL,
+  `type` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

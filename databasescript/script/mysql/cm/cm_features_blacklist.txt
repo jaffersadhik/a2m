@@ -1,0 +1,5 @@
+CREATE TABLE `cm_features_blacklist` (
+  `cli_id` bigint(16) NOT NULL,
+  `feature` varchar(100) NOT NULL COMMENT 'link/card to be disabled',
+  `cts` timestamp NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

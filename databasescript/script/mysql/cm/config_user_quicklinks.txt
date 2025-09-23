@@ -1,0 +1,10 @@
+CREATE TABLE `config_user_quicklinks` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `username` varchar(50) DEFAULT NULL COMMENT 'username for cli_id',
+  `quicklink` varchar(10) NOT NULL COMMENT 'cq/cotm/cmtm/cg/ct/account/template/group etc',
+  `group` varchar(15) NOT NULL COMMENT 'campaign/createnew/myaccount/report',
+  `done_by` bigint(16) NOT NULL COMMENT 'Client Id of the user who created ',
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

@@ -1,0 +1,7 @@
+CREATE TABLE `mcc_mnc_routes` (
+  `cli_id` bigint(16) DEFAULT NULL,
+  `country` varchar(50) NOT NULL,
+  `mcc` varchar(50) DEFAULT NULL,
+  `mnc` varchar(50) DEFAULT NULL,
+  `route_id` varchar(6) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

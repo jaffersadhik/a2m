@@ -1,0 +1,12 @@
+ CREATE TABLE `contactus_request` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `fname` varchar(50) DEFAULT NULL COMMENT 'first name',
+  `lname` varchar(50) DEFAULT NULL COMMENT 'last name',
+  `email` varchar(50) DEFAULT NULL COMMENT 'email',
+  `mobile` varchar(50) DEFAULT NULL COMMENT 'mobile',
+  `ip` varchar(50) DEFAULT NULL COMMENT 'ip',
+  `comments` varchar(2000) NOT NULL COMMENT 'comments',
+  `created_ts` datetime DEFAULT current_timestamp(),
+  `modified_ts` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

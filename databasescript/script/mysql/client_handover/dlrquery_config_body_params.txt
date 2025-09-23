@@ -1,0 +1,15 @@
+CREATE TABLE `dlrquery_config_body_params` (
+  `response_header_id` bigint(20) NOT NULL,
+  `param_seq_no` int(3) NOT NULL,
+  `mw_constant_name` varchar(100) NOT NULL,
+  `mw_alternative_constant_name` varchar(100) DEFAULT NULL,
+  `default_value` varchar(200) DEFAULT NULL,
+  `data_type` int(1) NOT NULL DEFAULT 1 COMMENT '1 -> String, 2 -> Number, 3 -> Date / Time',
+  `data_format` varchar(50) DEFAULT NULL,
+  `data_validation` varchar(100) DEFAULT NULL COMMENT '"" -> Empty String, NULL -> Empty String, -999 -> Number invalid',
+  `drools_file_path` varchar(500) DEFAULT NULL,
+  `created_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  PRIMARY KEY (`response_header_id`,`param_seq_no`),
+  CONSTRAINT `dlrquery_config_body_params_FK` FOREIGN KEY (`response_header_id`) REFERENCES `dlrquery_response_master` (`response_header_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

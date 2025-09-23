@@ -1,0 +1,8 @@
+CREATE TABLE `mcc_mnc_rates` (
+  `cli_id` bigint(16) DEFAULT NULL,
+  `country` varchar(50) NOT NULL COMMENT 'ROW - means rest of world.',
+  `mcc` varchar(50) DEFAULT NULL,
+  `mnc` varchar(50) DEFAULT NULL,
+  `base_sms_rate` decimal(16,12) NOT NULL,
+  `base_add_fixed_rate` decimal(16,12) NOT NULL DEFAULT 0.000000000000
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

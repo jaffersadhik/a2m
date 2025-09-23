@@ -1,0 +1,5 @@
+ CREATE TABLE `sms_priority` (
+  `volume` bigint(20) NOT NULL,
+  `priority` tinyint(4) NOT NULL COMMENT '0,1=High; 2,3=Medium; 4=Low; 5=VeryLow',
+  UNIQUE KEY `sms_priority_UN` (`volume`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci COMMENT='based on volume respective sms priority will be set' 

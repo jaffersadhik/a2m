@@ -1,0 +1,11 @@
+CREATE TABLE `user_session_log` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `user` varchar(50) NOT NULL COMMENT 'username',
+  `action` varchar(10) NOT NULL COMMENT 'login/logout',
+  `sessionid` varchar(50) NOT NULL COMMENT 'unique key to identify the token uniqueness',
+  `ip` varchar(20) DEFAULT NULL,
+  `action_ts` datetime DEFAULT current_timestamp(),
+  `ua_info` text NOT NULL COMMENT 'user agent information',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

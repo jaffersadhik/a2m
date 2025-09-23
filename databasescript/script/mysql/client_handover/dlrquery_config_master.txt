@@ -1,0 +1,11 @@
+CREATE TABLE `dlrquery_config_master` (
+  `cli_id` bigint(20) NOT NULL,
+  `response_header_id` bigint(9) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  PRIMARY KEY (`cli_id`,`response_header_id`),
+  UNIQUE KEY `dlrquery_config_master_UN` (`cli_id`),
+  KEY `dlrquery_config_master_FK` (`response_header_id`),
+  CONSTRAINT `dlrquery_config_master_FK` FOREIGN KEY (`response_header_id`) REFERENCES `dlrquery_response_master` (`response_header_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

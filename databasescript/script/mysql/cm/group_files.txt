@@ -1,0 +1,22 @@
+CREATE TABLE `group_files` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table, which also represents a uploaded file',
+  `g_id` char(36) NOT NULL COMMENT 'foreign key of group_master.id',
+  `filename` varchar(250) DEFAULT NULL COMMENT 'filename used for internal processing',
+  `filename_ori` varchar(200) DEFAULT NULL COMMENT 'the file uploaded by the user',
+  `filesize` varchar(100) DEFAULT NULL,
+  `filetype` varchar(5) NOT NULL COMMENT 'file extension. csv/xls/xlsx',
+  `fileloc` varchar(550) DEFAULT NULL COMMENT 'full path of the file',
+  `total` int(11) DEFAULT NULL COMMENT 'total rows in file',
+  `valid` int(11) DEFAULT NULL COMMENT 'valid rows in file',
+  `invalid` int(11) DEFAULT NULL COMMENT 'invalid rows in file',
+  `duplicate` int(11) DEFAULT NULL COMMENT 'duplicate count',
+  `failed` int(11) DEFAULT NULL COMMENT 'failed count',
+  `instance_id` varchar(15) DEFAULT NULL COMMENT 'the instance which processed this file',
+  `status` varchar(10) DEFAULT 'queued' COMMENT 'file processing status. queued/completed/failed/inprocess',
+  `retry_count` tinyint(3) unsigned DEFAULT 0 COMMENT 'retry count of the file on failure. retry count starts from 1.',
+  `created_ts` datetime DEFAULT current_timestamp(),
+  `started_ts` datetime DEFAULT NULL COMMENT 'represents the ts of process beginning for this file',
+  `completed_ts` datetime DEFAULT NULL COMMENT 'represents the ts of process completion (completed/failed) for this file',
+  `reason` varchar(100) DEFAULT NULL COMMENT 'the reason for failure or some desc',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

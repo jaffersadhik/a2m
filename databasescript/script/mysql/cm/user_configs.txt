@@ -1,0 +1,8 @@
+CREATE TABLE `user_configs` (
+  `cli_id` bigint(16) NOT NULL,
+  `auto_gen_cname` tinyint(4) DEFAULT 0 COMMENT '0-do not auto generate campaign name 1-auto generate campaign name',
+  `subusers_reports` tinyint(4) DEFAULT 0,
+  `full_message` tinyint(4) DEFAULT 0,
+  `inactive_account_login` tinyint(4) DEFAULT 0 COMMENT '0-disabled, 1-enabled',
+  UNIQUE KEY `user_configs_UN` (`cli_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

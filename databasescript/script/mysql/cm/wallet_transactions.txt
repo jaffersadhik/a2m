@@ -1,0 +1,18 @@
+CREATE TABLE `wallet_transactions` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `username` varchar(50) DEFAULT NULL COMMENT 'username for cli_id',
+  `action` varchar(10) NOT NULL COMMENT 'add/deduct',
+  `amount` decimal(10,4) NOT NULL COMMENT 'wallet amount to be added / deducted',
+  `loggedin_bal_before` decimal(15,6) DEFAULT NULL COMMENT 'loggedin users balance before the action',
+  `loggedin_bal_after` decimal(15,6) DEFAULT NULL COMMENT 'loggedin users balance after the action. calc=>bal_before + action_amount',
+  `old_bal` decimal(15,6) DEFAULT NULL COMMENT 'users bal before action',
+  `new_bal` decimal(15,6) DEFAULT 0.000000 COMMENT 'users new balance after action. newbal=oldbal+action_amount',
+  `source` varchar(50) DEFAULT NULL COMMENT 'request from e.g. account creation / edit account / manage wallet',
+  `description` varchar(300) DEFAULT NULL COMMENT 'comments abt the transaction',
+  `sessionid` char(36) DEFAULT NULL COMMENT 'session id from token',
+  `done_by` bigint(16) NOT NULL COMMENT 'Client Id of the user who made this transaction',
+  `done_by_username` varchar(50) DEFAULT NULL COMMENT 'username for done_by',
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

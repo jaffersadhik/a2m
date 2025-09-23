@@ -1,0 +1,6 @@
+ CREATE TABLE `client_handover_retry_meta_data_failure` (
+  `msg_id` varchar(25) NOT NULL,
+  `cli_hover_message` text NOT NULL,
+  `is_customer_specific` tinyint(1) NOT NULL,
+  `created_time` datetime NOT NULL DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

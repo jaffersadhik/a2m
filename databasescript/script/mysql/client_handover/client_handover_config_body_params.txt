@@ -1,0 +1,17 @@
+CREATE TABLE `client_handover_config_body_params` (
+  `handover_id` bigint(20) NOT NULL,
+  `handover_seq_no` int(3) NOT NULL,
+  `param_seq_no` int(3) NOT NULL,
+  `mw_constant_name` varchar(100) NOT NULL,
+  `mw_alternative_constant_name` varchar(100) DEFAULT NULL,
+  `default_value` varchar(200) DEFAULT NULL,
+  `data_type` int(1) NOT NULL DEFAULT 1 COMMENT '1 -> String, 2 -> Number, 3 -> Date / Time',
+  `data_format` varchar(50) DEFAULT NULL,
+  `data_validation` varchar(100) DEFAULT NULL COMMENT '"" -> Empty String, NULL -> Empty String, -999 -> Number invalid',
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `drools_file_path` varchar(500) DEFAULT NULL,
+  PRIMARY KEY (`handover_id`,`handover_seq_no`,`mw_constant_name`),
+  CONSTRAINT `client_handover_params_FK` FOREIGN KEY (`handover_id`) REFERENCES `client_handover_config_master` (`handover_id`),
+  CONSTRAINT `client_handover_params_FK_1` FOREIGN KEY (`handover_id`, `handover_seq_no`) REFERENCES `client_handover_config_detail` (`handover_id`, `handover_seq_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

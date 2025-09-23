@@ -1,0 +1,21 @@
+CREATE TABLE `dlt_template_info` (
+  `template_id` varchar(19) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL,
+  `template_content` text NOT NULL,
+  `is_static` tinyint(1) DEFAULT NULL COMMENT '0-dynamic, 1-static',
+  `pattern_type` tinyint(1) NOT NULL COMMENT '0-PM, 1-UC, 2-FLPlain,3-FLUni',
+  `template_type` varchar(30) CHARACTER SET latin1 COLLATE latin1_swedish_ci NOT NULL COMMENT 'Transactional, Promotional, Service-Implicit, Service-Explicit',
+  `language` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL COMMENT 'language type if pattern_type is UC',
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `telemarketer` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `template_name` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `category` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `registered_dlt` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `registered_on` datetime DEFAULT NULL,
+  `status_date` datetime DEFAULT NULL,
+  `approval_status` varchar(100) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `status` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `consent_type` varchar(50) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  `template_content_ori` text DEFAULT NULL,
+  `fileloc` varchar(550) CHARACTER SET latin1 COLLATE latin1_swedish_ci DEFAULT NULL,
+  PRIMARY KEY (`template_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

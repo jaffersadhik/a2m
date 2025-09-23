@@ -1,0 +1,13 @@
+ CREATE TABLE `campaign_schedule_at` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this campaign',
+  `cs_id` char(36) NOT NULL COMMENT 'foreign key of campaign_schedule.id',
+  `username` varchar(50) NOT NULL,
+  `scheduled_ts` datetime NOT NULL,
+  `status` varchar(10) DEFAULT 'queued' COMMENT 'queued/completed/failed/inprocess',
+  `retry_count` tinyint(3) unsigned DEFAULT 0 COMMENT 'retry count of the file on failure. retry count starts from 1.',
+  `reason` varchar(100) DEFAULT NULL COMMENT 'the reason for failure or some desc',
+  `selected_dt` varchar(100) DEFAULT NULL,
+  `selected_zone` varchar(100) DEFAULT NULL,
+  `created_ts` datetime DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

@@ -1,0 +1,15 @@
+CREATE TABLE `prepaid_history` (
+  `seq_no` bigint(10) NOT NULL AUTO_INCREMENT,
+  `cli_id` bigint(16) NOT NULL,
+  `file_id` varchar(25) DEFAULT NULL,
+  `base_msg_id` varchar(25) DEFAULT NULL,
+  `msg_id` varchar(25) DEFAULT NULL,
+  `process_type` varchar(10) NOT NULL,
+  `no_of_parts` tinyint(3) NOT NULL,
+  `sms_rate` double(10,4) NOT NULL,
+  `dlt_rate` double(10,4) NOT NULL DEFAULT 0.0000,
+  `reason` varchar(200) DEFAULT NULL,
+  `request_time` datetime(3) NOT NULL,
+  `created_ts` datetime(3) DEFAULT current_timestamp(3),
+  PRIMARY KEY (`seq_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

@@ -1,0 +1,5 @@
+CREATE TABLE `config_user_whitelabel` (
+  `cli_id` bigint(16) NOT NULL COMMENT 'SA Client Id',
+  `logo_relative_path` varchar(50) NOT NULL COMMENT 'customers logo',
+  `created_ts` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

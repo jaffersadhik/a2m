@@ -1,0 +1,15 @@
+CREATE TABLE `kafka_partition_log` (
+  `seq_no` bigint(20) NOT NULL AUTO_INCREMENT,
+  `process_id` varchar(25) NOT NULL DEFAULT '-99999',
+  `component` varchar(100) NOT NULL,
+  `event_type` varchar(25) NOT NULL,
+  `prometheus_port` int(5) DEFAULT -1000,
+  `is_on_startup` tinyint(1) NOT NULL DEFAULT 0,
+  `topic_name` varchar(200) NOT NULL,
+  `partition_no` int(3) NOT NULL,
+  `kafka_offset` bigint(15) NOT NULL,
+  `redis_offset` bigint(15) DEFAULT NULL,
+  `event_time` datetime(3) DEFAULT NULL,
+  `created_ts` datetime(3) DEFAULT current_timestamp(3),
+  PRIMARY KEY (`seq_no`)
+) ENGINE=InnoDB AUTO_INCREMENT=2356163 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

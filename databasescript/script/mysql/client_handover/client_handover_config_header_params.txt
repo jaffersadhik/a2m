@@ -1,0 +1,12 @@
+CREATE TABLE `client_handover_config_header_params` (
+  `handover_id` bigint(20) NOT NULL,
+  `handover_seq_no` int(3) NOT NULL,
+  `param_seq_no` int(3) NOT NULL,
+  `header_param_name` varchar(200) NOT NULL,
+  `header_param_value` varchar(200) NOT NULL,
+  `created_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  `updated_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`handover_id`,`handover_seq_no`,`header_param_name`),
+  CONSTRAINT `client_handover_header_params_FK` FOREIGN KEY (`handover_id`) REFERENCES `client_handover_config_master` (`handover_id`),
+  CONSTRAINT `client_handover_header_params_FK_1` FOREIGN KEY (`handover_id`, `handover_seq_no`) REFERENCES `client_handover_config_detail` (`handover_id`, `handover_seq_no`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

@@ -1,0 +1,11 @@
+CREATE TABLE `dlrquery_config_detail` (
+  `response_header_id` bigint(20) NOT NULL,
+  `handover_template` varchar(2000) NOT NULL COMMENT 'template to send the message to the client',
+  `body_header` varchar(500) DEFAULT NULL,
+  `body_footer` varchar(500) DEFAULT NULL,
+  `batch_body_delimiter` varchar(100) DEFAULT NULL,
+  `created_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  PRIMARY KEY (`response_header_id`),
+  CONSTRAINT `dlrquery_config_detail_FK` FOREIGN KEY (`response_header_id`) REFERENCES `dlrquery_response_master` (`response_header_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

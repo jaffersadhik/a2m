@@ -1,0 +1,14 @@
+CREATE TABLE `redis_info_cm` (
+  `rid` int(15) NOT NULL,
+  `ip` varchar(15) NOT NULL,
+  `port` int(5) NOT NULL,
+  `password` varchar(15) DEFAULT NULL,
+  `db` varchar(2) NOT NULL,
+  `maxpool` int(4) NOT NULL,
+  `con_time_out_insec` int(5) NOT NULL,
+  `con_wait_time_insec` int(5) NOT NULL,
+  `status` int(5) DEFAULT 1,
+  `comment` varchar(50) NOT NULL,
+  PRIMARY KEY (`rid`),
+  UNIQUE KEY `unique_cons_cm` (`ip`,`port`,`status`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

@@ -1,0 +1,7 @@
+CREATE TABLE `mcc_mnc` (
+  `prefix` decimal(20,0) DEFAULT NULL,
+  `mnc` int(10) DEFAULT NULL,
+  `mcc` int(10) DEFAULT NULL,
+  `created_ts` datetime DEFAULT NULL,
+  `updated_ts` datetime DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

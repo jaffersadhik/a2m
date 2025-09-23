@@ -1,0 +1,7 @@
+CREATE TABLE `client_handover_retry_detail` (
+  `cli_id` bigint(20) DEFAULT NULL,
+  `msg_id` varchar(50) NOT NULL,
+  `max_retry_count` int(11) DEFAULT NULL,
+  `request_id` varchar(50) DEFAULT NULL,
+  `cli_handover_start_time` datetime DEFAULT current_timestamp()
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

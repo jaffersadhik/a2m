@@ -1,0 +1,17 @@
+CREATE TABLE `template_master` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `t_name` varchar(100) NOT NULL COMMENT '-- should be unique for this user',
+  `t_type` varchar(10) DEFAULT NULL COMMENT 'column/index incase is_static=0',
+  `t_mobile_column` varchar(50) DEFAULT NULL COMMENT 'used to represent mobile column in the upload file. it could be a index position or column name in case is_static=0',
+  `dlt_entity_id` varchar(19) NOT NULL COMMENT 'dlt_template_master.entity_id',
+  `dlt_template_id` varchar(19) NOT NULL COMMENT 'dlt_template_master.template_id',
+  `t_lang_type` varchar(15) NOT NULL COMMENT 'english, unicode',
+  `t_lang` varchar(35) DEFAULT NULL COMMENT 'null / the language selected when unicode',
+  `t_content` text NOT NULL COMMENT 'template message',
+  `is_static` tinyint(1) DEFAULT NULL COMMENT '0-dynamic, 1-static',
+  `is_unicode` tinyint(1) NOT NULL COMMENT '0-plain 1-unicode',
+  `created_ts` datetime DEFAULT current_timestamp(),
+  `modified_ts` datetime DEFAULT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci 

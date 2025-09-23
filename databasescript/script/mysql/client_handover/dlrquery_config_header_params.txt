@@ -1,0 +1,12 @@
+CREATE TABLE `dlrquery_config_header_params` (
+  `response_header_id` bigint(20) NOT NULL,
+  `param_seq_no` int(3) NOT NULL,
+  `header_param_name` varchar(200) NOT NULL,
+  `header_param_value` varchar(200) NOT NULL,
+  `is_active` tinyint(1) DEFAULT 1,
+  `created_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  `updated_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3) ON UPDATE current_timestamp(3),
+  PRIMARY KEY (`response_header_id`,`param_seq_no`),
+  UNIQUE KEY `dlrquery_config_header_params_UN` (`response_header_id`,`header_param_name`),
+  CONSTRAINT `dlrquery_config_header_params_FK` FOREIGN KEY (`response_header_id`) REFERENCES `dlrquery_response_master` (`response_header_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

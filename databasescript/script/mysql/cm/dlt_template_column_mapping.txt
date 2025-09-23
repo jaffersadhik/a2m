@@ -1,0 +1,23 @@
+CREATE TABLE `dlt_template_column_mapping` (
+  `id` bigint(20) NOT NULL AUTO_INCREMENT COMMENT 'unique id for each row of this table',
+  `telco` varchar(50) NOT NULL COMMENT 'telco name whose config this row holds',
+  `telco_display_name` varchar(100) DEFAULT NULL,
+  `header` varchar(30) NOT NULL COMMENT 'header/senderid column',
+  `template_id` varchar(30) NOT NULL COMMENT 'dlt template id column',
+  `template_name` varchar(30) DEFAULT NULL,
+  `template_content` varchar(30) NOT NULL COMMENT 'dlt template message column',
+  `template_type` varchar(30) DEFAULT NULL,
+  `telemarketer` varchar(40) DEFAULT NULL,
+  `category` varchar(30) DEFAULT NULL,
+  `registered_dlt` varchar(30) DEFAULT NULL,
+  `registered_on` varchar(30) DEFAULT NULL,
+  `status_date` varchar(30) DEFAULT NULL,
+  `approval_status` varchar(30) DEFAULT NULL,
+  `status` varchar(30) DEFAULT NULL,
+  `consent_type` varchar(30) DEFAULT NULL,
+  `datetime_format` varchar(30) DEFAULT NULL COMMENT 'format of date & time in file. If cell is in custom format then leave this null',
+  `approval_text` varchar(30) DEFAULT NULL COMMENT 'text to identify if template is approved. If multiple then should be comma seperated',
+  `sample_file_name` varchar(100) DEFAULT NULL,
+  PRIMARY KEY (`id`),
+  UNIQUE KEY `dlt_template_column_mapping_UN` (`telco`)
+) ENGINE=InnoDB AUTO_INCREMENT=14 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 

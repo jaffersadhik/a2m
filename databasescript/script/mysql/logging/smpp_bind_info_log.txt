@@ -1,0 +1,21 @@
+ CREATE TABLE `smpp_bind_info_log` (
+  `sno` bigint(20) unsigned NOT NULL AUTO_INCREMENT,
+  `bind_id` varchar(50) NOT NULL COMMENT 'Connection ID as Thread',
+  `system_id` varchar(150) DEFAULT NULL,
+  `cli_id` bigint(16) DEFAULT NULL,
+  `bind_mode` varchar(10) DEFAULT NULL COMMENT '1 - Rx, 2 - Tx, 9 - TRx',
+  `bind_date` date NOT NULL,
+  `bind_time` datetime(3) DEFAULT NULL,
+  `server_ip` varchar(20) DEFAULT NULL COMMENT 'Host name of the Server',
+  `server_port` int(10) DEFAULT NULL COMMENT 'SMPP port',
+  `source_ip` varchar(20) DEFAULT NULL COMMENT 'IP Address of the client',
+  `server_instance` varchar(200) DEFAULT NULL,
+  `thread_name` varchar(200) DEFAULT NULL COMMENT 'Thread ID at Server Level',
+  `unbind_time` datetime(3) DEFAULT NULL,
+  `error_code` varchar(50) DEFAULT NULL COMMENT 'Error Code',
+  `reason` varchar(100) DEFAULT NULL COMMENT 'Error Reason',
+  `created_ts` datetime(3) NOT NULL DEFAULT current_timestamp(3),
+  PRIMARY KEY (`sno`,`bind_date`),
+  KEY `bind_id` (`bind_id`,`server_port`),
+  KEY `smpp_bind_info_log_system_id_idx` (`system_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1262336 DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci

@@ -1,0 +1,15 @@
+ CREATE TABLE `billing_rate_changes` (
+  `id` char(36) NOT NULL COMMENT 'unique id for this table',
+  `req_id` char(36) NOT NULL COMMENT 'unique id for this request/transaction',
+  `cli_id` bigint(16) NOT NULL COMMENT 'Client Id of the end user',
+  `username` varchar(50) DEFAULT NULL COMMENT 'username for cli_id',
+  `country` varchar(50) DEFAULT NULL COMMENT 'country name',
+  `new_sms_rate` decimal(15,6) DEFAULT NULL COMMENT 'smsrate after the update',
+  `old_sms_rate` decimal(15,6) DEFAULT NULL COMMENT 'previous smsrate before the update',
+  `new_addl_rate` decimal(15,6) DEFAULT NULL COMMENT 'additional rate (DLT rate incase of india) after the update',
+  `old_addl_rate` decimal(15,6) DEFAULT NULL COMMENT 'previous additional rate (DLT rate incase of india) before the update',
+  `billing_currency` varchar(5) DEFAULT NULL,
+  `done_by` bigint(16) NOT NULL COMMENT 'Client Id of the user who made this transaction',
+  `modified_ts` datetime NOT NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

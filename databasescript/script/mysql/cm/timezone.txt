@@ -1,0 +1,9 @@
+ CREATE TABLE `timezone` (
+  `id` int(10) NOT NULL AUTO_INCREMENT,
+  `zone_name` varchar(50) NOT NULL COMMENT 'eg. Asia/Calcutta',
+  `display_name` varchar(80) NOT NULL COMMENT 'eg. (UTC+00:00) Etc/Greenwich',
+  `short_name` varchar(20) DEFAULT NULL,
+  `long_name` varchar(40) NOT NULL COMMENT 'eg. Indian Standard Time',
+  `offset` varchar(10) NOT NULL COMMENT 'e.g +05:30',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB AUTO_INCREMENT=602 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_uca1400_ai_ci

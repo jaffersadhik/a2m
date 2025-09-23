@@ -1,0 +1,5 @@
+ CREATE TABLE `client_handover_retry_master` (
+  `cli_id` bigint(20) NOT NULL,
+  `msg_id` varchar(25) NOT NULL,
+  `cli_hover_message` text NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1 COLLATE=latin1_swedish_ci 
