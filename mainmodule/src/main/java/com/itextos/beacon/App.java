@@ -7,13 +7,22 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
+import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
+import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.TimeTakenLog;
 
-@SpringBootApplication
+@SpringBootApplication(exclude = {
+	    DataSourceAutoConfiguration.class,
+	    HibernateJpaAutoConfiguration.class, 
+	    DataSourceTransactionManagerAutoConfiguration.class,
+	    SqlInitializationAutoConfiguration.class
+	})
 public class App {
 
     private static final Log                log                               = LogFactory.getLog(App.class);
