@@ -6,7 +6,10 @@
     <version>1.0</version>
   </parent>
   <artifactId>mainmodule</artifactId>
-  
+   <properties>
+		<main.class>com.itextos.beacon.App</main.class>
+	</properties>
+
    <dependencies>
 	  
 	  	<dependency>
@@ -41,5 +44,48 @@
 		</dependency>
   </dependencies>
   
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<version>${spring-boot-maven-plugin-version}</version>
+				<configuration>
+					<classifier>executable</classifier>
+					<mainClass>${main.class}</mainClass>
+					    <excludes>
+                    <!-- Exclude specific JAR files -->
+                    <exclude>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                    </exclude>
+                    <exclude>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-core</artifactId>
+                    </exclude>
+                    <exclude>
+                        <groupId>org.apache.logging.log4j</groupId>
+                        <artifactId>log4j-to-slf4j</artifactId>
+                    </exclude>
+                    <exclude>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>jul-to-slf4j</artifactId>
+                    </exclude>
+                </excludes>
+				</configuration>
+				<executions>
+					<execution>
+						<id>repackage</id>
+						<phase>package</phase>
+						<goals>
+							<goal>repackage</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+		</plugins>
+	</build>
+
 
 </project>
