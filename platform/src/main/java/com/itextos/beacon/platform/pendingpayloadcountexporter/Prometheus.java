@@ -2,12 +2,8 @@ package com.itextos.beacon.platform.pendingpayloadcountexporter;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 
 import io.prometheus.client.Gauge;
-import io.prometheus.client.exporter.MetricsServlet;
 
 class Prometheus
 {

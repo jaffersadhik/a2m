@@ -5,14 +5,10 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
 
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 
 import io.prometheus.client.Histogram.Timer;
-import io.prometheus.client.exporter.MetricsServlet;
 
 class PrometheusDataHolder
 {
