@@ -91,8 +91,9 @@
 	<module>servlet</module>
 	<module>properties</module>
 	<module>python-cron</module>
-	<module>docker-beacon</module>
 	<module>databasescript</module>
+	<module>docker-beacon</module>
+
   </modules>
   
     <dependencies>
