@@ -77,6 +77,10 @@ public class App {
     }
 	public static void main(String[] args) throws IOException {
 		
+		
+        SpringApplication.run(App.class, args);
+
+		
 		long start=System.currentTimeMillis();
 	
 		createfolder();
@@ -329,7 +333,6 @@ public class App {
 	            {
 	            	
 	                PrometheusMetrics.registerPlatformMetrics();
-	                SpringApplication.run(App.class, args);
 
 	            }
 	        }
