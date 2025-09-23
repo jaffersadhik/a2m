@@ -10,7 +10,7 @@
    	
   <dependencies>
   <dependency>
-			<groupId>beacon</groupId>
+			<groupId>a2m</groupId>
 			<artifactId>mainmodule</artifactId>
 			<version>1.0</version>
 	</dependency>
