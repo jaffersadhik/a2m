@@ -5,12 +5,15 @@ import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.TimeTakenLog;
 
+@SpringBootApplication
 public class App {
 
     private static final Log                log                               = LogFactory.getLog(App.class);
@@ -125,7 +128,7 @@ public class App {
 		
 		if(IS_START_PROMETHEUS) {
 			
-			startPrometheusServer(true);
+			startPrometheusServer(true,args);
 
 		}
 		
@@ -316,7 +319,7 @@ public class App {
 	
 
 	public static void startPrometheusServer(
-	            boolean aStartJettyServer)
+	            boolean aStartJettyServer,String[] args)
 	    {
 
 	        try
@@ -324,7 +327,10 @@ public class App {
 
 	            if (aStartJettyServer)
 	            {
+	            	
 	                PrometheusMetrics.registerPlatformMetrics();
+	                SpringApplication.run(App.class, args);
+
 	            }
 	        }
 	        catch (final Exception e)
