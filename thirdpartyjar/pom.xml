@@ -29,7 +29,7 @@
 		<dependency>
 			<groupId>org.mariadb.jdbc</groupId>
 			<artifactId>mariadb-java-client</artifactId>
-			<version>${mariadb.version}</version>
+			<version>${mariadb-java-client-version}</version>
 		</dependency>
 	
 		<dependency>
