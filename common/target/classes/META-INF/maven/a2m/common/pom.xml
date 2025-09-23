@@ -10,7 +10,7 @@
    <dependencies>
 	  
 	  	<dependency>
-			<groupId>beacon</groupId>
+			<groupId>a2m</groupId>
 			<artifactId>thirdpartyjar</artifactId>
 			<version>1.0</version>
 		</dependency>
