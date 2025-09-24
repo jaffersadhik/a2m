@@ -11,6 +11,9 @@ import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceTransactionManagerAutoConfiguration;
 import org.springframework.boot.autoconfigure.orm.jpa.HibernateJpaAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
+import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
@@ -21,7 +24,10 @@ import com.itextos.beacon.smslog.TimeTakenLog;
 	    DataSourceAutoConfiguration.class,
 	    HibernateJpaAutoConfiguration.class, 
 	    DataSourceTransactionManagerAutoConfiguration.class,
-	    SqlInitializationAutoConfiguration.class
+	    SqlInitializationAutoConfiguration.class,
+	    SecurityAutoConfiguration.class,
+	    UserDetailsServiceAutoConfiguration.class,
+	    SecurityFilterAutoConfiguration.class
 	})
 public class App {
 
