@@ -476,16 +476,7 @@ public class App {
 
 			return true;			
 		}else if(module.equals("dbpoller")) {
-			com.itextos.beacon.platform.kannelstatusupdater.StartApplication.main(args);
-
-			com.itextos.beacon.platform.smppdlrpoller.StartApplication.main(args);
-			com.itextos.beacon.platform.sbpcore.StartApplication.main(args);
-			com.itextos.beacon.http.interfacefallbackpoller.StartApplication.main(args);
-			com.itextos.beacon.platform.dnrfallbackpoller.StartApplication.main(args);
-			
-			com.itextos.beacon.platform.duplicatecheckremoval.start.StartApplication.main(args);
-			com.itextos.beacon.platform.dlrpayloadgen.process.StartApplication.main(args);
-			com.itextos.beacon.platform.rch.StartApplication.main(args);
+			startDBPoller(args);
 
 
 			IS_START_PROMETHEUS=true;
@@ -499,6 +490,20 @@ public class App {
 	}
 	
 	
+	private static void startDBPoller(String[] args) {
+		com.itextos.beacon.platform.kannelstatusupdater.StartApplication.main(args);
+
+		com.itextos.beacon.platform.smppdlrpoller.StartApplication.main(args);
+		com.itextos.beacon.platform.sbpcore.StartApplication.main(args);
+		com.itextos.beacon.http.interfacefallbackpoller.StartApplication.main(args);
+		com.itextos.beacon.platform.dnrfallbackpoller.StartApplication.main(args);
+		
+		com.itextos.beacon.platform.duplicatecheckremoval.start.StartApplication.main(args);
+		com.itextos.beacon.platform.dlrpayloadgen.process.StartApplication.main(args);
+		com.itextos.beacon.platform.rch.StartApplication.main(args);
+		
+	}
+
 	private static boolean isAllBiller(String module, String[] args) {
 		
 		if(module.equals("biller")) {
@@ -644,6 +649,13 @@ public class App {
 		}else if(module.equals("japi")){
 			
 		//	com.itextos.beacon.platform.aysnprocessor.StartApplication.main(args);
+			
+			IS_START_PROMETHEUS=true;
+			return true;
+			
+		}else if(module.equals("backend")){
+			
+			startBackEnd(args);
 			
 			IS_START_PROMETHEUS=true;
 			return true;
@@ -851,10 +863,7 @@ public class App {
 		return false;
 	}
 
-	private static void startDnpost(String[] args) {
-		// TODO Auto-generated method stub
-		
-	}
+	
 
 	private static void startBillerOther(String[] args) {
 
@@ -872,6 +881,29 @@ public class App {
 	//	com.itextos.beacon.platform.fullmsgt2tb.StartApplication.main(args);
 	}
 
+	private static void startBackEnd(String[] args) {
+		
+		startBillerMain(args);
+		startBillerOther(args);
+		startDN(args);
+		startDBPoller(args);
+		com.itextos.beacon.smpp.concatehandover.StartApplication.main(args);
+		com.itextos.beacon.platform.ic.StartApplication.main(args);
+		com.itextos.beacon.platform.sbc.StartApplication.main(args);
+		com.itextos.beacon.kafkabackend.kafka2elasticsearch.start.StartApplicationDelivery.main(args);
+		com.itextos.beacon.kafkabackend.kafka2elasticsearch.start.StartApplicationSubmission.main(args);
+
+
+	}
+	
+	private static void startDN(String[] args) {
+		
+
+		com.itextos.beacon.platform.dnpcore.StartApplication.main(args);
+		com.itextos.beacon.platform.smppdlr.StartApplication.main(args);
+		com.itextos.beacon.httpclienthandover.StartApplication.main(args);
+
+	}
 	private static void startDigitalT2DB(String[] args) {
 		
 		
