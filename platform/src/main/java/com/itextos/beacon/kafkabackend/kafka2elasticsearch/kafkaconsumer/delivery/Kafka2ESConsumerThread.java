@@ -81,7 +81,7 @@ public class Kafka2ESConsumerThread
     {
         this.setName(pThreadName);
         ConsumerThreadName           = pThreadName;
-        this.ConsumerMode            = StartApplicationDelivery.AppMode;
+        this.ConsumerMode            = "deliveries";
         this.AppConfig               = StartApplicationDelivery.AppConfig;
         this.ESIndexName             = StartApplicationDelivery.ESIndexName;
         this.ESIndexUniqueColumn     = StartApplicationDelivery.ESIndexUniqueColumn;
