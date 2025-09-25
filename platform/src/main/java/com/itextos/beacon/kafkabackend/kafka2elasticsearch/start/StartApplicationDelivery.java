@@ -203,13 +203,7 @@ public class StartApplicationDelivery
                 System.err.println("Kafka Topic name is empty");
                 return;
             }
-            else
-                if (!KafkaTopicName.contains(AppMode))
-                {
-                    log.error("Invalid Kafka Topic name for Consumer Mode");
-                    System.err.println("Invalid Kafka Topic name for Consumer Mode");
-                    return;
-                }
+            
 
             // final String vmName = ManagementFactory.getRuntimeMXBean().getName();
             // AppProcID = vmName.substring(0, vmName.indexOf("@"));
