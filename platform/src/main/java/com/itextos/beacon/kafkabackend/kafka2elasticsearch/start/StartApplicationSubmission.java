@@ -189,14 +189,7 @@ public class StartApplicationSubmission
                 return;
             }
 
-            if (!AppMode.equals(Kafka2ESConstants.subMode) && !AppMode.equals(Kafka2ESConstants.delMode))
-            {
-                log.error("Invalid Consumer Mode: " + AppMode);
-                log.error("Valid Modes are : " + Kafka2ESConstants.subMode + ", " + Kafka2ESConstants.delMode);
-                System.err.println("Invalid Consumer Mode: " + AppMode);
-                return;
-            }
-
+            
                 ESDocUpdTmColumn = Kafka2ESConstants.subUpdTmColumn;
                 KafkaTopicName  = Component.T2DB_SUBMISSION.getKey();
 
