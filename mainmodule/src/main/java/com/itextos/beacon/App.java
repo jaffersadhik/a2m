@@ -500,7 +500,6 @@ public class App {
 		
 		com.itextos.beacon.platform.duplicatecheckremoval.start.StartApplication.main(args);
 		com.itextos.beacon.platform.dlrpayloadgen.process.StartApplication.main(args);
-		com.itextos.beacon.platform.rch.StartApplication.main(args);
 		
 	}
 
@@ -878,6 +877,10 @@ public class App {
 		
 		com.itextos.beacon.platform.subt2tb.StartApplication.main(args);
 		com.itextos.beacon.platform.dnt2tb.StartApplication.main(args);
+		com.itextos.beacon.kafkabackend.kafka2elasticsearch.start.StartApplicationDelivery.main(args);
+		com.itextos.beacon.kafkabackend.kafka2elasticsearch.start.StartApplicationSubmission.main(args);
+		com.itextos.beacon.platform.sbc.StartApplication.main(args);
+
 	//	com.itextos.beacon.platform.fullmsgt2tb.StartApplication.main(args);
 	}
 
@@ -887,15 +890,18 @@ public class App {
 		startBillerOther(args);
 		startDN(args);
 		startDBPoller(args);
-		com.itextos.beacon.smpp.concatehandover.StartApplication.main(args);
-		com.itextos.beacon.platform.ic.StartApplication.main(args);
-		com.itextos.beacon.platform.sbc.StartApplication.main(args);
-		com.itextos.beacon.kafkabackend.kafka2elasticsearch.start.StartApplicationDelivery.main(args);
-		com.itextos.beacon.kafkabackend.kafka2elasticsearch.start.StartApplicationSubmission.main(args);
+		startKanelSubmit(args);
 
 
 	}
 	
+	private static void startKanelSubmit(String[] args) {
+		com.itextos.beacon.smpp.concatehandover.StartApplication.main(args);
+		com.itextos.beacon.platform.ic.StartApplication.main(args);
+		com.itextos.beacon.platform.rch.StartApplication.main(args);
+		
+	}
+
 	private static void startDN(String[] args) {
 		
 
