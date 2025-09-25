@@ -108,6 +108,11 @@
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
         
+         <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jcl-over-slf4j</artifactId>
+    </dependency>
+    
         <!-- Actuator for metrics and monitoring -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

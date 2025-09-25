@@ -11,11 +11,14 @@
  
 
    <dependencies>
+   
+   <!-- 
 			<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>${commons-logging-version}</version>
 		</dependency>
+		-->
 		<dependency>
 			<groupId>javax.servlet</groupId>
 			<artifactId>javax.servlet-api</artifactId>
@@ -37,11 +40,12 @@
 			<artifactId>commons-configuration</artifactId>
 			<version>${commons-configuration-version}</version>
 		</dependency>
+		<!-- 
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>${commons-logging-version}</version>
-		</dependency>
+		</dependency> -->
 		<dependency>
     <groupId>javax.servlet</groupId>
     <artifactId>javax.servlet-api</artifactId>
@@ -240,13 +244,13 @@
 			<artifactId>commons-text</artifactId>
 			<version>${commons-text-version}</version>
 		</dependency>
-
+<!-- 
 		<dependency>
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>${commons-logging-version}</version>
 		</dependency>
-
+-->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-math3</artifactId>
