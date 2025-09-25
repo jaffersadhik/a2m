@@ -29,7 +29,7 @@ public class StartApplicationSubmission
   //  private static final Log                              log                     = LogFactory.getLog(StartApplication.class);
     public static String                                  ESClientTypeConfig      = null;
     public static AppConfiguration                        AppConfig               = null;
-    public static String                                  AppMode                 = null;
+ //   public static String                                  AppMode                 = null;
 
     public static String                                  AppProcID               = null;
     public static String                                  HostIPAddr              = null;
@@ -81,8 +81,7 @@ public class StartApplicationSubmission
         final String MariaDBJDBCURL  = "jdbc:mariadb://" + MariaDBHost + ":" + MariaDBPort + "/" + MariaDBDatabase;
 
         String       SQL             = "select column_name, mapped_name, column_type, default_value, ci_column_required ";
-        SQL += " from configuration.es_sub_del_t2_col_map where index_type='" + AppMode;
-        SQL += "' and column_name != '" + ESIndexUniqueColumn + "'";
+        SQL += " from configuration.es_sub_del_t2_col_map where index_type='submission' and column_name != '" + ESIndexUniqueColumn + "'";
 
         log.info("ES Index Column Map SQL: " + SQL);
         log.info("Connecting MariaDB: " + MariaDBJDBCURL);
@@ -177,7 +176,6 @@ public class StartApplicationSubmission
 
             mainThread      = Thread.currentThread();
 
-            AppMode         = System.getenv("appmode");//args[0];
             KafkaConsGrpSeq = Integer.parseInt(System.getenv("topicgroupid"));//Integer.parseInt(args[2]);
             final int threadCount = Integer.parseInt(System.getenv("threadcount"));//Integer.parseInt(args[3]);
 
@@ -264,10 +262,8 @@ public class StartApplicationSubmission
                 return;
             }
 
-            log.info("Kafka Consumer for ES started, Mode: " + AppMode);
             log.info("Host IP Address: " + HostIPAddr);
             log.info("App Process ID: " + AppProcID);
-            log.info("Kafka2ES Consumer Application started, Mode: " + AppMode);
             log.info("Kafka Topic Name: " + KafkaTopicName);
             log.info("Kafka Consumer Group ID: " + KafkaConsGrpID);
             log.info("Elastic Index name: " + ESIndexName);
