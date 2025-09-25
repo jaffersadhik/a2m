@@ -890,12 +890,12 @@ public class App {
 		startBillerOther(args);
 		startDN(args);
 		startDBPoller(args);
-		startKanelSubmit(args);
+		startKannelSubmit(args);
 
 
 	}
 	
-	private static void startKanelSubmit(String[] args) {
+	private static void startKannelSubmit(String[] args) {
 		com.itextos.beacon.smpp.concatehandover.StartApplication.main(args);
 		com.itextos.beacon.platform.ic.StartApplication.main(args);
 		com.itextos.beacon.platform.rch.StartApplication.main(args);
