@@ -15,6 +15,7 @@ public class CarrierCircles
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	private static final int BATCH_SIZE = 1000;
 
     private static final Log                        log               = LogFactory.getLog(CarrierCircles.class);
     private Map<String, Map<String, CarrierCircle>> mCarrierCircleMap = new HashMap<>();
@@ -62,6 +63,9 @@ public class CarrierCircles
             ResultSet aResultSet)
             throws SQLException
     {
+    	
+        int count = 0;
+
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
@@ -79,6 +83,15 @@ public class CarrierCircles
 
             final Map<String, CarrierCircle> inner    = lTempMscCodes.computeIfAbsent(lPrefix, k -> new HashMap<>());
             inner.put(lMsc, new CarrierCircle(lCarrier, lCircle));
+            
+
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         if (!lTempMscCodes.isEmpty())

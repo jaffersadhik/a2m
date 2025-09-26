@@ -16,6 +16,7 @@ public class MccMncRates
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	private static final int BATCH_SIZE = 1000;
 
     // CUSTOMER_INTL_CREDITS
     private static final Log          log                     = LogFactory.getLog(MccMncRates.class);
@@ -42,6 +43,9 @@ public class MccMncRates
             ResultSet aResultSet)
             throws SQLException
     {
+    	
+        int count = 0;
+
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
@@ -61,6 +65,14 @@ public class MccMncRates
             final IntlSmsRates lIntlSmsRates      = new IntlSmsRates(lBaseSmsRate, lBaseAddlFixedRate);
 
             lCustomerCreditMap.put(CommonUtility.combine(lClientId, lCountry.toUpperCase(),lMcc,lMnc), lIntlSmsRates);
+       
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         if (!lCustomerCreditMap.isEmpty())

@@ -19,6 +19,8 @@ public class LoadTemplates
         AbstractAutoRefreshInMemoryProcessor
 {
 
+	private static final int BATCH_SIZE = 1000;
+
     private static final Log          log              = LogFactory.getLog(LoadTemplates.class);
 
     private Map<String, List<String>> mMsgTemplatesMap = new HashMap<>();
@@ -42,6 +44,7 @@ public class LoadTemplates
     {
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
+        int count = 0;
 
         final Map<String, List<String>> loadMsgTemplates = new HashMap<>();
 
@@ -57,6 +60,15 @@ public class LoadTemplates
 
             final List<String> lTemplatesLst = loadMsgTemplates.computeIfAbsent(lClientId, k -> new ArrayList<>());
             lTemplatesLst.add(CommonUtility.combine(lTemplateId, lEncrypt, lMsgTemplate));
+            
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
+
         }
 
         if (!loadMsgTemplates.isEmpty())

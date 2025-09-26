@@ -19,6 +19,9 @@ public class VerifiedSmsUserHeaderInfo
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	
+	private static final int BATCH_SIZE = 1000;
+
 
     private static final Log          log                 = LogFactory.getLog(VerifiedSmsUserHeaderInfo.class);
     private Map<String, List<String>> mVerifiedSmsHeaders = new HashMap<>();
@@ -33,6 +36,8 @@ public class VerifiedSmsUserHeaderInfo
             String aClientId,
             String aHeader)
     {
+    	
+
         aHeader = aHeader.toLowerCase();
 
         final ItextosClient lCustomer   = new ItextosClient(aClientId);
@@ -60,6 +65,9 @@ public class VerifiedSmsUserHeaderInfo
             ResultSet aResultSet)
             throws SQLException
     {
+    	
+        int count = 0;
+
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
@@ -75,6 +83,14 @@ public class VerifiedSmsUserHeaderInfo
 
             final List<String> lVsmsHederIds = lVerifiedSMSEnabledHeaderIds.computeIfAbsent(lClientId, k -> new ArrayList<>());
             lVsmsHederIds.add(lHeaderId.toLowerCase());
+            
+           count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         if (!lVerifiedSMSEnabledHeaderIds.isEmpty())

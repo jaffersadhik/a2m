@@ -17,6 +17,9 @@ public class DLTMsgTemplatePrefixSuffix
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	
+	private static final int BATCH_SIZE = 1000;
+
 
     private static final Log                   log                         = LogFactory.getLog(DLTMsgTemplatePrefixSuffix.class);
 
@@ -39,6 +42,9 @@ public class DLTMsgTemplatePrefixSuffix
             ResultSet aResultSet)
             throws SQLException
     {
+    	
+        int count = 0;
+
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
@@ -51,6 +57,14 @@ public class DLTMsgTemplatePrefixSuffix
             final String                lMsgSuffix          = CommonUtility.nullCheck(aResultSet.getString("msg_suffix"), false);
             final DLTMsgPrefixSuffixObj lMsgPrefixSuffixObj = new DLTMsgPrefixSuffixObj(lMsgPrefix, lMsgSuffix);
             lDltMsgSuffixPrefixMap.put(lTemplateType, lMsgPrefixSuffixObj);
+            
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         if (!lDltMsgSuffixPrefixMap.isEmpty())

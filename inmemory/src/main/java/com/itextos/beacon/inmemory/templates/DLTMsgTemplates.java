@@ -20,6 +20,7 @@ public class DLTMsgTemplates
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	private static final int BATCH_SIZE = 1000;
 
     private static final Log                     log             = LogFactory.getLog(DLTMsgTemplates.class);
 
@@ -44,6 +45,9 @@ public class DLTMsgTemplates
             ResultSet aResultSet)
             throws SQLException
     {
+    	
+        int count = 0;
+
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
@@ -64,6 +68,14 @@ public class DLTMsgTemplates
             final List<DLTMsgTemplateObj> lMsgTemplLst = loadDLTMsgTemplatesMap.computeIfAbsent(CommonUtility.combine(lTemplateGroupId, lEntityId, lHeader), k -> new ArrayList<>());
 
             lMsgTemplLst.add(lMsgTemplObj);
+            
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         mMsgTemplateMap = loadDLTMsgTemplatesMap;

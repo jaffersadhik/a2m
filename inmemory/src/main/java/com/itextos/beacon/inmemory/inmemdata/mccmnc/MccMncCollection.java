@@ -13,6 +13,9 @@ public class MccMncCollection
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	
+	private static final int BATCH_SIZE = 1000;
+
 
     private final Map<String, MccMncInfo> mMccMncData = new HashMap<>();
 
@@ -27,11 +30,20 @@ public class MccMncCollection
             ResultSet aResultSet)
             throws SQLException
     {
+        int count = 0;
 
         while (aResultSet.next())
         {
             final MccMncInfo ci = getMccMncInfoFromDB(aResultSet);
             mMccMncData.put(ci.getPrefix(), ci);
+            
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
     }
 

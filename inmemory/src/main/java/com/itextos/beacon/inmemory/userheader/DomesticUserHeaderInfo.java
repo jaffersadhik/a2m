@@ -18,6 +18,8 @@ public class DomesticUserHeaderInfo
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	
+	private static final int BATCH_SIZE = 1000;
 
     private static final Log         log                               = LogFactory.getLog(DomesticUserHeaderInfo.class);
 
@@ -59,6 +61,8 @@ public class DomesticUserHeaderInfo
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
+        int count = 0;
+
         // select template_group_id, header, template_id, entity_id from
         // dlt_template_group_header_entity_map
 
@@ -80,6 +84,15 @@ public class DomesticUserHeaderInfo
 
             final Set<String> tempSet = lTemplateGroupHeaderTemplateIdMap.computeIfAbsent(temp, k -> new HashSet<>());
             tempSet.add(lTemplateId);
+            
+            
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         if (!lTemplateGroupHeaderEntiryIdMap.isEmpty())

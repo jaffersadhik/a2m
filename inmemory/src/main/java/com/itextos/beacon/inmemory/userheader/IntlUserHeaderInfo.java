@@ -18,6 +18,7 @@ public class IntlUserHeaderInfo
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
+	private static final int BATCH_SIZE = 1000;
 
     private static final Log         log         = LogFactory.getLog(IntlUserHeaderInfo.class);
     private Map<String, Set<String>> mHeaderInfo = new HashMap<>();
@@ -45,6 +46,7 @@ public class IntlUserHeaderInfo
     {
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
+        int count = 0;
 
         final Map<String, Set<String>> lClientHeaderInfo = new HashMap<>();
 
@@ -58,6 +60,14 @@ public class IntlUserHeaderInfo
 
             final Set<String> temp = lClientHeaderInfo.computeIfAbsent(lClientId, k -> new HashSet<>());
             temp.add(lHeader.toLowerCase());
+            
+            count++;
+            
+            // Process in batches to reduce memory pressure
+            if (count % BATCH_SIZE == 0) {
+                // Optional: yield thread to prevent CPU monopolization
+                Thread.yield();
+            }
         }
 
         if (!lClientHeaderInfo.isEmpty())
