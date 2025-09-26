@@ -52,7 +52,12 @@
     <version>4.0.1</version>  <!-- You can use the latest version of the javax.servlet-api -->
     <scope>provided</scope>  <!-- This ensures it's provided by the container, like Tomcat or WildFly -->
 </dependency>
-
+<!-- Alternatively, you can use this newer implementation -->
+    <dependency>
+        <groupId>org.glassfish.jaxb</groupId>
+        <artifactId>jaxb-runtime</artifactId>
+        <version>4.0.3</version>
+    </dependency>
 		<!-- 
 		<dependency>
 			<groupId>org.apache.logging.log4j</groupId>
