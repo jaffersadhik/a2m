@@ -8,6 +8,7 @@ import java.util.concurrent.Callable;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.ClientIP;
 import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
@@ -39,21 +41,24 @@ public class JSONCustomReceiverController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> handleJsonGetRequest(
             @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp
-            ,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            ,@RequestHeader(value = "Authorization", required = false) String authorization,
+            ServerHttpRequest request) {
         
-        return processJsonRequest("GET", "", clientIp,authorization);
+        return processJsonRequest("GET", "", clientIp,authorization,request);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> handleJsonPostRequest(
             @RequestBody Mono<String> requestBody,
             @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp
-            ,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            ,@RequestHeader(value = "Authorization", required = false) String authorization,
+            ServerHttpRequest request) {
         
-        return requestBody.flatMap(body -> processJsonRequest("POST", body, clientIp,authorization));
+        return requestBody.flatMap(body -> processJsonRequest("POST", body, clientIp,authorization,request));
     }
 
-    private Mono<String> processJsonRequest(String method, String requestBody, String clientIp,String authorization) {
+    private Mono<String> processJsonRequest(String method, String requestBody, String clientIp,String authorization,
+            ServerHttpRequest request) {
         final Instant startTime = Instant.now();
         final StringBuffer logBuffer = new StringBuffer();
         
@@ -66,7 +71,7 @@ public class JSONCustomReceiverController {
 
         Map<String, String> params=new HashMap<String,String>();
         
-        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), clientIp);
+        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), ClientIP.getClientIpAddress(clientIp, request));
         
         params.put(InterfaceInputParameters.AUTHORIZATION, authorization);
         

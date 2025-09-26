@@ -3,6 +3,7 @@ package com.itextos.beacon.web.generichttpapi.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -10,6 +11,7 @@ import reactor.core.scheduler.Schedulers;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.ClientIP;
 import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
@@ -30,9 +32,10 @@ public class QSCustomReceiverController {
     public Mono<String> handleCustomQSGet(
             @RequestParam Map<String, String> allParams,
             @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp
-            ,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            ,@RequestHeader(value = "Authorization", required = false) String authorization,
+            ServerHttpRequest request) {
         
-        return processCustomQSRequest("GET", allParams, clientIp,authorization);
+        return processCustomQSRequest("GET", allParams, clientIp,authorization,request);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -40,13 +43,15 @@ public class QSCustomReceiverController {
             @RequestBody(required = false) Mono<String> requestBody,
             @RequestParam Map<String, String> allParams,
             @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp
-            ,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            ,@RequestHeader(value = "Authorization", required = false) String authorization,
+            ServerHttpRequest request) {
         
         return requestBody.defaultIfEmpty("")
-            .flatMap(body -> processCustomQSRequest("POST", allParams, clientIp,authorization));
+            .flatMap(body -> processCustomQSRequest("POST", allParams, clientIp,authorization,request));
     }
 
-    private Mono<String> processCustomQSRequest(String method, Map<String, String> params, String clientIp, String authorization) {
+    private Mono<String> processCustomQSRequest(String method, Map<String, String> params, String clientIp, String authorization,
+            ServerHttpRequest request) {
         final Instant startTime = Instant.now();
         
         if (log.isDebugEnabled()) {
@@ -54,7 +59,7 @@ public class QSCustomReceiverController {
         }
         
 
-        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), clientIp);
+        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), ClientIP.getClientIpAddress(clientIp, request));
         
         params.put(InterfaceInputParameters.AUTHORIZATION, authorization);
 

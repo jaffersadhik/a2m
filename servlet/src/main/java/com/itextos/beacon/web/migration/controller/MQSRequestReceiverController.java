@@ -3,6 +3,7 @@ package com.itextos.beacon.web.migration.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 import reactor.core.scheduler.Schedulers;
@@ -10,6 +11,7 @@ import reactor.core.scheduler.Schedulers;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.ClientIP;
 import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
@@ -32,22 +34,25 @@ public class MQSRequestReceiverController {
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> handleQSGetRequest(
             @RequestParam java.util.Map<String, String> allParams,
-            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,@RequestHeader(value = "Authorization", required = false) String authorization,
+            ServerHttpRequest request) {
         
-        return processQSRequest("GET", allParams, clientIp,authorization);
+        return processQSRequest("GET", allParams, clientIp,authorization,request);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     public Mono<String> handleQSPostRequest(
             @RequestBody(required = false) Mono<String> requestBody,
             @RequestParam java.util.Map<String, String> allParams,
-            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,@RequestHeader(value = "Authorization", required = false) String authorization,
+            ServerHttpRequest request) {
         
         return requestBody.defaultIfEmpty("")
-            .flatMap(body -> processQSRequest("POST", allParams, clientIp,authorization));
+            .flatMap(body -> processQSRequest("POST", allParams, clientIp,authorization,request));
     }
 
-    private Mono<String> processQSRequest(String method, java.util.Map<String, String> params, String clientIp,String authorization) {
+    private Mono<String> processQSRequest(String method, java.util.Map<String, String> params, String clientIp,String authorization,
+            ServerHttpRequest request) {
         final Instant processStart = Instant.now();
         final AtomicReference<StringBuffer> logBuffer = new AtomicReference<>(new StringBuffer());
         
@@ -55,7 +60,7 @@ public class MQSRequestReceiverController {
             log.debug("QS request received via " + method);
         }
 
-        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), clientIp);
+        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), ClientIP.getClientIpAddress(clientIp, request));
         
         params.put(InterfaceInputParameters.AUTHORIZATION, authorization);
 
