@@ -209,7 +209,7 @@ public class App {
         
         // Module-specific initialization with throttling
         if ("japi".equals(module)) {
-            throttleStartup("japi-init", 2000); // 2-second delay before init
+            throttleStartup("japi-init", 1000); // 2-second delay before init
             try {
                 init();
                 ReactiveQSRequestReader.initSMS();
