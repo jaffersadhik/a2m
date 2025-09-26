@@ -10,6 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
+import com.itextos.beacon.commonlib.constants.ErrorMessage;
 import com.itextos.beacon.errorlog.MemoryLoaderLog;
 import com.itextos.beacon.inmemory.loader.process.AbstractAutoRefreshInMemoryProcessor;
 import com.itextos.beacon.inmemory.loader.process.InmemoryInput;
@@ -23,7 +24,6 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
     private static final int MAX_RECORDS_BEFORE_BREAK = 50000;
     private static final double CPU_THRESHOLD = 75.0;
     
-    private static final Log log = LogFactory.getLog(CarrierCircles.class);
     
     // Optimized data structures
     private volatile Map<String, Map<String, CarrierCircle>> mCarrierCircleMap = new ConcurrentHashMap<>(10000);
@@ -65,9 +65,8 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
         int batchCount = 0;
         int totalCount = 0;
 
-        if (log.isDebugEnabled()) {
-            log.debug("Starting resultset processing for " + this.getClass().getSimpleName());
-        }
+        	MemoryLoaderLog.log("Starting resultset processing for " + this.getClass().getSimpleName());
+       
 
         // Pre-size the map if possible
         final Map<String, Map<String, CarrierCircle>> lTempMscCodes = createOptimizedMap(aResultSet);
@@ -96,14 +95,12 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
         // Atomic swap of the map reference
         if (!lTempMscCodes.isEmpty()) {
             mCarrierCircleMap = new ConcurrentHashMap<>(lTempMscCodes);
-            if (log.isInfoEnabled()) {
-                log.info("Loaded " + totalCount + " carrier circle records in " + 
+            	MemoryLoaderLog.log("Loaded " + totalCount + " carrier circle records in " + 
                         (System.currentTimeMillis() - overallStartTime) + "ms");
-            }
+           
         }
         
         totalProcessed.set(totalCount);
-        MemoryLoaderLog.log(this.getClass().getSimpleName() + " - Completed: " + totalCount + " records");
     }
 
     private Map<String, Map<String, CarrierCircle>> createOptimizedMap(ResultSet rs) throws SQLException {
@@ -122,7 +119,7 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
             }
         } catch (SQLException e) {
             // Ignore - use default size
-            log.debug("Could not estimate result set size, using default");
+        	MemoryLoaderLog.log("Could not estimate result set size, using default");
         }
         
         return new HashMap<>(estimatedSize + estimatedSize/4); // 25% extra capacity
@@ -178,7 +175,7 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
             lastCpuCheck = currentTime;
             currentCpuUsage = estimateCpuUsage();
             if (currentCpuUsage > CPU_THRESHOLD) {
-                log.warn("High CPU usage detected: " + currentCpuUsage + "%, increasing throttling");
+            	MemoryLoaderLog.log("High CPU usage detected: " + currentCpuUsage + "%, increasing throttling");
                 return true;
             }
         }
@@ -206,10 +203,9 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
         
         // Efficient logging - only log every 1000 records or every 5 seconds
         if (totalCount % 1000 == 0 || System.currentTimeMillis() - overallStartTime > 5000) {
-            if (log.isDebugEnabled()) {
-                log.debug("Processed " + totalCount + " records, elapsed: " + 
-                         (System.currentTimeMillis() - overallStartTime) + "ms");
-            }
+            //	MemoryLoaderLog.log("Processed " + totalCount + " records, elapsed: " + 
+             //            (System.currentTimeMillis() - overallStartTime) + "ms");
+            
         }
     }
 
@@ -256,7 +252,7 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
             return memoryUsage * 100;
             
         } catch (Exception e) {
-            log.debug("Error estimating CPU usage", e);
+        	MemoryLoaderLog.log("Error estimating CPU usage"+ ErrorMessage.getStackTraceAsString(e));
             return 50.0; // Conservative default
         }
     }
