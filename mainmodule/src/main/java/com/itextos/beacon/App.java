@@ -115,6 +115,7 @@ public class App {
 		if(module.equals("japi")) {
 			
 			try {
+				init();
 				ReactiveQSRequestReader.initSMS();
 			} catch (Exception e) {
 				// TODO Auto-generated catch block
@@ -135,7 +136,7 @@ public class App {
 		
 		DebugLog.log("module : "+module);
 
-		init();
+		
 		
 		if(!isMW(module,args)) {
 			
