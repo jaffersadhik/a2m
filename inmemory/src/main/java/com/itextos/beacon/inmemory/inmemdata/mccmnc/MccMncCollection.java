@@ -17,7 +17,7 @@ public class MccMncCollection
     // Configuration constants - can be externalized to properties
     private static final int BATCH_SIZE = 100;
     private static final int YIELD_FREQUENCY = 50;
-    private static final long MAX_BATCH_TIME_MS = 2000; // Reduced from 5s to 2s
+    private static final long MAX_BATCH_TIME_MS = 500; // Reduced from 5s to 2s
     private static final long THROTTLE_DELAY_MS = 50;   // Small delay between batches
     private static final double CPU_THRESHOLD = 80.0;
     private static final int MAX_ROWS_BEFORE_YIELD = 1000;
