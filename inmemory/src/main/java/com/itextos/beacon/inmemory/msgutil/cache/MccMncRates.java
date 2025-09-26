@@ -16,7 +16,7 @@ public class MccMncRates
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
-	private static final int BATCH_SIZE = 1000;
+	private static final int BATCH_SIZE = 50;
 
     // CUSTOMER_INTL_CREDITS
     private static final Log          log                     = LogFactory.getLog(MccMncRates.class);

@@ -14,7 +14,7 @@ public class MccMncCollection
         AbstractAutoRefreshInMemoryProcessor
 {
 	
-	private static final int BATCH_SIZE = 1000;
+	private static final int BATCH_SIZE = 50;
 
 
     private final Map<String, MccMncInfo> mMccMncData = new HashMap<>();

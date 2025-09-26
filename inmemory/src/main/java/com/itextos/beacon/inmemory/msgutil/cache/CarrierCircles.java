@@ -15,7 +15,7 @@ public class CarrierCircles
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
-	private static final int BATCH_SIZE = 1000;
+	private static final int BATCH_SIZE = 50;
 
     private static final Log                        log               = LogFactory.getLog(CarrierCircles.class);
     private Map<String, Map<String, CarrierCircle>> mCarrierCircleMap = new HashMap<>();

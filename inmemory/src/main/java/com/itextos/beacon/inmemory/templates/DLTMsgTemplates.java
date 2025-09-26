@@ -20,7 +20,7 @@ public class DLTMsgTemplates
         extends
         AbstractAutoRefreshInMemoryProcessor
 {
-	private static final int BATCH_SIZE = 1000;
+	private static final int BATCH_SIZE = 50;
 
     private static final Log                     log             = LogFactory.getLog(DLTMsgTemplates.class);
 
