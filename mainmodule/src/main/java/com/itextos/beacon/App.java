@@ -6,6 +6,7 @@ import java.io.IOException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.WebApplicationType;
 import org.springframework.boot.actuate.autoconfigure.security.servlet.ManagementWebSecurityAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
@@ -15,6 +16,7 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfi
 import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAutoConfiguration;
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
+import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
@@ -29,7 +31,8 @@ import com.itextos.beacon.smslog.TimeTakenLog;
 	    SecurityAutoConfiguration.class,
 	    UserDetailsServiceAutoConfiguration.class,
 	    SecurityFilterAutoConfiguration.class,
-	    ManagementWebSecurityAutoConfiguration.class  // Add this line
+	    ManagementWebSecurityAutoConfiguration.class,
+	    WebMvcAutoConfiguration.class// Add this line
 	})
 public class App {
 
@@ -95,9 +98,10 @@ public class App {
 	public static void main(String[] args) throws IOException {
 		
 		
-        SpringApplication.run(App.class, args);
+        SpringApplication application = new SpringApplication(App.class);
+        application.setWebApplicationType(WebApplicationType.REACTIVE);
+        application.run(args);
 
-		
 		long start=System.currentTimeMillis();
 	
 		createfolder();
