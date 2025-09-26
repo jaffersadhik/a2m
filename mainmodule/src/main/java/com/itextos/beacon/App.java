@@ -25,6 +25,7 @@ import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.TimeTakenLog;
+import com.itextos.beacon.web.generichttpapi.controller.ReactiveQSRequestReader;
 
 @SpringBootApplication(exclude = {
 	    DataSourceAutoConfiguration.class,
@@ -109,8 +110,17 @@ public class App {
 		*/
     }
 	public static void main(String[] args) throws IOException {
-		
-		
+		String module=System.getenv("module");
+
+		if(module.equals("japi")) {
+			
+			try {
+				ReactiveQSRequestReader.initSMS();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
         SpringApplication application = new SpringApplication(App.class);
         application.setWebApplicationType(WebApplicationType.REACTIVE);
         application.run(args);
@@ -120,7 +130,6 @@ public class App {
 		createfolder();
 
 		
-		String module=System.getenv("module");
 		
 		System.out.println("module : "+module);
 		
