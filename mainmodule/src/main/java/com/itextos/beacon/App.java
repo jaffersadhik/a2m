@@ -111,6 +111,7 @@ public class App {
     }
 	public static void main(String[] args) throws IOException {
 		String module=System.getenv("module");
+		createfolder();
 
 		if(module.equals("japi")) {
 			
@@ -128,8 +129,7 @@ public class App {
 
 		long start=System.currentTimeMillis();
 	
-		createfolder();
-
+		
 		
 		
 		System.out.println("module : "+module);

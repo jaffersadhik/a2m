@@ -129,7 +129,7 @@ public class MccMncCollection
         
         // Check for timeout conditions
         if (System.currentTimeMillis() - startTime > 30000) { // 30 second overall timeout
-            MemoryLoaderLog.log("Processing taking too long, consider optimizing query or reducing load");
+        //    MemoryLoaderLog.log("Processing taking too long, consider optimizing query or reducing load");
         }
     }
 
