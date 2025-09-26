@@ -281,20 +281,5 @@ public class CarrierCircles extends AbstractAutoRefreshInMemoryProcessor {
         totalProcessed.set(0);
     }
     
-    // Static helper for CarrierCircle creation optimization
-    private static class CarrierCircle {
-        public static final CarrierCircle DEFAULT_CARRIER_CIRCLE = new CarrierCircle("DEFAULT", "DEFAULT");
-        
-        private final String carrier;
-        private final String circle;
-        
-        public CarrierCircle(String carrier, String circle) {
-            this.carrier = carrier;
-            this.circle = circle;
-        }
-        
-        // Add getters if needed
-        public String getCarrier() { return carrier; }
-        public String getCircle() { return circle; }
-    }
+   
 }
