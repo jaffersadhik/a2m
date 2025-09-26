@@ -45,6 +45,8 @@ public class DLTMsgTemplatePrefixSuffix
     	
         int count = 0;
 
+        long startTime = System.currentTimeMillis();
+
         if (log.isDebugEnabled())
             log.debug("Calling the resultset process of " + this.getClass());
 
@@ -63,6 +65,18 @@ public class DLTMsgTemplatePrefixSuffix
             // Process in batches to reduce memory pressure
             if (count % BATCH_SIZE == 0) {
                 // Optional: yield thread to prevent CPU monopolization
+            	
+            	if (System.currentTimeMillis() - startTime > 5000) { // 5 second threshold
+                    log.warn("Processing too slow, yielding to prevent CPU spike");
+                    try {
+                        Thread.sleep(1000); // 1 second break
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                    startTime = System.currentTimeMillis();
+                }
+            	
                 Thread.yield();
             }
         }

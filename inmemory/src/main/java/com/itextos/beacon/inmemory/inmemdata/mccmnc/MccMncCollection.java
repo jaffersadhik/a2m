@@ -30,6 +30,8 @@ public class MccMncCollection
             ResultSet aResultSet)
             throws SQLException
     {
+        long startTime = System.currentTimeMillis();
+
         int count = 0;
 
         while (aResultSet.next())
@@ -41,6 +43,16 @@ public class MccMncCollection
             
             // Process in batches to reduce memory pressure
             if (count % BATCH_SIZE == 0) {
+            	
+            	if (System.currentTimeMillis() - startTime > 5000) { // 5 second threshold
+                    try {
+                        Thread.sleep(1000); // 1 second break
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        break;
+                    }
+                    startTime = System.currentTimeMillis();
+                }
                 // Optional: yield thread to prevent CPU monopolization
                 Thread.yield();
             }
