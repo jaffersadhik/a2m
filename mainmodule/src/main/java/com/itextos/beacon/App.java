@@ -2,6 +2,10 @@ package com.itextos.beacon;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,11 +22,14 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAut
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.platform.subbiller.processor.BillerProcessor;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.TimeTakenLog;
 import com.itextos.beacon.web.generichttpapi.controller.ReactiveQSRequestReader;
@@ -108,7 +115,7 @@ public class App {
 			e.printStackTrace();
 		}
 		*/
-    }
+    }/*
 	public static void main(String[] args) throws IOException {
 		String module=System.getenv("module");
 		createfolder();
@@ -186,7 +193,120 @@ public class App {
 		
 		TimeTakenLog.log("Time Taken for Start : "+(end-start)/1000+" seconds");
 	}
-	
+	*/
+    
+    
+    public static void main(String[] args) throws IOException {
+        long start = System.currentTimeMillis();
+        
+        // Early environment setup
+        String module = System.getenv("module");
+        System.setProperty("spring.main.lazy-initialization", "true");
+        System.setProperty("spring.datasource.hikari.maximum-pool-size", "2");
+        System.setProperty("spring.jmx.enabled", "false");
+        
+        createfolder();
+        
+        // Module-specific initialization with throttling
+        if ("japi".equals(module)) {
+            throttleStartup("japi-init", 2000); // 2-second delay before init
+            try {
+                init();
+                ReactiveQSRequestReader.initSMS();
+            } catch (Exception e) {
+                System.err.println("JAPI initialization failed: " + e.getMessage());
+                e.printStackTrace();
+            }
+        }
+        
+        // Start Spring application with minimal footprint
+        SpringApplication application = new SpringApplication(App.class);
+        application.setWebApplicationType(WebApplicationType.REACTIVE);
+        application.setLazyInitialization(true);
+        application.setLogStartupInfo(false);
+        
+        // Reduce Spring startup overhead
+        ConfigurableApplicationContext context = application.run(args);
+        
+        processModuleLegacy(module,args);
+        
+        
+        addShutdownHook();
+        
+        long end = System.currentTimeMillis();
+        TimeTakenLog.log("Startup completed in: " + (end - start) + " ms");
+    }
+
+    // Add these helper methods to your class:
+
+    /**
+     * Throttles CPU usage during startup with adaptive delays
+     */
+    private static void throttleStartup(String phase, long baseDelay) {
+        try {
+            // Adaptive delay based on system load
+            long delay = calculateAdaptiveDelay(phase, baseDelay);
+            Thread.sleep(delay);
+            
+            // Yield CPU to prevent monopolization
+            Thread.yield();
+            
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    private static long calculateAdaptiveDelay(String phase, long baseDelay) {
+        // Simple CPU load detection
+        Runtime runtime = Runtime.getRuntime();
+        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
+        double memoryPressure = (double) usedMemory / runtime.maxMemory();
+        
+        // Increase delay if system is under memory pressure
+        if (memoryPressure > 0.7) {
+            return baseDelay * 2;
+        }
+        
+        return baseDelay;
+    }
+
+   
+
+    // Interface for module processors
+    private interface ModuleProcessor {
+        void process(String module, String[] args, ConfigurableApplicationContext context);
+    }
+
+    // Example processor implementation
+    private static class MWProcessor implements ModuleProcessor {
+        @Override
+        public void process(String module, String[] args, ConfigurableApplicationContext context) {
+            DebugLog.log("Processing MW module configuration");
+            // MW-specific initialization
+        }
+    }
+
+    // Add similar implementations for other modules...
+
+    /**
+     * Optimized version of your existing nested if-else logic
+     * (keeping original structure but more efficient)
+     * @throws IOException 
+     */
+    private static boolean processModuleLegacy(String module, String[] args) throws IOException {
+        if (module == null) return false;
+        
+        // Single return point with efficient checks
+        return isMW(module, args) || 
+               isBiller(module, args) || 
+               isAux(module, args) || 
+               isSMPP(module, args) || 
+               isALL(module, args) || 
+               isMWALL(module, args) || 
+               isAllBiller(module, args) || 
+               isAllDNPost(module, args) || 
+               isAllSingleTon(module, args);
+    }
 	 private static void init() {
 
 		 com.itextos.beacon.web.generichttpapi.controller.InitServlet.init();
