@@ -17,6 +17,9 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAut
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
+import org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory;
+import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
+import org.springframework.context.annotation.Bean;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
@@ -39,6 +42,15 @@ public class App {
     private static final Log                log                               = LogFactory.getLog(App.class);
 
     private static boolean IS_START_PROMETHEUS=false;
+    
+    
+ // Prevent Tomcat from starting
+    @Bean
+    public ServletWebServerFactory servletWebServerFactory() {
+        return new org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory(0) {
+            // This will create a factory that doesn't actually start a server
+        };
+    }
     
     public static void foldercreaton(String folderPath) {
         
