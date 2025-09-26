@@ -4,6 +4,7 @@ import java.util.Map;
 
 import com.itextos.beacon.interfaces.generichttpapi.processor.reader.QSRequestReader;
 import com.itextos.beacon.interfaces.generichttpapi.processor.reader.RequestReader;
+import com.itextos.beacon.smslog.QSReceiverLog;
 
 public class ReactiveQSRequestReader {
 
@@ -22,6 +23,10 @@ public class ReactiveQSRequestReader {
 	}
 
 	public String processRequest() throws Exception {
+
+        QSReceiverLog.log("params : "+params);
+        QSReceiverLog.log("method : "+method);
+        QSReceiverLog.log("requestType : "+requestType);
 
 		 final RequestReader reader = new QSRequestReader( params,  method,  requestType,stringBuffer);
 	        

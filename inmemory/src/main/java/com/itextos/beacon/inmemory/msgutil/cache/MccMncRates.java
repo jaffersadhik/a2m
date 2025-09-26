@@ -9,6 +9,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.utility.CommonUtility;
+import com.itextos.beacon.errorlog.MemoryLoaderLog;
 import com.itextos.beacon.inmemory.loader.process.AbstractAutoRefreshInMemoryProcessor;
 import com.itextos.beacon.inmemory.loader.process.InmemoryInput;
 
@@ -83,6 +84,9 @@ public class MccMncRates
                     }
                     startTime = System.currentTimeMillis();
                 }
+            	
+            	MemoryLoaderLog.log(this.getClass().getName());
+
                 // Optional: yield thread to prevent CPU monopolization
                 Thread.yield();
             }
