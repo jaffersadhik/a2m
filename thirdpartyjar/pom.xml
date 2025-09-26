@@ -45,13 +45,13 @@
 			<groupId>commons-logging</groupId>
 			<artifactId>commons-logging</artifactId>
 			<version>${commons-logging-version}</version>
-		</dependency> -->
+		</dependency> 
 		<dependency>
     <groupId>javax.servlet</groupId>
     <artifactId>javax.servlet-api</artifactId>
-    <version>4.0.1</version>  <!-- You can use the latest version of the javax.servlet-api -->
-    <scope>provided</scope>  <!-- This ensures it's provided by the container, like Tomcat or WildFly -->
-</dependency>
+    <version>4.0.1</version> 
+    <scope>provided</scope>  
+</dependency> -->
 <!-- Alternatively, you can use this newer implementation -->
     <dependency>
         <groupId>org.glassfish.jaxb</groupId>
