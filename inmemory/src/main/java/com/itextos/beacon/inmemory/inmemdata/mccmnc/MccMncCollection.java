@@ -124,7 +124,7 @@ public class MccMncCollection
         
         // Log progress periodically (reduced frequency to save CPU)
         if (totalCount % 500 == 0) {
-            MemoryLoaderLog.log(this.getClass().getName() + " - Processed " + totalCount + " records");
+           // MemoryLoaderLog.log(this.getClass().getName() + " - Processed " + totalCount + " records");
         }
         
         // Check for timeout conditions
