@@ -62,8 +62,8 @@ public abstract class InmemoryProcessor
          //   doWithPagination();
         	doWithoutPagination();
         	
-            DEFAULT_PAGE_SIZE = 100;
-            DEFAULT_FETCH_SIZE = 100;
+            DEFAULT_PAGE_SIZE = 50;
+            DEFAULT_FETCH_SIZE = 50;
         } else {
             doWithoutPagination();
         }
