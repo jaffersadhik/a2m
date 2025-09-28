@@ -71,14 +71,9 @@ public class AccountInfo extends AbstractAutoRefreshInMemoryProcessor {
 
        
 
-        // Pre-sized maps for optimal performance
-        Map<String, UserInfo> tempUserPassMap = new HashMap<>(estimateInitialCapacity(resultSet));
-        Map<String, UserInfo> tempAccessKeyMap = new HashMap<>(estimateInitialCapacity(resultSet));
-        Map<String, UserInfo> tempClientIdMap = new HashMap<>(estimateInitialCapacity(resultSet));
-
-        try {
+            try {
             while (resultSet.next()) {
-                if (processSingleRecord(resultSet, tempUserPassMap, tempAccessKeyMap, tempClientIdMap)) {
+                if (processSingleRecord(resultSet)) {
                     processedCount++;
                     batchCounter++;
                 }
@@ -98,7 +93,7 @@ public class AccountInfo extends AbstractAutoRefreshInMemoryProcessor {
             }
         } finally {
             // Atomic swap of maps
-            updateMaps(tempUserPassMap, tempAccessKeyMap, tempClientIdMap, processedCount, startTime);
+          //  updateMaps(tempUserPassMap, tempAccessKeyMap, tempClientIdMap, processedCount, startTime);
         }
     }
 
@@ -122,10 +117,7 @@ public class AccountInfo extends AbstractAutoRefreshInMemoryProcessor {
         return 256; // Reasonable default
     }
 
-    private boolean processSingleRecord(ResultSet rs, 
-                                      Map<String, UserInfo> userMap,
-                                      Map<String, UserInfo> accessMap,
-                                      Map<String, UserInfo> clientMap) throws SQLException {
+    private boolean processSingleRecord(ResultSet rs) throws SQLException {
         try {
             String clientId = rs.getString(COL_INDEX_CLIENT_ID);
             if (clientId == null || clientId.trim().isEmpty()) {
@@ -151,11 +143,11 @@ public class AccountInfo extends AbstractAutoRefreshInMemoryProcessor {
             UserInfo userInfo = new UserInfo(clientId, userName, decryptedApiPass, decryptedSmppPass, status);
 
             // Batch map operations
-            userMap.put(userName, userInfo);
-            clientMap.put(clientId, userInfo);
+            userPassMap.put(userName, userInfo);
+            clientIdMap.put(clientId, userInfo);
 
             if (decryptedApiPass != null && !decryptedApiPass.isEmpty()) {
-                accessMap.put(decryptedApiPass, userInfo);
+            	accessKeyMap.put(decryptedApiPass, userInfo);
             }
 
             return true;

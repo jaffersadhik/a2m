@@ -13,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.commondbpool.DBDataSourceFactory;
+import com.itextos.beacon.inmemdata.account.dao.AccountInfo;
 import com.itextos.beacon.inmemory.inmemdata.mccmnc.MccMncCollection;
 
 public abstract class InmemoryProcessor
@@ -28,8 +29,8 @@ public abstract class InmemoryProcessor
     private boolean          isFirstTime = true;
     
     // Pagination constants - can be made configurable
-    private static final int DEFAULT_PAGE_SIZE = 1000;
-    private static final int DEFAULT_FETCH_SIZE = 1000;
+    private static  int DEFAULT_PAGE_SIZE = 1000;
+    private static  int DEFAULT_FETCH_SIZE = 1000;
 
     protected InmemoryProcessor(
             InmemoryInput aInmemoryInputDetail)
@@ -57,6 +58,11 @@ public abstract class InmemoryProcessor
     	
         if(this instanceof MccMncCollection) {
             doWithPagination();
+        }else if (this instanceof AccountInfo) {
+            doWithPagination();
+            
+            DEFAULT_PAGE_SIZE = 100;
+            DEFAULT_FETCH_SIZE = 100;
         } else {
             doWithoutPagination();
         }
