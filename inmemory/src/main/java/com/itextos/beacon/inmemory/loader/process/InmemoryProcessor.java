@@ -63,7 +63,14 @@ public abstract class InmemoryProcessor
             DEFAULT_PAGE_SIZE = 50;
             DEFAULT_FETCH_SIZE = 50;
         	
-        	doWithoutPagination();
+       // 	doWithoutPagination();
+            
+            try {
+				new InmemoryProcessorAccountsView(mInmemoryInput,(AccountInfo) this).doWithPagination();
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
         	
      
         } else {
