@@ -74,68 +74,65 @@ public abstract class InmemoryProcessor
 	}
 
 	protected void doWithPagenation() {
-    	
-    	 int pageNumber = 0;
-         boolean hasMoreData = true;
-         
-         try (
-                 Connection con = DBDataSourceFactory.getConnection(mInmemoryInput.getJNDIInfo());)
-         {
-             while (hasMoreData) {
-                 hasMoreData = processPage(con, pageNumber);
-                 pageNumber++;
-             }
-             isFirstTime = false;
-         }
-         catch (final Exception e)
-         {
-             log.error("ignorable Exception. Exception while doing inmemory load of '" + mInmemoryInput.getInmemoryId() + "'", e);
+	    int pageNumber = 0;
+	    boolean hasMoreData = true;
+	    
+	    // ✅ Single connection for all pages
+	    try (Connection connection = DBDataSourceFactory.getConnection(mInmemoryInput.getJNDIInfo())) {
+	        
+	        while (hasMoreData) {
+	            // ✅ Process page and check if more data exists
+	            hasMoreData = processPage(connection, pageNumber);
+	            pageNumber++;
+	            
+	            log.debug("Processed page " + pageNumber + ", hasMoreData: " + hasMoreData);
+	        }
+	        
+	        isFirstTime = false;
+	        log.info("Completed processing all pages. Total pages: " + pageNumber);
+	        
+	    } catch (final Exception e) {
+	        log.error("Exception during inmemory load of '" + mInmemoryInput.getInmemoryId() + "'", e);
+	        
+	        if (isFirstTime) {
+	            log.error("Initial load failed, stopping application", e);
+	            System.exit(-9);
+	        }
+	    }}
 
-             if (isFirstTime)
-             {
-                 log.error("Since the initial load has failed, stopping the application for " + mInmemoryInput, e);
-                 System.exit(-9);
-             }
-         }
-    }
-
-	/**
-     * Process a single page of data
-     * @param connection Database connection
-     * @param pageNumber Current page number (0-based)
-     * @return true if more data is available, false otherwise
-     */
-    private boolean processPage(Connection connection, int pageNumber) {
-        int pageSize = getPageSize();
-        int offset = pageNumber * pageSize;
-        
-        String paginatedSQL = addPaginationToSQL(mInmemoryInput.getSQL(), offset, pageSize);
-        
-        try (
-                PreparedStatement pstmt = connection.prepareStatement(paginatedSQL, 
-                    ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
-                ResultSet mResultSet = pstmt.executeQuery();)
-        {
-            pstmt.setFetchSize(getFetchSize());
-            
-            boolean hasData = false;
-            int rowCount = 0;
-            
-            // Process the result set for this page
-            processResultSet(mResultSet);
-            
-            // Check if we got a full page (meaning there might be more data)
-            // Note: This is a simple approach - we process the page and assume 
-            // if we asked for pageSize rows, there might be more
-            return true; // We'll process until no more rows are returned
-        }
-        catch (final SQLException e)
-        {
-            log.error("Error processing page " + pageNumber + " for inmemory load of '" + 
-                     mInmemoryInput.getInmemoryId() + "'", e);
-            throw new RuntimeException("Failed to process page " + pageNumber, e);
-        }
-    }
+	private boolean processPage(Connection connection, int pageNumber) {
+	    int pageSize = getPageSize();
+	    int offset = pageNumber * pageSize;
+	    
+	    String paginatedSQL = addPaginationToSQL(mInmemoryInput.getSQL(), offset, pageSize);
+	    
+	    try (PreparedStatement pstmt = connection.prepareStatement(paginatedSQL, 
+	            ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
+	         ResultSet resultSet = pstmt.executeQuery()) {
+	        
+	        pstmt.setFetchSize(getFetchSize());
+	        
+	        int rowCount = 0;
+	        boolean hasData = false;
+	        
+	        // Process results and count rows
+	        while (resultSet.next()) {
+	            processSingleRow(resultSet); // Or your processing logic
+	            rowCount++;
+	            hasData = true;
+	        }
+	        
+	        // ✅ Proper pagination logic:
+	        // - If we got a full page, there might be more data
+	        // - If we got less than a full page, this is the last page
+	        return rowCount == pageSize;
+	        
+	    } catch (final SQLException e) {
+	        log.error("Error processing page " + pageNumber + " for inmemory load of '" + 
+	                 mInmemoryInput.getInmemoryId() + "'", e);
+	        throw new RuntimeException("Failed to process page " + pageNumber, e);
+	    }
+	}
     
     /**
      * Adds pagination to the SQL query based on database type
