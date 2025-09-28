@@ -15,7 +15,7 @@ public class MccMncCollection
         AbstractAutoRefreshInMemoryProcessor
 {
     // Configuration constants - can be externalized to properties
-    private static final int BATCH_SIZE = 10000;
+    private static final int BATCH_SIZE = 100;
     private static final int YIELD_FREQUENCY = 50;
     private static final long MAX_BATCH_TIME_MS = 10000; // Reduced from 5s to 2s
     private static final long THROTTLE_DELAY_MS = 50;   // Small delay between batches
@@ -43,16 +43,7 @@ public class MccMncCollection
         int count = 0;
         int totalCount = 0;
 
-        // Pre-size map if we know approximate size (optional optimization)
-        if (aResultSet.getType() != ResultSet.TYPE_FORWARD_ONLY) {
-            aResultSet.last();
-            int estimatedSize = aResultSet.getRow();
-            if (estimatedSize > 0) {
-            //    mMccMncData.clear();
-           //     mMccMncData = new HashMap<>(estimatedSize + estimatedSize/4); // 25% extra capacity
-                aResultSet.beforeFirst();
-            }
-        }
+        
 
         while (aResultSet.next())
         {
