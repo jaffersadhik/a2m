@@ -73,7 +73,8 @@ public abstract class InmemoryProcessor
     	
     	 try (
                  Connection con = DBDataSourceFactory.getConnection(mInmemoryInput.getJNDIInfo());
-                 PreparedStatement pstmt = con.prepareStatement("select count(*) cnt from "+tablename);
+                 PreparedStatement pstmt = con.prepareStatement("select count(*) cnt from "+tablename, 
+                         ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                  ResultSet mResultSet = pstmt.executeQuery();)
          {
             
