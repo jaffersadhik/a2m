@@ -47,7 +47,7 @@ public abstract class InmemoryProcessor
                 PreparedStatement pstmt = con.prepareStatement(mInmemoryInput.getSQL(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                 ResultSet mResultSet = pstmt.executeQuery();)
         {
-            // pstmt.setFetchSize(1000);
+            pstmt.setFetchSize(1000);
             processResultSet(mResultSet);
             isFirstTime = false;
         }
@@ -72,7 +72,7 @@ public abstract class InmemoryProcessor
             hasMoreData = processPageWithNewConnection(pageNumber);
             pageNumber++;
             try {
-				Thread.sleep(1);
+				Thread.sleep(500);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
