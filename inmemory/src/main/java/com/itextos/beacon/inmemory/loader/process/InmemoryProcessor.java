@@ -4,6 +4,10 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -17,6 +21,8 @@ public abstract class InmemoryProcessor
 {
 
     private static final Log log         = LogFactory.getLog(InmemoryProcessor.class);
+    
+   public static Map<String,Map<String,String>> TABLESUMMARY =new HashMap<String,Map<String,String>>();
 
     protected InmemoryInput  mInmemoryInput;
     private boolean          isFirstTime = true;
@@ -34,13 +40,61 @@ public abstract class InmemoryProcessor
     @Override
     public void getDataFromDB()
     {
+    	long start=System.currentTimeMillis();
+    	
+    	Map<String,String> data=TABLESUMMARY.get(mInmemoryInput.getInmemoryProcessClassName());
+    	
+    	if(data==null) {
+    		
+    		data=new HashMap<String,String>();
+    		
+    		TABLESUMMARY.put(mInmemoryInput.getInmemoryProcessClassName(), data);
+    		    		
+    	}
+    	
+    	data.put("recordcount", ""+getCount(getFirstTableName(mInmemoryInput.getSQL())));
+    	data.put("tablename", getFirstTableName(mInmemoryInput.getSQL()));
+    	
         if(this instanceof MccMncCollection) {
             doWithPagination();
         } else {
             doWithoutPagination();
         }
+        
+    	long end=System.currentTimeMillis();
+    	
+    	data.put("timetakenforfetch", ""+(end-start)+" in ms");
+
+
     }
 
+    private int getCount(String tablename) {
+    	
+    	
+    	 try (
+                 Connection con = DBDataSourceFactory.getConnection(mInmemoryInput.getJNDIInfo());
+                 PreparedStatement pstmt = con.prepareStatement("select count(*) cnt from "+tablename);
+                 ResultSet mResultSet = pstmt.executeQuery();)
+         {
+            
+    		 if(mResultSet.next()) {
+    			 
+    			 return mResultSet.getInt("cnt");
+    		 }
+         }
+         catch (final Exception e)
+         {
+             log.error("ignorable Exception. Exception while doing inmemory load of '" + mInmemoryInput.getInmemoryId() + "'", e);
+
+             if (isFirstTime)
+             {
+                 log.error("Since the initial load has failed, stopping the application for " + mInmemoryInput, e);
+                 System.exit(-9);
+             }
+         }
+    	 
+    	 return 0;
+    }
     private void doWithoutPagination() {
         try (
                 Connection con = DBDataSourceFactory.getConnection(mInmemoryInput.getJNDIInfo());
@@ -295,5 +349,23 @@ public abstract class InmemoryProcessor
                 getDataFromDB();
             }
         }
+    
+    }
+    
+    public static String getFirstTableName(String sql) {
+        if (sql == null) return null;
+        
+        // Simple regex to find table after FROM
+        Pattern pattern = Pattern.compile(
+            "FROM\\s+(\\w+)", 
+            Pattern.CASE_INSENSITIVE
+        );
+        
+        Matcher matcher = pattern.matcher(sql);
+        if (matcher.find()) {
+            return matcher.group(1);
+        }
+        
+        return null;
     }
 }
