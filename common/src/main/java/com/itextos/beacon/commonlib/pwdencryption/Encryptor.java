@@ -1,6 +1,7 @@
 package com.itextos.beacon.commonlib.pwdencryption;
 
 import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 
 import com.itextos.beacon.commonlib.constants.Constants;
@@ -46,6 +47,7 @@ public class Encryptor
         return returnValue;
     }
 
+    
     public static String decrypt(
             CryptoType aCryptoType,
             String aToDecrypt,
@@ -78,6 +80,26 @@ public class Encryptor
         return returnValue;
     }
 
+    
+    
+  
+    
+    
+    private static String optimizedBase64Decode(String encoded) throws ItextosRuntimeException {
+        if (encoded == null || encoded.isEmpty()) {
+            return encoded;
+        }
+        
+        try {
+            // ✅ Use direct byte array conversion instead of String constructor
+            byte[] decodedBytes = Base64.getDecoder().decode(encoded);
+            return new String(decodedBytes, StandardCharsets.UTF_8);
+            
+        } catch (IllegalArgumentException e) {
+            // Handle invalid Base64 input
+            throw new ItextosRuntimeException("Invalid Base64 input: " + encoded, e);
+        }
+    }
     public static EncryptedObject getEncryptedDbPassword(
             String aDbPassword)
             throws Exception
@@ -166,34 +188,37 @@ public class Encryptor
     
         	}*/
 
-        	  String lDecryptedSmppPassword = getSmppDecryptedPassword("peXPpbZzTtAfEVUwLly42jE5dlpqRzNpZ0U9i6H8vjvYlz31IrGJl7qC");
+        	long start=System.currentTimeMillis();
+        	//  String lDecryptedSmppPassword = getSmppDecryptedPassword("peXPpbZzTtAfEVUwLly42jE5dlpqRzNpZ0U9i6H8vjvYlz31IrGJl7qC");
            //    System.out.println("sss: "+lDecryptedSmppPassword);//Pf5X7wpt  //  hs+ItzXLENtN1DfrvK1teWxlYjFhdWpCYkRtdo3iEJ+IRekwl8/G7fn3
 
         	
         	  String lApiPassword = getApiDecryptedPassword("46AsqfI5S3lclHDF4GbXe0YyZkp5SVhWdWeN7Iin9T5APveHY+CtB1ir");
           //   System.out.println(lApiPassword);//WPzDMqbaVqG8  // i1GTPzBhdrTTErUi2F6U629SVVNLNWF3dFZYTXn/pv6C3V77YZLFNXYY
-             
+        	  long end=System.currentTimeMillis(); 
 
-         	 //pinnacle1
-         	  lDecryptedSmppPassword = getDecryptedDbPassword("YSrU1+RIM5hwN+ycQQdy4XhlOGhoU3RrYmtELgjZwSBQBXSHJ8AUHk/I");
+        	  System.out.println("Time Taken "+(end-start));
+         	 /*
+        	  lDecryptedSmppPassword = getDecryptedDbPassword("YSrU1+RIM5hwN+ycQQdy4XhlOGhoU3RrYmtELgjZwSBQBXSHJ8AUHk/I");
 
          	
                System.out.println(lDecryptedSmppPassword);// 7R8es6Dg  //  i1GTPzBhdrTTErUi2F6U629SVVNLNWF3dFZYTXn/pv6C3V77YZLFNXYY
 
                 lApiPassword = getApiDecryptedPassword("2Sdu9dt/vgQ/E5/VkUJtz2w2bmltTFBaUkt4iDJjHQNrj8628IGDVD8c");
-             //   System.out.println(lApiPassword);// b0vlFpgZ7Pm6 ,7zhFMHs49ziY,ftW0BphOQQtG // u0SE1rkBCPmKvC+5LsiLCnpzOERjSXM0RXY5Gcqxmf/02rqv4MX5mB8H
+                System.out.println(lApiPassword);// b0vlFpgZ7Pm6 ,7zhFMHs49ziY,ftW0BphOQQtG // u0SE1rkBCPmKvC+5LsiLCnpzOERjSXM0RXY5Gcqxmf/02rqv4MX5mB8H
                   
                   
-            // $2a$10$QZbSGc10EcUdBX9Z00Hmgepw5RK8RFaP4xPbcZX87GEWddoUGHna.
-        	// gui ; EncryptedObject [mActualString=HyePFO6oNqNz, mEncryptedWithIvAndSalt=$2a$10$d8jxByZmbR2ZFziViQbSneaGzPJ5rs/R.c8J6n1OyvBm8zrVhrHpa]
+             $2a$10$QZbSGc10EcUdBX9Z00Hmgepw5RK8RFaP4xPbcZX87GEWddoUGHna.
+        	 gui ; EncryptedObject [mActualString=HyePFO6oNqNz, mEncryptedWithIvAndSalt=$2a$10$d8jxByZmbR2ZFziViQbSneaGzPJ5rs/R.c8J6n1OyvBm8zrVhrHpa]
 
-           //  System.out.println(" gui : "+getGuiPassword("test@123"));// $2a$10$bOcAL/Bp4sEeMrZM0IJfVueXiux3UJT5JzmlT1Bx5YPSQDJE8RwFi
-         	//
+            System.out.println(" gui : "+getGuiPassword("test@123"));// $2a$10$bOcAL/Bp4sEeMrZM0IJfVueXiux3UJT5JzmlT1Bx5YPSQDJE8RwFi
+         
+         	
              lApiPassword = getApiDecryptedPassword("O3qFcs1c5VVFk3++2mG3D0FrMUxWdGtkcUplWxQtjQmiXylt8NDgNRj+");
-             //
-        //     System.out.println(lApiPassword);//LSIqeA3pGMsi
-        	
             
+            System.out.println(lApiPassword);//LSIqeA3pGMsi
+        	
+        */    
              
 
         	 String lDbPassword = getDecryptedDbPassword("N5mIleJjtYx2EFg8+cd3uFpGaUgxdEpKQjde+JBw9AjmsAX7iQEVAvlI");

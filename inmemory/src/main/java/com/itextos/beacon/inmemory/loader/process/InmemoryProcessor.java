@@ -74,7 +74,7 @@ public abstract class InmemoryProcessor
 			}
         	
      */
-        	mInmemoryInput.setSQL("select cli_id, user, ui_pass, api_pass, smpp_pass, acc_status from user_config");
+        //	mInmemoryInput.setSQL("select cli_id, user, ui_pass, api_pass, smpp_pass, acc_status from user_config");
         	
         	doWithoutPagination();
         } else {
