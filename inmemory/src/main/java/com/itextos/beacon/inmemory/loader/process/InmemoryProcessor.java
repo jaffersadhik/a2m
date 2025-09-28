@@ -29,8 +29,8 @@ public abstract class InmemoryProcessor
     private boolean          isFirstTime = true;
     
     // Pagination constants - can be made configurable
-    private static  int DEFAULT_PAGE_SIZE = 1000;
-    private static  int DEFAULT_FETCH_SIZE = 1000;
+    private int DEFAULT_PAGE_SIZE = 1000;
+    private int DEFAULT_FETCH_SIZE = 1000;
 
     protected InmemoryProcessor(
             InmemoryInput aInmemoryInputDetail)
