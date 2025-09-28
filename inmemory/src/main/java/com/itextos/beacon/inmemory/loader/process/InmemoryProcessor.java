@@ -35,7 +35,7 @@ public abstract class InmemoryProcessor
                 PreparedStatement pstmt = con.prepareStatement(mInmemoryInput.getSQL(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                 ResultSet mResultSet = pstmt.executeQuery();)
         {
-        //    pstmt.setFetchSize(1000);
+            pstmt.setFetchSize(1000);
             processResultSet(mResultSet);
             isFirstTime = false;
         }
