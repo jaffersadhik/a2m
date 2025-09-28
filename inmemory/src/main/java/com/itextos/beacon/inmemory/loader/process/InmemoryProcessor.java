@@ -60,10 +60,12 @@ public abstract class InmemoryProcessor
             doWithPagination();
         }else if (this instanceof AccountInfo) {
          //   doWithPagination();
-        	doWithoutPagination();
-        	
             DEFAULT_PAGE_SIZE = 50;
             DEFAULT_FETCH_SIZE = 50;
+        	
+        	doWithoutPagination();
+        	
+     
         } else {
             doWithoutPagination();
         }

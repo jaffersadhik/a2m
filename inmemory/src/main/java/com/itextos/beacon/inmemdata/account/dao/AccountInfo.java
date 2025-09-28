@@ -61,7 +61,7 @@ public class AccountInfo extends AbstractAutoRefreshInMemoryProcessor {
     }
 
     @Override
-    protected void processResultSet(ResultSet resultSet) throws SQLException {
+    public void processResultSet(ResultSet resultSet) throws SQLException {
         if (resultSet == null) return;
 
         long startTime = System.nanoTime();
