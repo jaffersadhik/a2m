@@ -59,8 +59,9 @@ public abstract class InmemoryProcessor
         if(this instanceof MccMncCollection) {
             doWithPagination();
         }else if (this instanceof AccountInfo) {
-            doWithPagination();
-            
+         //   doWithPagination();
+        	doWithoutPagination();
+        	
             DEFAULT_PAGE_SIZE = 100;
             DEFAULT_FETCH_SIZE = 100;
         } else {
@@ -108,7 +109,7 @@ public abstract class InmemoryProcessor
                 PreparedStatement pstmt = con.prepareStatement(mInmemoryInput.getSQL(), ResultSet.TYPE_FORWARD_ONLY, ResultSet.CONCUR_READ_ONLY);
                 ResultSet mResultSet = pstmt.executeQuery();)
         {
-            pstmt.setFetchSize(1000);
+            pstmt.setFetchSize(DEFAULT_FETCH_SIZE);
             processResultSet(mResultSet);
             isFirstTime = false;
         }
