@@ -90,7 +90,7 @@ public abstract class InmemoryProcessor
              if (isFirstTime)
              {
                  log.error("Since the initial load has failed, stopping the application for " + mInmemoryInput, e);
-                 System.exit(-9);
+                 //System.exit(-9);
              }
          }
     	 
