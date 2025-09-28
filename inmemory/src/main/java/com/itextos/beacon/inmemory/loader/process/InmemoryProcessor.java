@@ -59,11 +59,12 @@ public abstract class InmemoryProcessor
         if(this instanceof MccMncCollection) {
             doWithPagination();
         }else if (this instanceof AccountInfo) {
-         //   doWithPagination();
+         /*
+        	  doWithPagination();
             DEFAULT_PAGE_SIZE = 50;
             DEFAULT_FETCH_SIZE = 50;
         	
-       // 	doWithoutPagination();
+       	doWithoutPagination();
             
             try {
 				new InmemoryProcessorAccountsView(mInmemoryInput,(AccountInfo) this).doWithPagination();
@@ -72,7 +73,10 @@ public abstract class InmemoryProcessor
 				e.printStackTrace();
 			}
         	
-     
+     */
+        	mInmemoryInput.setSQL("select cli_id, user, ui_pass, api_pass, smpp_pass, acc_status from user_config");
+        	
+        	doWithoutPagination();
         } else {
             doWithoutPagination();
         }

@@ -9,7 +9,7 @@ public class InmemoryInput
     private final InmemoryId mInmemoryId;
     private final String     mDescription;
     private final JndiInfo   mJNDIInfo;
-    private final String     mSQL;
+    private  String     mSQL;
     private final boolean    isAutoRefreshRequired;
     private final int        mSleepSec;
     private final String     mInmemoryProcessClassName;
@@ -45,6 +45,12 @@ public class InmemoryInput
     public JndiInfo getJNDIInfo()
     {
         return mJNDIInfo;
+    }
+
+    public void setSQL(String aSQL)
+    {
+        
+    	mSQL=aSQL;
     }
 
     public String getSQL()
