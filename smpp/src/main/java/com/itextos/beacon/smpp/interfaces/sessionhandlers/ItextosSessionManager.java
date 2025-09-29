@@ -18,6 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppServerSession;
 import com.itextos.beacon.commonlib.constants.exception.ItextosException;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorSMPPDNRedisPoller;
 import com.itextos.beacon.inmemdata.account.UserInfo;
 import com.itextos.beacon.smpp.interfaces.event.handlers.ItextosSmppSessionHandler;
 import com.itextos.beacon.smpp.interfaces.sessionhandlers.objects.SessionRoundRobin;
@@ -58,7 +59,7 @@ public class ItextosSessionManager
 
     private final Map<String, SessionRoundRobin>  txSessionsMap    = new ConcurrentHashMap<>();
     private final Map<String, SessionRoundRobin>  rxTrxSessionsMap = new ConcurrentHashMap<>();
-    private final Map<String, LinkedList<Thread>> dnWorkerMap      = new ConcurrentHashMap<>();
+    private final Map<String, LinkedList<Runnable>> dnWorkerMap      = new ConcurrentHashMap<>();
 
     private ItextosSessionManager()
     {}
@@ -199,9 +200,9 @@ public class ItextosSessionManager
         if (!aSessionHandler.getBindType().equals(SmppBindType.TRANSMITTER) && ALLOW_DLR_SESSIONS)
         {
             final SessionRedisQWorker sworker = new SessionRedisQWorker(aSessionHandler.getClientId(), systemId, aSessionHandler);
-            sworker.start();
 
-            final LinkedList<Thread> list = dnWorkerMap.computeIfAbsent(systemId, k -> new LinkedList<>());
+            ExecutorSMPPDNRedisPoller.getInstance().addTask(sworker, sworker.getThreadName());
+            final LinkedList<Runnable> list = dnWorkerMap.computeIfAbsent(systemId, k -> new LinkedList<>());
             list.add(sworker);
         }
 
@@ -217,9 +218,10 @@ public class ItextosSessionManager
         if (!aSessionHandler.getBindType().equals(SmppBindType.TRANSMITTER) && !ALLOW_DLR_SESSIONS)
         {
             final CustomerRedisQWorker worker = new CustomerRedisQWorker(aSessionHandler.getClientId(), aSessionHandler.getSystemId());
-            worker.start();
+            
+            ExecutorSMPPDNRedisPoller.getInstance().addTask(worker, worker.getThreadName());
 
-            final LinkedList<Thread> list = dnWorkerMap.computeIfAbsent(aSessionHandler.getSystemId(), k -> new LinkedList<>());
+            final LinkedList<Runnable> list = dnWorkerMap.computeIfAbsent(aSessionHandler.getSystemId(), k -> new LinkedList<>());
             list.add(worker);
         }
         return srrObj;
@@ -267,7 +269,7 @@ public class ItextosSessionManager
 
                 if (dnWorkerMap.containsKey(systemId) && !aSession.getBindType().equals(SmppBindType.TRANSMITTER)) // && !ALLOW_DLR_SESSIONS
                 {
-                    final LinkedList<Thread> lLinkedList = dnWorkerMap.get(systemId);
+                    final LinkedList<Runnable> lLinkedList = dnWorkerMap.get(systemId);
 
                     if (!lLinkedList.isEmpty())
                     {
@@ -350,7 +352,7 @@ public class ItextosSessionManager
             String aSystemId,
             SessionRedisQWorker aSessionRedisQWorker)
     {
-        final LinkedList<Thread> lLinkedList = dnWorkerMap.get(aSystemId);
+        final LinkedList<Runnable> lLinkedList = dnWorkerMap.get(aSystemId);
 
         if (lLinkedList != null)
         {

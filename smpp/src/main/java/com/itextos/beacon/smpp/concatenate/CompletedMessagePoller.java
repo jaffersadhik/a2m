@@ -19,7 +19,7 @@ import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorConcateRedisPoller;
 import com.itextos.beacon.http.interfaceutil.InterfaceUtil;
 import com.itextos.beacon.smpp.objects.SmppUserInfo;
 import com.itextos.beacon.smpp.objects.request.SmppMessageRequest;
@@ -50,7 +50,7 @@ public class CompletedMessagePoller
       
         mTimedProcessor = new TimedProcessor("CompletedMessagePoller:" + mClusterType + "~" + mRedisPoolIndex, this, TimerIntervalConstant.SMPP_CONCAT_MESSAGE_CHECKER_INTERVAL);
   
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "CompletedMessagePoller:" + mClusterType + "~" + mRedisPoolIndex);
+        ExecutorConcateRedisPoller.getInstance().addTask(mTimedProcessor, "CompletedMessagePoller:" + mClusterType + "~" + mRedisPoolIndex);
     
         if (log.isDebugEnabled())
             log.debug("CompletedMessagePoller started successfully ........." + mClusterType + "~" + aRedisPoolIndex);

@@ -32,7 +32,7 @@ public class Decrypt implements Runnable{
   
 	}
 	
-	
+	/*
 	public void gotosleep() {
 		
 
@@ -42,7 +42,7 @@ public class Decrypt implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	private void doProcess(Map<String, UserInfo> userPassMap,Map<String, UserInfo> accessKeyMap,Map<String, UserInfo> clientIdMap,UserInfo userinfo) {
 		try
@@ -53,9 +53,9 @@ public class Decrypt implements Runnable{
             final String lSmppPass         = userinfo.getSmppPassword();
 
             final String decryptedApiPass  = decryptApiPassword(lApiPass, clientId);
-            gotosleep();
+          //  gotosleep();
             final String decryptedSmppPass = decryptSmppPassword(lSmppPass, clientId);
-            gotosleep();
+          //  gotosleep();
             final String cliId             = CommonUtility.nullCheck(userinfo.getClientId(), true);
             final String userName          = CommonUtility.nullCheck(userinfo.getUserName(), true).toLowerCase();
 

@@ -20,8 +20,8 @@ import com.itextos.beacon.smpp.utils.SmppKafkaProducer;
 import com.itextos.beacon.smpp.utils.properties.SmppProperties;
 
 public class SessionRedisQWorker
-        extends
-        Thread
+        implements
+        Runnable
 {
 
     private static final Log                log          = LogFactory.getLog(SessionRedisQWorker.class);
@@ -32,6 +32,8 @@ public class SessionRedisQWorker
     private final ItextosSmppSessionHandler mSessionHandler;
 
     private final DNWorker                  worker;
+    
+    private final String threadName;
 
     public SessionRedisQWorker(
             String aClientId,
@@ -42,17 +44,23 @@ public class SessionRedisQWorker
         mSystemId       = aSystemId;
         mSessionHandler = aSessionhandler;
         worker          = new DNWorker(mSystemId);
-        setName("SessionRedisQWorker-" + aSessionhandler.getSessionId() + "-" + mClientId);
+        threadName="SessionRedisQWorker-" + aSessionhandler.getSessionId() + "-" + mClientId;
     }
 
-    @Override
+    
+    public String getThreadName() {
+		return threadName;
+	}
+
+
+	@Override
     public void run()
     {
 
         try
         {
             log.info("started SessionRedisQWorker for Client Id =" + mClientId + " Systemid=" + mSystemId);
-            final String hbname = getName();
+            final String hbname = threadName;
 
             while (mSessionHandler.getSession().isBinding() || mSessionHandler.getSession().isOpen())
             {
@@ -99,7 +107,7 @@ public class SessionRedisQWorker
         }
         catch (final Exception exp)
         {
-            log.error("abruptly quiting session thread=" + getName() + " due to...", exp);
+            log.error("abruptly quiting session thread=" + threadName + " due to...", exp);
         }
     }
 
@@ -113,7 +121,7 @@ public class SessionRedisQWorker
 
             if (aDeliverySmInfo != null) // This is not required.
             {
-                CustomerRedisHeartBeatData.getInstance().addHeartBeat(getName(), mSystemId);
+                CustomerRedisHeartBeatData.getInstance().addHeartBeat(threadName, mSystemId);
 
                 try
                 {

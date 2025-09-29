@@ -23,8 +23,8 @@ import com.itextos.beacon.smpp.utils.SmppKafkaProducer;
 import com.itextos.beacon.smpp.utils.properties.SmppProperties;
 
 public class CustomerRedisQWorker
-        extends
-        Thread
+        implements
+        Runnable
 {
 
     private static final Log log  = LogFactory.getLog(CustomerRedisQWorker.class);
@@ -33,7 +33,7 @@ public class CustomerRedisQWorker
     private final String     clientId;
     private final DNWorker   worker;
     private boolean          done = false;
-
+    private final String threadName; 
     public CustomerRedisQWorker(
             String aClientId,
             String aSystemId)
@@ -42,10 +42,14 @@ public class CustomerRedisQWorker
         systemId = aSystemId;
         worker   = new DNWorker(systemId);
 
-        setName("CustomerRedisQWorker-" + clientId);
+        threadName="CustomerRedisQWorker-" + clientId;
     }
 
-    @Override
+    public String getThreadName() {
+		return threadName;
+	}
+
+	@Override
     public void run()
     {
 
@@ -57,7 +61,7 @@ public class CustomerRedisQWorker
                 try
                 {
                     final List<DeliverSmInfo> delvieryInfoList = DeliverySmRedisOps.lpopDeliverSm(clientId);
-                    CustomerRedisHeartBeatData.getInstance().addHeartBeat(getName(), systemId);
+                    CustomerRedisHeartBeatData.getInstance().addHeartBeat(threadName, systemId);
 
                     if (delvieryInfoList == null)
                     {
@@ -72,7 +76,7 @@ public class CustomerRedisQWorker
                     log.error("problem sending dn's possible loss...", e1);
                     CommonUtility.sleepForAWhile();
                 }
-            CustomerRedisHeartBeatData.getInstance().remove(getName(), systemId);
+            CustomerRedisHeartBeatData.getInstance().remove(threadName, systemId);
             log.info("exiting customerwise redis worker for ClientId =" + clientId + " no bind exists...");
         }
         catch (final Exception exp)
@@ -92,7 +96,7 @@ public class CustomerRedisQWorker
 
             if (deliveryInfo != null)
             {
-                CustomerRedisHeartBeatData.getInstance().addHeartBeat(getName(), systemId);
+                CustomerRedisHeartBeatData.getInstance().addHeartBeat(threadName, systemId);
 
                 try
                 {

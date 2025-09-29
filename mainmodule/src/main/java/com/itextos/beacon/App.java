@@ -202,8 +202,8 @@ public class App {
         createfolder();
         
         // Module-specific initialization with throttling
-        if ("japi".equals(module)) {
-            throttleStartup("japi-init", 1000); // 2-second delay before init
+        if ("japi".equals(module)||"backend".equals(module)) {
+            throttleStartup("japi-init", 500); // 2-second delay before init
             try {
                 init();
                 ReactiveQSRequestReader.initSMS();
