@@ -28,41 +28,45 @@ public class Decrypt implements Runnable{
 	}
 	public void run() {
 		
-		 try
-         {
-             final String clientId          = userinfo.getClientId();
-
-             final String lApiPass          = userinfo.getApiPassword();
-             final String lSmppPass         = userinfo.getSmppPassword();
-
-             final String decryptedApiPass  = decryptApiPassword(lApiPass, clientId);
-             final String decryptedSmppPass = decryptSmppPassword(lSmppPass, clientId);
-
-             final String cliId             = CommonUtility.nullCheck(userinfo.getClientId(), true);
-             final String userName          = CommonUtility.nullCheck(userinfo.getUserName(), true).toLowerCase();
-
-             if (cliId.isBlank())
-                 throw new ItextosException("Invalid client Id specified.");
-
-             if (userName.isBlank())
-                 throw new ItextosException("Invalid username specified.");
-
-             final UserInfo userInfo = new UserInfo(cliId, userName, decryptedApiPass, decryptedSmppPass, userinfo.getStatus());
-
-             userPassMap.put(userInfo.getUserName(), userInfo);
-             clientIdMap.put(userInfo.getClientId(), userInfo);
-
-             if (userInfo.getApiPassword()!=null&&!userInfo.getApiPassword().isBlank())
-            	 accessKeyMap.put(userInfo.getApiPassword(), userInfo);
-         }
-         catch (final Exception e)
-         {
-         }
+		 doProcess( userPassMap, accessKeyMap, clientIdMap, userinfo);
 
   
 	}
 	
 	
+	private void doProcess(Map<String, UserInfo> userPassMap,Map<String, UserInfo> accessKeyMap,Map<String, UserInfo> clientIdMap,UserInfo userinfo) {
+		try
+        {
+            final String clientId          = userinfo.getClientId();
+
+            final String lApiPass          = userinfo.getApiPassword();
+            final String lSmppPass         = userinfo.getSmppPassword();
+
+            final String decryptedApiPass  = decryptApiPassword(lApiPass, clientId);
+            final String decryptedSmppPass = decryptSmppPassword(lSmppPass, clientId);
+
+            final String cliId             = CommonUtility.nullCheck(userinfo.getClientId(), true);
+            final String userName          = CommonUtility.nullCheck(userinfo.getUserName(), true).toLowerCase();
+
+            if (cliId.isBlank())
+                throw new ItextosException("Invalid client Id specified.");
+
+            if (userName.isBlank())
+                throw new ItextosException("Invalid username specified.");
+
+            final UserInfo userInfo = new UserInfo(cliId, userName, decryptedApiPass, decryptedSmppPass, userinfo.getStatus());
+
+            userPassMap.put(userInfo.getUserName(), userInfo);
+            clientIdMap.put(userInfo.getClientId(), userInfo);
+
+            if (userInfo.getApiPassword()!=null&&!userInfo.getApiPassword().isBlank())
+           	 accessKeyMap.put(userInfo.getApiPassword(), userInfo);
+        }
+        catch (final Exception e)
+        {
+        }
+		
+	}
 	private static String decryptApiPassword(
             String aApiPass,
             String aClientId)
