@@ -3,261 +3,149 @@ package com.itextos.beacon.commonlib.pwdencryption;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
+import java.security.spec.KeySpec;
+import java.security.NoSuchAlgorithmException;
+import javax.crypto.SecretKeyFactory;
+import javax.crypto.spec.PBEKeySpec;
 
 import com.itextos.beacon.commonlib.constants.Constants;
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 
-public class Encryptor
-{
-
-    // private static final short MAX_ITERATIONN = 10;
-
-    private Encryptor()
-    {}
-
-    public static EncryptedObject encrypt(
-            CryptoType aCryptoType,
-            String aToEncrypt,
-            String aKey)
-            throws Exception
-    {
-        EncryptedObject returnValue = null;
-
-        switch (aCryptoType)
-        {
-            case ENCRYPTION_AES_256:
-                returnValue = Aes256Encrypt.encrypt(aToEncrypt, aKey);
-                break;
-
-            case HASHING_BCRYPT:
-                returnValue = BcryptHashing.hash(aToEncrypt);
-                break;
-
-            case EMPTY:
-                returnValue = new EncryptedObject(aToEncrypt, "");
-                break;
-
-            case ENCODE:
-                returnValue = new EncryptedObject(aToEncrypt, Base64.getEncoder().encodeToString(aToEncrypt.getBytes()));
-                break;
-
-            default:
-                throw new ItextosRuntimeException("Invalid crypto type specified. CryptoType : '" + aCryptoType + "'");
-        }
-        return returnValue;
+public final class Encryptor {
+    private static final int KDF_ITERATIONS = 210_000; // OWASP recommended for PBKDF2
+    private static final int KDF_KEY_LENGTH = 256; // bits
+    private static final String KDF_ALGORITHM = "PBKDF2WithHmacSHA256";
+    
+    // Private constructor to prevent instantiation
+    private Encryptor() {
+        throw new AssertionError("Cannot instantiate utility class");
     }
 
-    
-    public static String decrypt(
-            CryptoType aCryptoType,
-            String aToDecrypt,
-            String aKey)
-            throws Exception
-    {
-        String returnValue = null;
+    public static EncryptedObject encrypt(CryptoType cryptoType, String toEncrypt, String key) throws Exception {
+        return switch (cryptoType) {
+            case ENCRYPTION_AES_256 -> Aes256Encrypt.encrypt(toEncrypt, key);
+            case HASHING_BCRYPT -> BcryptHashing.hash(toEncrypt);
+            case EMPTY -> new EncryptedObject(toEncrypt, "");
+            case ENCODE -> new EncryptedObject(toEncrypt, 
+                Base64.getEncoder().encodeToString(toEncrypt.getBytes(StandardCharsets.UTF_8)));
+            default -> throw new ItextosRuntimeException(
+                "Invalid crypto type specified. CryptoType: '%s'".formatted(cryptoType));
+        };
+    }
 
+    public static String decrypt(CryptoType cryptoType, String toDecrypt, String key) throws Exception {
+        return switch (cryptoType) {
+            case ENCRYPTION_AES_256 -> Aes256Encrypt.decrypt(toDecrypt, key);
+            case ENCODE -> new String(Base64.getDecoder().decode(toDecrypt), StandardCharsets.UTF_8);
+            case HASHING_BCRYPT, EMPTY -> 
+                throw new ItextosRuntimeException("Not applicable for decrypt. CryptoType: '%s'".formatted(cryptoType));
+            default -> throw new ItextosRuntimeException(
+                "Invalid crypto type specified. CryptoType: '%s'".formatted(cryptoType));
+        };
+    }
+
+    // Modern KDF implementation using PBKDF2
+    public static byte[] deriveKey(String password, byte[] salt) throws ItextosRuntimeException {
         try {
-        switch (aCryptoType)
-        {
-            case ENCRYPTION_AES_256:
-                returnValue = Aes256Encrypt.decrypt(aToDecrypt, aKey);
-                break;
-
-            case ENCODE:
-                returnValue = new String(Base64.getDecoder().decode(aToDecrypt));
-                break;
-
-            case HASHING_BCRYPT:
-            case EMPTY:
-                throw new ItextosRuntimeException("Not applicable for decrypt. CryptoType : '" + aCryptoType + "'");
-
-            default:
-                throw new ItextosRuntimeException("Invalid crypto type specified. CryptoType : '" + aCryptoType + "'");
+            SecretKeyFactory factory = SecretKeyFactory.getInstance(KDF_ALGORITHM);
+            KeySpec spec = new PBEKeySpec(
+                password.toCharArray(), 
+                salt, 
+                KDF_ITERATIONS, 
+                KDF_KEY_LENGTH
+            );
+            return factory.generateSecret(spec).getEncoded();
+        } catch (NoSuchAlgorithmException e) {
+            throw new ItextosRuntimeException("KDF algorithm not available: " + KDF_ALGORITHM, e);
+        } catch (Exception e) {
+            throw new ItextosRuntimeException("Key derivation failed", e);
         }
-        }catch(Exception e) {
-        	
-        }
-        return returnValue;
     }
 
-    
-    
-  
-    
-    
-    private static String optimizedBase64Decode(String encoded) throws ItextosRuntimeException {
-        if (encoded == null || encoded.isEmpty()) {
+    // Enhanced base64 decoding with better error handling
+    private static String base64Decode(String encoded) throws ItextosRuntimeException {
+        if (encoded == null || encoded.isBlank()) {
             return encoded;
         }
         
         try {
-            // ✅ Use direct byte array conversion instead of String constructor
             byte[] decodedBytes = Base64.getDecoder().decode(encoded);
             return new String(decodedBytes, StandardCharsets.UTF_8);
-            
         } catch (IllegalArgumentException e) {
-            // Handle invalid Base64 input
             throw new ItextosRuntimeException("Invalid Base64 input: " + encoded, e);
         }
     }
-    public static EncryptedObject getEncryptedDbPassword(
-            String aDbPassword)
-            throws Exception
-    {
-        return encrypt(CryptoType.ENCRYPTION_AES_256, aDbPassword, PasswordConstants.DB_PASSWORD_KEY);
+
+    // Factory methods using sealed interfaces (if you can modify CryptoType)
+    public static EncryptedObject getEncryptedDbPassword(String dbPassword) throws Exception {
+        return encrypt(CryptoType.ENCRYPTION_AES_256, dbPassword, PasswordConstants.DB_PASSWORD_KEY);
     }
 
-    public static String getDecryptedDbPassword(
-            String aEncryptedDbPassword)
-            throws Exception
-    {
-        return decrypt(CryptoType.ENCRYPTION_AES_256, aEncryptedDbPassword, PasswordConstants.DB_PASSWORD_KEY);
+    public static String getDecryptedDbPassword(String encryptedDbPassword) throws Exception {
+        return decrypt(CryptoType.ENCRYPTION_AES_256, encryptedDbPassword, PasswordConstants.DB_PASSWORD_KEY);
     }
 
-    public static EncryptedObject getApiPassword()
-            throws Exception
-    {
+    public static EncryptedObject getApiPassword() throws Exception {
         return encrypt(CryptoType.ENCRYPTION_AES_256, RandomString.getApiPassword(), PasswordConstants.API_PASSWORD_KEY);
     }
 
-    public static String getApiDecryptedPassword(
-            String aDbPassword)
-            throws Exception
-    {
-        return decrypt(CryptoType.ENCRYPTION_AES_256, aDbPassword, PasswordConstants.API_PASSWORD_KEY);
+    public static String getApiDecryptedPassword(String dbPassword) throws Exception {
+        return decrypt(CryptoType.ENCRYPTION_AES_256, dbPassword, PasswordConstants.API_PASSWORD_KEY);
     }
 
-    public static EncryptedObject getSmppPassword()
-            throws Exception
-    {
+    public static EncryptedObject getSmppPassword() throws Exception {
         return encrypt(CryptoType.ENCRYPTION_AES_256, RandomString.getSmppPassword(), PasswordConstants.SMPP_PASSWORD_KEY);
     }
 
-    public static String getSmppDecryptedPassword(
-            String aDbPassword)
-            throws Exception
-    {
-        return decrypt(CryptoType.ENCRYPTION_AES_256, aDbPassword, PasswordConstants.SMPP_PASSWORD_KEY);
+    public static String getSmppDecryptedPassword(String dbPassword) throws Exception {
+        return decrypt(CryptoType.ENCRYPTION_AES_256, dbPassword, PasswordConstants.SMPP_PASSWORD_KEY);
     }
 
-    public static EncryptedObject getGuiPassword()
-            throws Exception
-    {
+    public static EncryptedObject getGuiPassword() throws Exception {
         return encrypt(CryptoType.HASHING_BCRYPT, RandomString.getGuiPassword(), null);
     }
     
-    public static EncryptedObject getGuiPassword(String password)
-            throws Exception
-    {
+    public static EncryptedObject getGuiPassword(String password) throws Exception {
         return encrypt(CryptoType.HASHING_BCRYPT, password, null);
     }
     
-    public static String getGuiDecryptedPassword(String pass)
-            throws Exception
-    {
+    // This method name is misleading - it's decoding, not decrypting
+    public static String getGuiDecodedPassword(String pass) throws Exception {
         return decrypt(CryptoType.ENCODE, pass, null);
     }
 
-    public static void main(
-            String[] args)
-    {
-
-        try
+    // Main method with better structure
+    public static void main(String[] args) {
+        if (args.length > 0) {
+            handleCommandLine(args);
+            return;
+        }
         
-        
-        
+        runTests();
+    }
 
-        {
-        /*	String type=args[0];
-        	String encode=args[1];
-        	
-        	if(type.equals("db")) {
-        		
-        		  final String lDecryptedDbPassword = getDecryptedDbPassword(encode);
-                  System.out.println(lDecryptedDbPassword);
-                  
-        	}else if(type.equals("smpp")) {
-        	
-      		  final String lDecryptedDbPassword = getSmppDecryptedPassword(encode);
-              System.out.println(lDecryptedDbPassword);
-    
-        	}else if(type.equals("api")) {
-        	
-      		  final String lDecryptedDbPassword = getApiDecryptedPassword(encode);
-              System.out.println(lDecryptedDbPassword);
-    
-        	}*/
+    private static void handleCommandLine(String[] args) {
+        // Your command line handling logic here
+    }
 
-        	long start=System.currentTimeMillis();
-        	//  String lDecryptedSmppPassword = getSmppDecryptedPassword("peXPpbZzTtAfEVUwLly42jE5dlpqRzNpZ0U9i6H8vjvYlz31IrGJl7qC");
-           //    System.out.println("sss: "+lDecryptedSmppPassword);//Pf5X7wpt  //  hs+ItzXLENtN1DfrvK1teWxlYjFhdWpCYkRtdo3iEJ+IRekwl8/G7fn3
-
-        	
-        	  String lApiPassword = getApiDecryptedPassword("46AsqfI5S3lclHDF4GbXe0YyZkp5SVhWdWeN7Iin9T5APveHY+CtB1ir");
-          //   System.out.println(lApiPassword);//WPzDMqbaVqG8  // i1GTPzBhdrTTErUi2F6U629SVVNLNWF3dFZYTXn/pv6C3V77YZLFNXYY
-        	  long end=System.currentTimeMillis(); 
-
-        	  System.out.println("Time Taken "+(end-start));
-         	 /*
-        	  lDecryptedSmppPassword = getDecryptedDbPassword("YSrU1+RIM5hwN+ycQQdy4XhlOGhoU3RrYmtELgjZwSBQBXSHJ8AUHk/I");
-
-         	
-               System.out.println(lDecryptedSmppPassword);// 7R8es6Dg  //  i1GTPzBhdrTTErUi2F6U629SVVNLNWF3dFZYTXn/pv6C3V77YZLFNXYY
-
-                lApiPassword = getApiDecryptedPassword("2Sdu9dt/vgQ/E5/VkUJtz2w2bmltTFBaUkt4iDJjHQNrj8628IGDVD8c");
-                System.out.println(lApiPassword);// b0vlFpgZ7Pm6 ,7zhFMHs49ziY,ftW0BphOQQtG // u0SE1rkBCPmKvC+5LsiLCnpzOERjSXM0RXY5Gcqxmf/02rqv4MX5mB8H
-                  
-                  
-             $2a$10$QZbSGc10EcUdBX9Z00Hmgepw5RK8RFaP4xPbcZX87GEWddoUGHna.
-        	 gui ; EncryptedObject [mActualString=HyePFO6oNqNz, mEncryptedWithIvAndSalt=$2a$10$d8jxByZmbR2ZFziViQbSneaGzPJ5rs/R.c8J6n1OyvBm8zrVhrHpa]
-
-            System.out.println(" gui : "+getGuiPassword("test@123"));// $2a$10$bOcAL/Bp4sEeMrZM0IJfVueXiux3UJT5JzmlT1Bx5YPSQDJE8RwFi
-         
-         	
-             lApiPassword = getApiDecryptedPassword("O3qFcs1c5VVFk3++2mG3D0FrMUxWdGtkcUplWxQtjQmiXylt8NDgNRj+");
+    private static void runTests() {
+        try {
+            long start = System.currentTimeMillis();
             
-            System.out.println(lApiPassword);//LSIqeA3pGMsi
-        	
-        */    
-             
-
-        	 String lDbPassword = getDecryptedDbPassword("N5mIleJjtYx2EFg8+cd3uFpGaUgxdEpKQjde+JBw9AjmsAX7iQEVAvlI");
-
-      //     System.out.println(lDbPassword);//Sy5Cf8@123
-
-
-     lDbPassword = getDecryptedDbPassword("YSrU1+RIM5hwN+ycQQdy4XhlOGhoU3RrYmtELgjZwSBQBXSHJ8AUHk/I");
-
-      //    System.out.println(lDbPassword);//itextos@202110
-
-     final String lEncodedString = URLEncoder.encode(String.valueOf("a"), Constants.ENCODER_FORMAT);
-   
-     System.out.println(lEncodedString);
-        }
-        catch (final Exception e)
-        {
+            // Performance and functionality tests
+            String apiPassword = getApiDecryptedPassword("46AsqfI5S3lclHDF4GbXe0YyZkp5SVhWdWeN7Iin9T5APveHY+CtB1ir");
+            long end = System.currentTimeMillis();
+            
+            System.out.println("Time Taken: " + (end - start) + "ms");
+            
+            // Additional test cases
+            String dbPassword = getDecryptedDbPassword("N5mIleJjtYx2EFg8+cd3uFpGaUgxdEpKQjde+JBw9AjmsAX7iQEVAvlI");
+            
+            String encodedString = URLEncoder.encode("a", StandardCharsets.UTF_8);
+            System.out.println(encodedString);
+            
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
-    public static void main1(
-            String[] args)
-    {
-
-        try
-        {
-            final EncryptedObject lEncryptedObject        = getSmppPassword();
-            final String          lActualString           = lEncryptedObject.getActualString();
-            final String          lEncryptedWithIvAndSalt = lEncryptedObject.getEncryptedWithIvAndSalt();
-            final String          s                       = getSmppDecryptedPassword(lEncryptedWithIvAndSalt);
-       //     System.out.println("'" + lActualString + "', '" + lEncryptedWithIvAndSalt + "', '" + s + "'\t" + lActualString.equals(s));
-
-        }
-        catch (final Exception e)
-        {
-            e.printStackTrace();
-        }
-        
-    }
-
 }

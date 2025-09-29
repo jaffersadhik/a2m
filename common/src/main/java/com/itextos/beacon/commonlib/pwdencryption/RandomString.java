@@ -17,17 +17,17 @@ class RandomString
 
     static String getGuiPassword()
     {
-        return getRandomString(PasswordConstants.GUI_PASSWORD_LEGNTH);
+        return getRandomString(PasswordConstants.GUI_PASSWORD_LENGTH);
     }
 
     static String getApiPassword()
     {
-        return getRandomString(PasswordConstants.API_PASSWORD_LEGNTH);
+        return getRandomString(PasswordConstants.API_PASSWORD_LENGTH);
     }
 
     static String getSmppPassword()
     {
-        return getRandomString(PasswordConstants.SMPP_PASSWORD_LEGNTH);
+        return getRandomString(PasswordConstants.SMPP_PASSWORD_LENGTH);
     }
 
     private static String getRandomString(
