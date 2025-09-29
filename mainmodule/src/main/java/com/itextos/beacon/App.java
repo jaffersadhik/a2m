@@ -202,7 +202,7 @@ public class App {
         createfolder();
         
         // Module-specific initialization with throttling
-        if ("japi".equals(module)||"backend".equals(module)) {
+        if ("japi".equals(module)||"kannelsubmit".equals(module)||"smppinterface".equals(module)) {
             throttleStartup("japi-init", 500); // 2-second delay before init
             try {
                 init();
@@ -635,7 +635,6 @@ public class App {
 		com.itextos.beacon.platform.kannelstatusupdater.StartApplication.main(args);
 
 		com.itextos.beacon.platform.smppdlrpoller.StartApplication.main(args);
-		com.itextos.beacon.platform.sbpcore.StartApplication.main(args);
 		com.itextos.beacon.http.interfacefallbackpoller.StartApplication.main(args);
 		com.itextos.beacon.platform.dnrfallbackpoller.StartApplication.main(args);
 		
@@ -796,6 +795,13 @@ public class App {
 		}else if(module.equals("backend")){
 			
 			startBackEnd(args);
+			
+			IS_START_PROMETHEUS=true;
+			return true;
+			
+		}else if(module.equals("kannelsubmit")){
+			
+			startKannelSubmit(args);
 			
 			IS_START_PROMETHEUS=true;
 			return true;
@@ -1031,7 +1037,7 @@ public class App {
 		startBillerOther(args);
 		startDN(args);
 		startDBPoller(args);
-		startKannelSubmit(args);
+		//startKannelSubmit(args);
 
 
 	}
@@ -1040,6 +1046,8 @@ public class App {
 		com.itextos.beacon.smpp.concatehandover.StartApplication.main(args);
 		com.itextos.beacon.platform.ic.StartApplication.main(args);
 		com.itextos.beacon.platform.rch.StartApplication.main(args);
+		com.itextos.beacon.platform.sbpcore.StartApplication.main(args);
+
 		
 	}
 

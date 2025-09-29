@@ -12,7 +12,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorShedulePoller;
 import com.itextos.beacon.platform.sbpcore.dao.DBPoller;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.SchedulePollerLog;
@@ -49,7 +49,7 @@ public class ScheduleBlockoutPollarHolder
        
         mTimedProcessor = new TimedProcessor("TimerThread-SchedulePollerStarter", this, TimerIntervalConstant.SCHEDULE_MESSAGE_TABLE_READER);
     
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "TimerThread-SchedulePollerStarter");
+        ExecutorShedulePoller.getInstance().addTask(mTimedProcessor, "TimerThread-SchedulePollerStarter");
      }
 
     private void startPollars()
