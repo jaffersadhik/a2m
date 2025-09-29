@@ -2,10 +2,6 @@ package com.itextos.beacon;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.Executors;
-import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -22,16 +18,14 @@ import org.springframework.boot.autoconfigure.security.servlet.SecurityFilterAut
 import org.springframework.boot.autoconfigure.security.servlet.UserDetailsServiceAutoConfiguration;
 import org.springframework.boot.autoconfigure.sql.init.SqlInitializationAutoConfiguration;
 import org.springframework.boot.autoconfigure.web.servlet.WebMvcAutoConfiguration;
-import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.boot.web.servlet.server.ServletWebServerFactory;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
-import com.itextos.beacon.platform.subbiller.processor.BillerProcessor;
 import com.itextos.beacon.smslog.DebugLog;
-import com.itextos.beacon.smslog.TimeTakenLog;
+import com.itextos.beacon.smslog.StartupTimeLog;
 import com.itextos.beacon.web.generichttpapi.controller.ReactiveQSRequestReader;
 
 @SpringBootApplication(exclude = {
@@ -234,7 +228,7 @@ public class App {
         addShutdownHook();
         
         long end = System.currentTimeMillis();
-        TimeTakenLog.log("Startup completed in: " + (end - start) + " ms");
+        StartupTimeLog.log("Startup completed in: " + (end - start) + " ms");
     }
 
     // Add these helper methods to your class:
