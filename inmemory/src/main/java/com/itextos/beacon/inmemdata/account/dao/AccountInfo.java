@@ -71,31 +71,26 @@ public class AccountInfo
     }
 
     private void decrypt(List<UserInfo> userlist) {
-        // Create a virtual thread executor
-        try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+        // If decryption is CPU-intensive, sequential might be better
+    	int count=0;
+        for (UserInfo userInfo : userlist) {
+            new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo).run();
+            count++;
             
-            // Submit all tasks and collect Futures
-            List<Future<?>> futures = new ArrayList<>();
-            for (UserInfo userInfo : userlist) {
-                Decrypt decrypt = new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo);
-                Future<?> future = executor.submit(decrypt);
-                futures.add(future);
+            if(count%25==0) {
+            	
+            	try {
+					Thread.sleep(300L);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	
             }
-            
-            // Wait for all tasks to complete
-            for (Future<?> future : futures) {
-                try {
-                    future.get(); // This will block until the task completes
-                } catch (InterruptedException | ExecutionException e) {
-                    // Handle exceptions from the tasks
-                    e.printStackTrace();
-                    // Or rethrow as runtime exception if needed
-                    // throw new RuntimeException("Decryption task failed", e);
-                }
-            }
-        } // ExecutorService is automatically shutdown here due to try-with-resources
+        }
     }
-
+    
+    
 	private List<UserInfo> getData(ResultSet aResultSet) throws SQLException {
 		
 		List<UserInfo> userlist=new ArrayList<UserInfo>();
