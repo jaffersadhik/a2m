@@ -9,7 +9,7 @@ public class ExecutorTopic {
     // Private constructor for singleton
     private ExecutorTopic() {
         // Create a fixed pool of 5 virtual threads
-        this.virtualThreadPool = Executors.newFixedThreadPool(5, Thread.ofVirtual().factory());
+        this.virtualThreadPool = Executors.newFixedThreadPool(2, Thread.ofVirtual().factory());
     }
     
     // Public method to get the singleton instance
