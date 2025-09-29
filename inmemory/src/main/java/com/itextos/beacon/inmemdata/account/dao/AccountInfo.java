@@ -42,6 +42,8 @@ public class AccountInfo
     private Map<String, UserInfo> userPassMap             = new HashMap<>();
     private Map<String, UserInfo> accessKeyMap            = new HashMap<>();
     private Map<String, UserInfo> clientIdMap             = new HashMap<>();
+    
+    private static boolean firstTime=true;
 
     public AccountInfo(
             InmemoryInput aInmemoryInputDetail)
@@ -62,6 +64,7 @@ public class AccountInfo
        
        decrypt(userlist);
 
+       firstTime=false;
         if (log.isDebugEnabled())
             log.debug("Completed loading db records into inmemory. Total Records Loaded : " + userPassMap.size());
     }
@@ -69,7 +72,7 @@ public class AccountInfo
     private void decrypt(List<UserInfo> userlist) {
 
     	for (UserInfo userInfo : userlist) {
-            new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo).run();
+            new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo,firstTime).run();
             
             	
             	

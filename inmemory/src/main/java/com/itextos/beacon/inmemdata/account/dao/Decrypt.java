@@ -18,12 +18,13 @@ public class Decrypt implements Runnable{
 	 private Map<String, UserInfo> accessKeyMap ;
 	 private Map<String, UserInfo> clientIdMap  ;
 	 private UserInfo userinfo ;
-	 
-	public Decrypt(Map<String, UserInfo> userPassMap,Map<String, UserInfo> accessKeyMap,Map<String, UserInfo> clientIdMap,UserInfo userinfo) {
+	 private boolean firstTime;
+	public Decrypt(Map<String, UserInfo> userPassMap,Map<String, UserInfo> accessKeyMap,Map<String, UserInfo> clientIdMap,UserInfo userinfo,boolean firstTime) {
 		this.accessKeyMap=accessKeyMap;
 		this.userPassMap=userPassMap;
 		this.clientIdMap=clientIdMap;
 		this.userinfo=userinfo;
+		this.firstTime=firstTime;
 	}
 	public void run() {
 		
@@ -32,9 +33,10 @@ public class Decrypt implements Runnable{
   
 	}
 	
-	/*
+	
 	public void gotosleep() {
 		
+		if(!firstTime) {
 
     	try {
 			Thread.sleep(250L);
@@ -42,7 +44,8 @@ public class Decrypt implements Runnable{
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}*/
+		}
+	}
 	
 	private void doProcess(Map<String, UserInfo> userPassMap,Map<String, UserInfo> accessKeyMap,Map<String, UserInfo> clientIdMap,UserInfo userinfo) {
 		try
@@ -53,9 +56,9 @@ public class Decrypt implements Runnable{
             final String lSmppPass         = userinfo.getSmppPassword();
 
             final String decryptedApiPass  = decryptApiPassword(lApiPass, clientId);
-          //  gotosleep();
+            gotosleep();
             final String decryptedSmppPass = decryptSmppPassword(lSmppPass, clientId);
-          //  gotosleep();
+            gotosleep();
             final String cliId             = CommonUtility.nullCheck(userinfo.getClientId(), true);
             final String userName          = CommonUtility.nullCheck(userinfo.getUserName(), true).toLowerCase();
 
