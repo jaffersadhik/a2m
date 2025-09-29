@@ -43,9 +43,6 @@ public final class Aes256Encrypt {
         throw new AssertionError("Cannot instantiate utility class");
     }
 
-    /**
-     * Decrypts data with backward compatibility for legacy CBC format
-     */
     public static String decrypt(String encryptedText, String secretKey) throws Exception {
         if (encryptedText == null || encryptedText.isBlank()) {
             return encryptedText;
@@ -54,7 +51,7 @@ public final class Aes256Encrypt {
         try {
             // First try modern GCM format
             return decryptGCM(encryptedText, secretKey);
-        } catch (SecurityException e) {
+        } catch (Exception e) {
             // If GCM fails, try legacy CBC format
             try {
                 return decryptLegacyCBC(encryptedText, secretKey);
@@ -67,7 +64,14 @@ public final class Aes256Encrypt {
             }
         }
     }
-
+    
+    private static SecretKey getSecrete(String aSecret, byte[] aSaltByte)
+            throws NoSuchAlgorithmException, InvalidKeySpecException {
+        final String decodedKey = new String(Base64.getDecoder().decode(aSecret));
+        final SecretKeyFactory factory = SecretKeyFactory.getInstance("PBKDF2WithHmacSHA256");
+        final KeySpec spec = new PBEKeySpec(decodedKey.toCharArray(), aSaltByte, 65536, 256);
+        return new SecretKeySpec(factory.generateSecret(spec).getEncoded(), "AES");
+    }
     /**
      * Modern GCM decryption
      */
