@@ -9,6 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -61,15 +65,47 @@ public class AccountInfo
 
     
        List<UserInfo> userlist= getData(aResultSet);
-       
-       decrypt(userlist);
+       if(firstTime) {
+       decryptWithVirtualThread(userlist);
+       }else {
+    	   
+           decrypt(userlist);
 
+       }
+       
        firstTime=false;
         if (log.isDebugEnabled())
             log.debug("Completed loading db records into inmemory. Total Records Loaded : " + userPassMap.size());
     }
 
-    private void decrypt(List<UserInfo> userlist) {
+    private void decryptWithVirtualThread(List<UserInfo> userlist) {
+		
+    	 try (ExecutorService executor = Executors.newVirtualThreadPerTaskExecutor()) {
+    	        
+    	        // Submit all tasks and collect Futures
+    	        List<Future<?>> futures = new ArrayList<>();
+    	        for (UserInfo userInfo : userlist) {
+    	        	Decrypt decrypt=new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo,firstTime);
+
+    	            Future<?> future = executor.submit(decrypt);
+    	            futures.add(future);
+    	        }
+    	        
+    	        // Wait for all tasks to complete
+    	        for (Future<?> future : futures) {
+    	            try {
+    	                future.get(); // This blocks until the task completes
+    	            } catch (InterruptedException | ExecutionException e) {
+    	                // Handle exceptions
+    	                e.printStackTrace();
+    	            }
+    	        }
+    	    }
+
+    	
+	}
+
+	private void decrypt(List<UserInfo> userlist) {
 
     	for (UserInfo userInfo : userlist) {
             new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo,firstTime).run();
