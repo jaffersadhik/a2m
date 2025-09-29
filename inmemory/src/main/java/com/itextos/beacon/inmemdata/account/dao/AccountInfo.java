@@ -76,12 +76,6 @@ public class AccountInfo
             new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo).run();
             
             	
-            	try {
-					Thread.sleep(300L);
-				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
             	
             
         }
