@@ -9,9 +9,10 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -70,19 +71,19 @@ public class AccountInfo
     }
 
     private void decrypt(List<UserInfo> userlist) {
-        int availableProcessors = Runtime.getRuntime().availableProcessors();
-        int threadCount = Math.min(availableProcessors, userlist.size());
-        
-        try (ExecutorService executor = Executors.newFixedThreadPool(threadCount)) {
-            List<CompletableFuture<Void>> futures = userlist.stream()
-                .map(userInfo -> CompletableFuture.runAsync(() -> {
-                    new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo).run();
-                }, executor))
-                .toList();
 
-            // Wait for all tasks to complete
-            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0]))
-                .join();
+    	for (UserInfo userInfo : userlist) {
+            new Decrypt(userPassMap, accessKeyMap, clientIdMap, userInfo).run();
+            
+            	
+            	try {
+					Thread.sleep(300L);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+            	
+            
         }
     }
     
