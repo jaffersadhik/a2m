@@ -108,7 +108,7 @@ public class InMemoryQueueWithRepeater {
         lDlvInfo.setClientId(aDeliveryObject.getClientId());
         lDlvInfo.setSourceAddress(MessageUtil.getHeaderId(aDeliveryObject));
         lDlvInfo.setDestinationAddress(aDeliveryObject.getMobileNumber());
-        lDlvInfo.setEsmClass(aDeliveryObject.getSmppEsmClass());
+        lDlvInfo.setEsmClass(""+4);
         lDlvInfo.setServiceType("sms");
         lDlvInfo.setDataCoding(aDeliveryObject.getDcs());
         lDlvInfo.setMsgId(aDeliveryObject.getFileId());
