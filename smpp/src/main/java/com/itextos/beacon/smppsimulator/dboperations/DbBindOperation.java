@@ -72,7 +72,7 @@ public class DbBindOperation
         }
         catch (final Exception e)
         {
-            log.error("Excception while inserting the data into 'smpp_bind_info'", e);
+            log.error("Excception while inserting the data into 'smpp_bind_info' data : "+aBindIngoList , e);
             CommonUtility.rollbackConnection(lSqlConn);
 
             final String s = "Excception while inserting the data into 'smpp_bind_info'";
