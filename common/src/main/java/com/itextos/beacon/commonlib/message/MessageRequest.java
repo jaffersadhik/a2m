@@ -35,7 +35,7 @@ public class MessageRequest
     
     private static final Log log = LogFactory.getLog(MessageRequest.class);
 
-
+    private Date                    mSMPPReceivedTime = null;
     private Date                    mFirstReceivedTime = null;
     private Date                    mLastReceivedTime  = null;
     private final List<MessagePart> mMessageParts      = new ArrayList<>();
@@ -63,7 +63,17 @@ public class MessageRequest
         super(aClusterType, aInterfaceType, aInterfaceGroup, aMessageType, aMessagePriority, aRouteType, "MessageRequest", aAccountJsonString);
     }
 
-    public MessageRequest(
+    
+    
+    public Date getmSMPPReceivedTime() {
+		return mSMPPReceivedTime;
+	}
+
+	public void setmSMPPReceivedTime(Date mSMPPReceivedTime) {
+		this.mSMPPReceivedTime = mSMPPReceivedTime;
+	}
+
+	public MessageRequest(
             String aCompleteJsonString)
             throws Exception
     {

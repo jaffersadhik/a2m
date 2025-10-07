@@ -42,6 +42,8 @@ public class InMemoryQueueWithRepeater {
 
     // Method to add items to the queue
     public void addToQueue(MessageRequest lMessageRequest) {
+    	
+    	lMessageRequest.setmSMPPReceivedTime(new Date());
         try {
             queue.put(lMessageRequest); // Blocks if the queue is full
         } catch (InterruptedException e) {
@@ -55,21 +57,18 @@ public class InMemoryQueueWithRepeater {
     	
     	return queue.size();
     }
-    // Repeater process that continuously consumes items from the queue
     public void startRepeaterProcess() {
-    	
-    	Thread.ofVirtual().start(() -> {
+        Thread.startVirtualThread(() -> {
             while (true) {
                 try {
                     // Poll the queue with a timeout to avoid indefinite blocking
-                	MessageRequest lMessageRequest = queue.poll(2, TimeUnit.SECONDS);
+                    MessageRequest lMessageRequest = queue.poll(2, TimeUnit.SECONDS);
 
                     if (lMessageRequest != null) {
                         processItem(lMessageRequest); // Process the item
                     } else {
                         System.out.println("Queue is empty, waiting for new items...");
                     }
-
                 } catch (InterruptedException e) {
                     Thread.currentThread().interrupt();
                     System.err.println("Repeater process interrupted: " + e.getMessage());
@@ -82,6 +81,20 @@ public class InMemoryQueueWithRepeater {
     // Example item processing method
     private void processItem(MessageRequest aDeliveryObject) {
        
+    	Date rDate=aDeliveryObject.getmSMPPReceivedTime();
+    	
+    	while(true) {
+    		
+    		if((System.currentTimeMillis()-rDate.getTime())>500) {
+    			break;
+    		}else {
+    			try {
+    				Thread.sleep(1L);
+    			} catch (InterruptedException e) {
+    				e.printStackTrace();
+    			}
+    		}
+    	}
     	
     	DeliverSmInfo dsm=getDeliveryInfo(aDeliveryObject);
     	send(aDeliveryObject, dsm);
