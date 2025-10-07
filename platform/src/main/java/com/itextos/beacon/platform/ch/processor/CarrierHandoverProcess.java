@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -261,11 +263,18 @@ public class CarrierHandoverProcess
 
                        final Timer      lKannelConnect = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "KannelConnect");
 
-                       final HttpResult lHttpResult    = BasicHttpConnector.connect(lKannelUrl);
-                       final boolean    lResponse      = lHttpResult.isSuccess();
+                     //  final HttpResult lHttpResult    = BasicHttpConnector.connect(lKannelUrl);
+                       
+                       CompletableFuture<HttpResult> future=BasicHttpConnector.connectAsync(lKannelUrl);
+                       final AtomicBoolean lResponseAtomic = new AtomicBoolean(false);
+
+                       future.thenAccept(result -> {
+                    	   lResponseAtomic.set(result.isSuccess());
+                    	});
 
                        PrometheusMetrics.componentMethodEndTimer(Component.CH, lKannelConnect);
 
+                       boolean lResponse=lResponseAtomic.get();
                       
                    	lMessageRequest.getLogBuffer().append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(lMessageRequest.getBaseMessageId()+" :: kannel URL--->" + lKannelUrl + "', Response : '" + lResponse + "'");
 
