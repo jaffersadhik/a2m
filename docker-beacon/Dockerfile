@@ -65,6 +65,41 @@ COPY ./target/common/r3c_addinfo.properties /r3c_addinfo.properties
 COPY ./target/common/prometheus.control.properties /prometheus.control.properties
 COPY ./target/common/mcc-mnc-list.json /mcc-mnc-list.json
 
+
+RUN mkdir -p /fileprocessor/224
+RUN mkdir -p /fileprocessor/216
+
+COPY ./target/fileprocessor/global.properties_216 /fileprocessor/global.properties_216
+COPY ./target/fileprocessor/global.properties_224 /fileprocessor/global.properties_224
+
+
+COPY ./target/fileprocessor/224/campaignfinisher.properties /fileprocessor/224/campaignfinisher.properties
+COPY ./target/fileprocessor/224/dltprocessor.properties /fileprocessor/224/dltprocessor.properties
+COPY ./target/fileprocessor/224/downloadhandler.properties /fileprocessor/224/downloadhandler.properties
+COPY ./target/fileprocessor/224/excludeprocessor.properties /fileprocessor/224/excludeprocessor.properties
+COPY ./target/fileprocessor/224/groupsprocessor.properties /fileprocessor/224/groupsprocessor.properties
+COPY ./target/fileprocessor/224/handoverstage.properties /fileprocessor/224/handoverstage.properties
+COPY ./target/fileprocessor/224/initialstage.properties /fileprocessor/224/initialstage.properties
+COPY ./target/fileprocessor/224/jndi-list.properties /fileprocessor/224/jndi-list.properties
+COPY ./target/fileprocessor/224/scheduleprocessor.properties /fileprocessor/224/scheduleprocessor.properties
+COPY ./target/fileprocessor/224/splitstage.properties /fileprocessor/224/splitstage.properties
+COPY ./target/fileprocessor/224/utils.properties /fileprocessor/224/utils.properties
+
+
+COPY ./target/fileprocessor/216/campaignfinisher.properties /fileprocessor/216/campaignfinisher.properties
+COPY ./target/fileprocessor/216/dltprocessor.properties /fileprocessor/216/dltprocessor.properties
+COPY ./target/fileprocessor/216/downloadhandler.properties /fileprocessor/216/downloadhandler.properties
+COPY ./target/fileprocessor/216/excludeprocessor.properties /fileprocessor/216/excludeprocessor.properties
+COPY ./target/fileprocessor/216/groupsprocessor.properties /fileprocessor/216/groupsprocessor.properties
+COPY ./target/fileprocessor/216/handoverstage.properties /fileprocessor/216/handoverstage.properties
+COPY ./target/fileprocessor/216/initialstage.properties /fileprocessor/216/initialstage.properties
+COPY ./target/fileprocessor/216/jndi-list.properties /fileprocessor/216/jndi-list.properties
+COPY ./target/fileprocessor/216/scheduleprocessor.properties /fileprocessor/216/scheduleprocessor.properties
+COPY ./target/fileprocessor/216/splitstage.properties /fileprocessor/216/splitstage.properties
+COPY ./target/fileprocessor/216/utils.properties /fileprocessor/216/utils.properties
+
+
+
 COPY ./target/profile/default/kafka2elasticsearch.properties /kafka2elasticsearch.properties_default
 COPY ./target/profile/default/kafka-producer.properties /kafka-producer.properties_default
 COPY ./target/profile/default/kafka-consumer.properties /kafka-consumer.properties_default

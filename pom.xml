@@ -94,6 +94,7 @@
 	<module>databasescript</module>
 	<module>docker-beacon</module>
 
+	<module>fileprocessor</module>
   </modules>
   
     <dependencies>
