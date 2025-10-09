@@ -1,16 +1,14 @@
 package com.winnovature.splitstage.consumers;
 
-import java.util.Map;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.winnovature.logger.SplitStageLog;
 import com.winnovature.splitstage.handlers.MasterFileSplitHandler;
 import com.winnovature.splitstage.singletons.RedisConnectionFactory;
-import com.winnovature.splitstage.utils.Constants;
 import com.winnovature.utils.dtos.RedisServerDetailsBean;
 import com.winnovature.utils.singletons.ConfigParamsTon;
 import com.winnovature.utils.utils.HeartBeatMonitoring;
@@ -19,7 +17,7 @@ import com.winnovature.utils.utils.Utility;
 
 import redis.clients.jedis.Jedis;
 
-public class FileSplitQConsumer extends Thread {
+public class FileSplitQConsumer implements Runnable {
 //	static Log log = LogFactory.getLog(Constants.SplitStageLogger);
 	static SplitStageLog log= SplitStageLog.getInstance();
 	
@@ -29,12 +27,23 @@ public class FileSplitQConsumer extends Thread {
 	String className = "[FileSplitQConsumer]";
 	private String instanceId = "";
 	private long sleepTime = 1000;
-
+    private String name=null;
 	public FileSplitQConsumer(RedisServerDetailsBean bean, String instanceId) {
 		this.bean = bean;
 		this.instanceId = instanceId;
 		this.sleepTime = Utility.getConsumersSleepTime();
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 
 	@Override
 	public void run() {

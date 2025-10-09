@@ -18,8 +18,8 @@ import com.winnovature.logger.GroupProcessorLog;
 import com.winnovature.utils.utils.EmailValidator;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.params.ScanParams;
+import redis.clients.jedis.resps.ScanResult;
 
 public class GroupRedisDAO {
 	static GroupProcessorLog log=GroupProcessorLog.getInstance();
@@ -254,7 +254,7 @@ public class GroupRedisDAO {
 		long total = 0L;
 		try {
 			ScanParams scanParams = new ScanParams().count(limit);
-			String cur = redis.clients.jedis.ScanParams.SCAN_POINTER_START;
+			String cur = ScanParams.SCAN_POINTER_START;
 			boolean cycleIsFinished = false;
 			while (!cycleIsFinished) {
 				ScanResult<String> scanResult = jedis.sscan(key, cur, scanParams);

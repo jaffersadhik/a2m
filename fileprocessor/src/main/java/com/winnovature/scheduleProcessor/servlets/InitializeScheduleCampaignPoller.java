@@ -1,31 +1,22 @@
 package com.winnovature.scheduleProcessor.servlets;
 
-import java.io.IOException;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.scheduleProcessor.pollers.ScheduleCampaignPoller;
 import com.winnovature.scheduleProcessor.utils.Constants;
-import com.winnovature.utils.utils.ExecutorSheduler;
 
-public class InitializeScheduleCampaignPoller extends GenericServlet implements Servlet {
+public class InitializeScheduleCampaignPoller  {
 
 	private static final long serialVersionUID = 1L;
 	static Log log = LogFactory.getLog(Constants.ScheduleProcessorLogger);
 	private static final String className = "InitializeScheduleCampaignPoller";
 	ScheduleCampaignPoller CSAPoller = null;
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
+
+	public void init()  {
 		
 	
 			
@@ -38,10 +29,10 @@ public class InitializeScheduleCampaignPoller extends GenericServlet implements 
 
 				CSAPoller = new ScheduleCampaignPoller("CSAPoller");
 				CSAPoller.setName("CSAPoller");
-				CSAPoller.start();
+				ExecutorFilePoller.getInstance().addTask(CSAPoller, "CSAPoller");
+	//			CSAPoller.start();
 	//			ExecutorSheduler.addTask(CSAPoller);
 
-				PrometheusMetrics.registerServer();
 		        PrometheusMetrics.registerApiMetrics();
 				if (log.isDebugEnabled())
 					log.debug(className + " CampaignMasterPoller[CSAPoller] started.");
@@ -55,9 +46,6 @@ public class InitializeScheduleCampaignPoller extends GenericServlet implements 
 		
 	}
 
-	@Override
-	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-
-	}
+	
 
 }

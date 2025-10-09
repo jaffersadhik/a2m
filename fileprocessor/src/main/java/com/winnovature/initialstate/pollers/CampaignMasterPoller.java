@@ -16,15 +16,26 @@ import com.winnovature.utils.singletons.ConfigParamsTon;
 import com.winnovature.utils.utils.HeartBeatMonitoring;
 import com.winnovature.utils.utils.Utility;
 
-public class CampaignMasterPoller extends Thread {
+public class CampaignMasterPoller implements Runnable {
 
 	static Log log = LogFactory.getLog(Constants.InitialStageLogger);
 	private static final String className = "[CampaignMasterPoller]";
 	private String threadName = null;
-
+	private String name=null;
 	public CampaignMasterPoller(String threadName) throws Exception {
 		this.threadName = threadName;
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 
 	@Override
 	public void run() {

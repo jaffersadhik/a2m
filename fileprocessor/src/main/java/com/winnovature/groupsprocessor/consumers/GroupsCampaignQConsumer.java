@@ -24,7 +24,7 @@ import com.winnovature.utils.utils.Utility;
 
 import redis.clients.jedis.Jedis;
 
-public class GroupsCampaignQConsumer extends Thread {
+public class GroupsCampaignQConsumer implements Runnable {
 //	static Log log = LogFactory.getLog(Constants.GroupsProcessorLogger);
 	static GroupProcessorLog log=GroupProcessorLog.getInstance();
 
@@ -38,11 +38,27 @@ public class GroupsCampaignQConsumer extends Thread {
 	String queueName = null;
 	Map<String, String> configMap = null;
 
+	private String name=null;
+	
 	public GroupsCampaignQConsumer(RedisServerDetailsBean bean, String instanceId) {
 		this.bean = bean;
 		this.instanceId = instanceId;
 		this.sleepTime = Utility.getConsumersSleepTime();
 	}
+	
+	
+
+	public String getName() {
+		return name;
+	}
+
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
 
 	@Override
 	public void run() {

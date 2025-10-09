@@ -24,7 +24,7 @@ import com.winnovature.utils.utils.Utility;
 
 import redis.clients.jedis.Jedis;
 
-public class GroupsFileSplitQConsumer extends Thread {
+public class GroupsFileSplitQConsumer implements Runnable {
 	//static Log log = LogFactory.getLog(Constants.GroupsProcessorLogger);
 	static GroupProcessorLog log=GroupProcessorLog.getInstance();
 
@@ -38,12 +38,24 @@ public class GroupsFileSplitQConsumer extends Thread {
 	private Map<String, String> requestMap = null;
 	PropertiesConfiguration groupsProperties = null;
 
+	private String name=null;
 	public GroupsFileSplitQConsumer(RedisServerDetailsBean bean, String instanceId, String batchSize) {
 		this.bean = bean;
 		this.instanceId = instanceId;
 		this.sleepTime = Utility.getConsumersSleepTime();
 		this.batchSize = batchSize;
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 
 	@Override
 	public void run() {

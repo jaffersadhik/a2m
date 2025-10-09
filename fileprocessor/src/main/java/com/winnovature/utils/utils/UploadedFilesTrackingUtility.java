@@ -15,8 +15,8 @@ import com.winnovature.utils.dtos.RedisServerDetailsBean;
 import com.winnovature.utils.singletons.RedisConnectionFactory;
 
 import redis.clients.jedis.Jedis;
-import redis.clients.jedis.ScanParams;
-import redis.clients.jedis.ScanResult;
+import redis.clients.jedis.params.ScanParams;
+import redis.clients.jedis.resps.ScanResult;
 
 public class UploadedFilesTrackingUtility {
 	static Log log = LogFactory.getLog(Constants.UtilsLogger);
@@ -67,7 +67,7 @@ public class UploadedFilesTrackingUtility {
 
 			if (jedis.exists(key)) {
 				ScanParams scanParams = new ScanParams().count(limit);
-				String cur = redis.clients.jedis.ScanParams.SCAN_POINTER_START;
+				String cur = ScanParams.SCAN_POINTER_START;
 				list = new ArrayList<String>();
 				boolean cycleIsFinished = false;
 				while (!cycleIsFinished) {

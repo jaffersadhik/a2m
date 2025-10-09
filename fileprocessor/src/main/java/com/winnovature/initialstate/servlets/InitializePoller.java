@@ -1,24 +1,16 @@
 package com.winnovature.initialstate.servlets;
 
-import java.io.IOException;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.initialstate.pollers.CampaignGroupsPoller;
 import com.winnovature.initialstate.pollers.CampaignMasterPoller;
 import com.winnovature.initialstate.utils.Constants;
 import com.winnovature.logger.InitialStageLog;
-import com.winnovature.utils.utils.ExecutorSheduler;
 
-public class InitializePoller extends GenericServlet implements Servlet {
+public class InitializePoller {
 
 	private static final long serialVersionUID = 1L;
 	static Log log = LogFactory.getLog(Constants.InitialStageLogger);
@@ -26,9 +18,9 @@ public class InitializePoller extends GenericServlet implements Servlet {
 	CampaignMasterPoller campaignMasterPoller = null;
 	CampaignGroupsPoller campaignGroupsPoller = null;
 
-	@Override
-	public void init() throws ServletException {
-		super.init();
+	
+	public void init()  {
+		
 		
 		
 	
@@ -42,7 +34,8 @@ public class InitializePoller extends GenericServlet implements Servlet {
 
 				campaignMasterPoller = new CampaignMasterPoller("CampaignMasterPoller");
 				campaignMasterPoller.setName("CampaignMasterPoller");
-				campaignMasterPoller.start();
+				ExecutorFilePoller.getInstance().addTask(campaignMasterPoller, "CampaignMasterPoller");
+		//		campaignMasterPoller.start();
 		//		ExecutorSheduler.addTask(campaignMasterPoller);
 
 				InitialStageLog.getInstance().debug(className+" : campaignMasterPoller.start()  " );
@@ -53,14 +46,14 @@ public class InitializePoller extends GenericServlet implements Servlet {
 				
 				campaignGroupsPoller = new CampaignGroupsPoller("CampaignGroupsPoller");
 				campaignGroupsPoller.setName("CampaignGroupsPoller");
-				campaignGroupsPoller.start();
+				ExecutorFilePoller.getInstance().addTask(campaignGroupsPoller, "CampaignGroupsPoller");
+			//	campaignGroupsPoller.start();
 			//	ExecutorSheduler.addTask(campaignGroupsPoller);
 
 				InitialStageLog.getInstance().debug(className+" : campaignGroupsPoller.start()  " );
 
 				if (log.isDebugEnabled())
 					log.debug(className + " CampaignGroupsPoller started.");
-				PrometheusMetrics.registerServer();
 		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + " Exception:", e);
@@ -71,9 +64,6 @@ public class InitializePoller extends GenericServlet implements Servlet {
 		
 	}
 
-	@Override
-	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-
-	}
+	
 
 }

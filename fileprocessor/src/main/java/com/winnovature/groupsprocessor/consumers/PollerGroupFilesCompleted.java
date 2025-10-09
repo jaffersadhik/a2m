@@ -15,7 +15,7 @@ import com.winnovature.logger.GroupProcessorLog;
 import com.winnovature.utils.utils.HeartBeatMonitoring;
 import com.winnovature.utils.utils.Utility;
 
-public class PollerGroupFilesCompleted extends Thread {
+public class PollerGroupFilesCompleted implements Runnable {
 
 	static GroupProcessorLog log=GroupProcessorLog.getInstance();
 
@@ -32,6 +32,8 @@ public class PollerGroupFilesCompleted extends Thread {
 
 	private long sleepTime = 1000;
 
+	private String name=null;
+	
 	public PollerGroupFilesCompleted() throws Exception {
 		try {
 			prop = GroupsProcessorPropertiesTon.getInstance().getPropertiesConfiguration();
@@ -41,6 +43,17 @@ public class PollerGroupFilesCompleted extends Thread {
 		}
 		this.sleepTime = com.winnovature.utils.utils.Utility.getConsumersSleepTime();
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 
 	private void consumerSleep(long sleepTime) {
 		try {

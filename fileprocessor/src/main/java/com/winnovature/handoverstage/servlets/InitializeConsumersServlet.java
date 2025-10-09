@@ -1,16 +1,9 @@
 package com.winnovature.handoverstage.servlets;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
@@ -19,6 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.messageidentifier.MessageIdentifier;
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.itextos.beacon.http.interfacefallback.inmem.FallbackQReaper;
 import com.winnovature.handoverstage.consumers.SplitFileConsumer;
 import com.winnovature.handoverstage.singletons.HandoverStagePropertiesTon;
@@ -28,9 +22,8 @@ import com.winnovature.logger.HandoverStageLog;
 import com.winnovature.utils.dtos.RedisServerDetailsBean;
 import com.winnovature.utils.singletons.ConfigParamsTon;
 import com.winnovature.utils.utils.App;
-import com.winnovature.utils.utils.ExecutorSheduler;
 
-public class InitializeConsumersServlet extends GenericServlet implements Servlet {
+public class InitializeConsumersServlet {
 	private static final long serialVersionUID = 1L;
 	static Log log = LogFactory.getLog(Constants.HandoverStageLogger);
 	private static final String className = "[InitializeConsumersServlet]";
@@ -38,14 +31,9 @@ public class InitializeConsumersServlet extends GenericServlet implements Servle
 	SplitFileConsumer consumer = null;
 	final MessageIdentifier lMsgIdentifier = MessageIdentifier.getInstance();
 	
-	@Override
-	public void service(ServletRequest arg0, ServletResponse arg1)
-			throws ServletException, IOException {
-
-	}
 	
-	public void init() throws ServletException {
-		super.init();
+	
+	public void init()  {
 
 		App.createfolder();
 
@@ -82,7 +70,8 @@ public class InitializeConsumersServlet extends GenericServlet implements Servle
 
 							consumer = new SplitFileConsumer(queueName, bean, instanceId);
 							consumer.setName("Thread" + i + "-" + queueName);
-							consumer.start();
+							ExecutorFilePoller.getInstance().addTask(consumer, "Thread" + i + "-" + queueName);
+					//		consumer.start();
 					//		ExecutorSheduler.addTask(consumer);
 
 							HandoverStageLog.getInstance().debug(className+" consumer.start() : "+consumer.getName());
@@ -96,7 +85,6 @@ public class InitializeConsumersServlet extends GenericServlet implements Servle
 
 				}
 				
-				PrometheusMetrics.registerServer();
 		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + "[init]  Exception:", e);

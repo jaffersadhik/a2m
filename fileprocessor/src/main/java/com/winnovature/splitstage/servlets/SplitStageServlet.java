@@ -1,22 +1,14 @@
 package com.winnovature.splitstage.servlets;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import javax.servlet.GenericServlet;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-
 import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.logger.SplitStageLog;
 import com.winnovature.splitstage.consumers.FileSplitQConsumer;
 import com.winnovature.splitstage.singletons.RedisConnectionTon;
@@ -24,9 +16,8 @@ import com.winnovature.splitstage.singletons.SplitStagePropertiesTon;
 import com.winnovature.splitstage.utils.Constants;
 import com.winnovature.utils.dtos.RedisServerDetailsBean;
 import com.winnovature.utils.singletons.ConfigParamsTon;
-import com.winnovature.utils.utils.ExecutorSheduler;
 
-public class SplitStageServlet extends GenericServlet implements Servlet {
+public class SplitStageServlet  {
 
 	private static final long serialVersionUID = 4534056481918798836L;
 	//static Log log = LogFactory.getLog(Constants.SplitStageLogger);
@@ -35,18 +26,15 @@ public class SplitStageServlet extends GenericServlet implements Servlet {
 	FileSplitQConsumer fileSplitQConsumer = null;
 	PropertiesConfiguration prop = null;
 
-	@Override
-	public void service(ServletRequest req, ServletResponse res) throws ServletException, IOException {
-	}
+	
 
-	public void init() throws ServletException {
+	public void init()  {
 		String methodName = " [init] ";
 
 		if (log.isDebugEnabled()) {
 			log.debug(className + methodName + "begin ..");
 		}
 
-		super.init();
 
 		SplitStageLog.getInstance().debug(className+" init() ");
 		
@@ -80,7 +68,8 @@ public class SplitStageServlet extends GenericServlet implements Servlet {
 					for (int i = 0; i < splitConsumersPerRedisServer; i++) {
 						fileSplitQConsumer = new FileSplitQConsumer(bean, instanceId);
 						fileSplitQConsumer.setName("Thread" + (i+1) + "-" + "SplitQConsumer");
-						fileSplitQConsumer.start();
+						ExecutorFilePoller.getInstance().addTask(fileSplitQConsumer, "Thread" + (i+1) + "-" + "SplitQConsumer");
+					//	fileSplitQConsumer.start();
 					//	ExecutorSheduler.addTask(fileSplitQConsumer);
 
 						SplitStageLog.getInstance().debug(className+" fileSplitQConsumer.start() : "+fileSplitQConsumer.getName());
@@ -93,7 +82,6 @@ public class SplitStageServlet extends GenericServlet implements Servlet {
 				} // end of REDIS servers iteration
 
 				
-				PrometheusMetrics.registerServer();
 		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + methodName + " >>>> Exception: ", e);

@@ -20,7 +20,7 @@ import com.winnovature.utils.utils.Utility;
 
 import redis.clients.jedis.Jedis;
 
-public class QueryExecutor extends Thread {
+public class QueryExecutor implements Runnable {
 
 	static Log log = LogFactory.getLog(Constants.CampaignFinisherLogger);
 	private static final String className = "[QueryExecutor]";
@@ -28,10 +28,25 @@ public class QueryExecutor extends Thread {
 	RedisServerDetailsBean bean = null;
 	private long sleepTime = 1000;
 
+	private String name=null;
 	public QueryExecutor(RedisServerDetailsBean bean) throws Exception {
 		this.bean = bean;
 		this.sleepTime = com.winnovature.utils.utils.Utility.getIdleThreadSleepTime();
 	}
+	
+	
+
+	public String getName() {
+		return name;
+	}
+
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+
 
 	@Override
 	public void run() {

@@ -24,7 +24,7 @@ import com.winnovature.utils.utils.JsonUtility;
 
 import redis.clients.jedis.Jedis;
 
-public class SplitFileConsumer extends Thread {
+public class SplitFileConsumer implements Runnable {
 	static Log logger = LogFactory.getLog(Constants.HandoverStageLogger);
 	private static final String className = "[SplitFileConsumer]";
 
@@ -33,7 +33,7 @@ public class SplitFileConsumer extends Thread {
 	private String deliveryQ = "";
 	private long sleepTime = 1000;
 	long nextRequestPickDelay = 1000l;
-	
+	private String name=null;
 	public SplitFileConsumer(String queue, RedisServerDetailsBean bean,
 			String instanceId) {
 		this.bean = bean;
@@ -42,6 +42,17 @@ public class SplitFileConsumer extends Thread {
 		this.sleepTime = com.winnovature.utils.utils.Utility
 				.getConsumersSleepTime();
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 
 	@Override
 	public void run() {

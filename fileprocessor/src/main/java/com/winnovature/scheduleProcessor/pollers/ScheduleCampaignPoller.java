@@ -15,15 +15,27 @@ import com.winnovature.scheduleProcessor.singletons.ScheduleProcessorPropertiesT
 import com.winnovature.utils.utils.HeartBeatMonitoring;
 import com.winnovature.utils.utils.Utility;
 
-public class ScheduleCampaignPoller extends Thread {
+public class ScheduleCampaignPoller implements Runnable {
 
 	static Log log = LogFactory.getLog(Constants.ScheduleProcessorLogger);
 	private static final String className = "[ScheduleCampaignPoller]";
 	private String threadName = null;
 
+	private String name =null;
 	public ScheduleCampaignPoller(String threadName) throws Exception {
 		this.threadName = threadName;
 	}
+
+	
+	public String getName() {
+		return name;
+	}
+
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
 
 	@Override
 	public void run() {

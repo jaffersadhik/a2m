@@ -15,6 +15,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 
 import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.groupsprocessor.consumers.GroupsCampaignQConsumer;
 import com.winnovature.groupsprocessor.consumers.GroupsFileSplitQConsumer;
 import com.winnovature.groupsprocessor.consumers.GroupsQConsumer;
@@ -65,7 +66,8 @@ public class InitializePoller  {
 				if (runGroupsPoller) {
 					groupsMasterPoller = new GroupsMasterPoller("GroupsMasterPoller");
 					groupsMasterPoller.setName("GroupsMasterPoller");
-					groupsMasterPoller.start();
+					ExecutorFilePoller.getInstance().addTask(groupsMasterPoller, "GroupsMasterPoller");
+				//	groupsMasterPoller.start();
 				//	ExecutorSheduler.addTask(groupsMasterPoller);
 
 					if (log.isDebugEnabled()) {
@@ -85,7 +87,8 @@ public class InitializePoller  {
 					for (int i = 0; i < groupFileConsumersPerRedisServer; i++) {
 						groupsQConsumer = new GroupsQConsumer(bean, instanceId);
 						groupsQConsumer.setName("Thread" + (i + 1) + "-" + "GroupsQConsumer");
-						groupsQConsumer.start();
+						ExecutorFilePoller.getInstance().addTask(groupsQConsumer, "Thread" + (i + 1) + "-" + "GroupsQConsumer");
+					//	groupsQConsumer.start();
 					//	ExecutorSheduler.addTask(groupsQConsumer);
 
 						if (log.isDebugEnabled())
@@ -104,7 +107,8 @@ public class InitializePoller  {
 					for (int i = 0; i < groupSplitFileConsumersPerRedisServer; i++) {
 						groupsFileSplitQConsumer = new GroupsFileSplitQConsumer(bean, instanceId, batchSize);
 						groupsFileSplitQConsumer.setName("Thread" + (i + 1) + "-" + "GroupsFileSplitQConsumer");
-						groupsFileSplitQConsumer.start();
+						ExecutorFilePoller.getInstance().addTask(groupsFileSplitQConsumer, "Thread" + (i + 1) + "-" + "GroupsFileSplitQConsumer");
+				//		groupsFileSplitQConsumer.start();
 					//	ExecutorSheduler.addTask(groupsFileSplitQConsumer);
 
 						if (log.isDebugEnabled())
@@ -117,7 +121,8 @@ public class InitializePoller  {
 				if (runGroupsPoller) {
 					pollerGroupFilesCompleted = new PollerGroupFilesCompleted();
 					pollerGroupFilesCompleted.setName("PollerGroupFilesCompleted");
-					pollerGroupFilesCompleted.start();
+					ExecutorFilePoller.getInstance().addTask(pollerGroupFilesCompleted, "PollerGroupFilesCompleted");
+			//		pollerGroupFilesCompleted.start();
 				//	ExecutorSheduler.addTask(pollerGroupFilesCompleted);
 
 					if (log.isDebugEnabled()) {
@@ -126,7 +131,8 @@ public class InitializePoller  {
 					
 					pollerGroupMasterCompleted = new PollerGroupMasterCompleted();
 					pollerGroupMasterCompleted.setName("PollerGroupMasterCompleted");
-					pollerGroupMasterCompleted.start();
+					ExecutorFilePoller.getInstance().addTask(pollerGroupMasterCompleted, "PollerGroupMasterCompleted");
+				//	pollerGroupMasterCompleted.start();
 				//	ExecutorSheduler.addTask(pollerGroupMasterCompleted);
 
 					if (log.isDebugEnabled()) {
@@ -135,7 +141,8 @@ public class InitializePoller  {
 					
 					pollerCampaignMasterCompleted = new PollerCampaignMasterCompleted();
 					pollerCampaignMasterCompleted.setName("PollerCampaignMasterCompleted");
-					pollerCampaignMasterCompleted.start();
+					ExecutorFilePoller.getInstance().addTask(pollerCampaignMasterCompleted, "PollerCampaignMasterCompleted");
+				//	pollerCampaignMasterCompleted.start();
 				//	ExecutorSheduler.addTask(pollerCampaignMasterCompleted);
 
 					if (log.isDebugEnabled()) {
@@ -153,7 +160,8 @@ public class InitializePoller  {
 					for (int i = 0; i < groupsCampaignQConsumersPerRedisServer; i++) {
 						groupsCampaignQConsumer = new GroupsCampaignQConsumer(bean, instanceId);
 						groupsCampaignQConsumer.setName("Thread" + (i+1) + "-" + "GroupsCampaignQConsumer");
-						groupsCampaignQConsumer.start();
+						ExecutorFilePoller.getInstance().addTask(groupsCampaignQConsumer, "Thread" + (i+1) + "-" + "GroupsCampaignQConsumer");
+					//	groupsCampaignQConsumer.start();
 					//	ExecutorSheduler.addTask(groupsCampaignQConsumer);
 
 						if (log.isDebugEnabled())

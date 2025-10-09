@@ -44,8 +44,8 @@ public class ServletInitializer  {
 					for (int i = 1; i <= queryExecutionConsumersCount; i++) {
 						queryExecutionConsumer = new QueryExecutor(bean);
 						queryExecutionConsumer.setName("QueryExecutionConsumer" + i);
-						queryExecutionConsumer.start();
-
+					//	queryExecutionConsumer.start();
+						ExecutorFilePoller.getInstance().addTask(queryExecutionConsumer, "QueryExecutionConsumer" + i);
 						///ExecutorSheduler.addTask(queryExecutionConsumer);
 						
 						if (log.isDebugEnabled())
