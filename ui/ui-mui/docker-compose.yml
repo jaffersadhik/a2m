@@ -1,0 +1,11 @@
+version: '3'
+services:
+  # Angular Application
+  angular-app:
+    image: dk-reg.mas:5000/angular-mui:31dec2024
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "4200:4200"
+

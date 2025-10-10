@@ -1,0 +1,9 @@
+version: '3'
+services:
+  api:
+    image: dockerregistry:5000/node-mui:10oct2025
+    build: .
+    ports:
+      - "3003:3000"
+    volumes: ['./logs:/logs']
+  

@@ -1,0 +1,11 @@
+version: '3'
+services:
+  # Angular Application
+  angular-app:
+    image: dk-reg.mas:5000/angular-cm:31dec2024
+    build:
+      context: .
+      dockerfile: Dockerfile
+   
+
+  

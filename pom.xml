@@ -96,6 +96,7 @@
 
 	<module>fileprocessor</module>
 	<module>logprocessor</module>
+	<module>ui</module>
   </modules>
   
     <dependencies>
