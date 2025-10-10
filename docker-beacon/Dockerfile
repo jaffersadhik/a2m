@@ -137,6 +137,7 @@ COPY ./target/profile/digitalocean4/common-db.properties_do4 /common-db.properti
 COPY ./target/profile/digitalocean4/elasticsearch.properties_do4 /elasticsearch.properties_do4
 COPY ./target/profile/digitalocean4/req_receiver.properties_do4 /req_receiver.properties_do4
 COPY ./target/profile/digitalocean4/kafka2es.properties_do4 /kafka2es.properties_do4
+COPY ./target/profile/digitalocean4/req_receiver.properties_do4 /req_receiver.properties_do4
 
 
 COPY ./target/profile/digitalocean2/kafka-producer.properties_do2 /kafka-producer.properties_do2
