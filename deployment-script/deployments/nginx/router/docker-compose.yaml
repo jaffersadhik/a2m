@@ -1,0 +1,17 @@
+services:
+  router:
+    image: dockerregistry:5000/beacon-nginx:10oct2025
+    ports:
+      - "80:80"
+      - '9280:9280'
+    volumes:
+      - ./logs:/var/log/nginx
+      - ./nginx:/etc/nginx/conf.d
+      - ./config/nginx.conf:/etc/nginx/nginx.conf
+    networks:
+      - app-net
+    restart: always   # <-- Enables auto-restart on crash, reboot, etc.
+
+networks:
+  app-net:
+    external: true
