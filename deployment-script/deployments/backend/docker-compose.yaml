@@ -2,7 +2,7 @@ version: '3.8'
 
 services:
   backend:
-    image: dk-reg.mas:5000/beacon:23sep2025
+    image: dockerregistry:5000/beacon:23sep2025
     ports:
       - "9090:8080"
       - "9091:8081"

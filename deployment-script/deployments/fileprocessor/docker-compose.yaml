@@ -1,28 +1,31 @@
-version: '3.8'
-
 services:
-  smppinterface:
+  fileprocessor:
     image: dockerregistry:5000/beacon:23sep2025
-    container_name: smppinterface
+    ports:
+      - "4080:8080"
+      - "4081:8081"
     volumes:
+      - '/home/data/fileprocessor/log_download/csv:/csv'
+      - '/home/data/fileprocessor:/fileprocessordata'
+      - '/home/data/sqlite:/sqlite'
       - './config/kafka2es.properties:/kafka2es.properties'
       - './logs:/opt/jboss/wildfly/logs'
-    ports:
-      - "2775:2775"
-      - '5081:8081'
-      - "5080:8080"
     environment:
-      - id=1
-      - _JAVA_OPTIONS=-Xmx256m -Xms256m
-      - module=smppinterface
+      - mysqldatadaycount=22
+      - propertyip=224 
+      - module=fileprocessor
       - profile=do4
-      - modvalue=0,1,2,3
-      - cluster.names=trans,bulk,otp,intl
-      - concat.redis.index=0,1,2,3
-      - cluster=trans,bulk,otp,intl
-      - hostname=10.122.0.2
-      - segment=chk3s
+      - priority=$PRIORITY
+      - threadcount=1
+      - topicgroupid=5
+      - hostname=10.122.0.20
+      - segment=ch20
+      - dlrpayloadgen.cluster=$CLUSTER
+      - modvalue=$MOD
+      - cluster.names=$CLUSTER
       - handovergw=unitia
+    logging:
+      driver: "none"
     command: >
       sh -c "java
       -Dcommon.property.file.location=/global.properties
@@ -32,9 +35,10 @@ services:
       -Djavax.xml.bind.JAXBContext=com.sun.xml.bind.v2.ContextFactory
       -Dreactor.schedulers.defaultBoundedElasticSize=50
       -Dreactor.schedulers.defaultBoundedElasticQueueSize=1000
-      -jar /mainmodule-1.0-executable.jar > /dev/null 2>&1"  
+      -jar /mainmodule-1.0-executable.jar > /dev/null 2>&1"
     networks:
-      - interface
+      - backend
+
 networks:
-  interface:
+  backend:
     external: true
