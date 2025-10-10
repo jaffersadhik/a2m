@@ -42,6 +42,13 @@
 			<artifactId>http</artifactId>
 			<version>1.0</version>
 		</dependency>
+			  	<dependency>
+			<groupId>a2m</groupId>
+			<artifactId>logprocessor</artifactId>
+			<version>1.0</version>
+		</dependency>
+		
+		
   </dependencies>
   
 

@@ -799,6 +799,13 @@ public class App {
 			IS_START_PROMETHEUS=true;
 			return true;
 			
+		}else if(module.equals("fileprocessor")){
+			
+			startFileProcessor(args);
+			
+			IS_START_PROMETHEUS=true;
+			return true;
+			
 		}else if(module.equals("kannelsubmit")){
 			
 			startKannelSubmit(args);
@@ -1047,10 +1054,16 @@ public class App {
 		com.itextos.beacon.platform.ic.StartApplication.main(args);
 		com.itextos.beacon.platform.rch.StartApplication.main(args);
 		com.itextos.beacon.platform.sbpcore.StartApplication.main(args);
-
+		com.winnovature.utils.utils.Main.startHandoverStage();
 		
 	}
 
+	
+	private static void startFileProcessor(String[] args) {
+		
+		com.winnovature.utils.utils.Main.startFileProcessor();
+		com.itextos.beacon.queryprocessor.main.App.main(args);
+	}
 	private static void startDN(String[] args) {
 		
 

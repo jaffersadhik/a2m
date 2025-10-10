@@ -95,6 +95,7 @@
 	<module>docker-beacon</module>
 
 	<module>fileprocessor</module>
+	<module>logprocessor</module>
   </modules>
   
     <dependencies>
