@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  backend:
+    image: dk-reg.mas:5000/beacon:23sep2025
+    ports: 
+      - "9090:8080"
+      - "9091:8081"
+    volumes:
+      - './config/kafka2es.properties:/kafka2es.properties'
+      - './logs:/opt/jboss/wildfly/logs'
+    environment: [module=backend,profile=do4,priority=$PRIORITY,threadcount=1,topicgroupid=5,hostname=10.122.0.20,segment=ch20,dlrpayloadgen.cluster=$CLUSTER,modvalue=$MOD,cluster.names=$CLUSTER,handovergw=unitia]
+    networks:
+      - backend
+networks:
+  backend:
+    external: true

@@ -1,0 +1,45 @@
+version: '3.8'
+
+services:
+  backend:
+    image: dk-reg.mas:5000/beacon:23sep2025
+    ports:
+      - "9090:8080"
+      - "9091:8081"
+    volumes:
+      - './config/kafka2es.properties:/kafka2es.properties'
+      - './logs:/opt/jboss/wildfly/logs'
+    environment: 
+      - module=backend
+      - profile=do4
+      - priority=$PRIORITY
+      - threadcount=1
+      - topicgroupid=5
+      - hostname=10.122.0.20
+      - segment=ch20
+      - dlrpayloadgen.cluster=$CLUSTER
+      - modvalue=$MOD
+      - cluster.names=$CLUSTER
+      - handovergw=unitia
+    logging:
+      driver: "none"
+    command: >
+      sh -c "java
+      -Djdk.virtualThreadScheduler.parallelism=4
+      -Djdk.virtualThreadScheduler.maxPoolSize=8
+      -Djdk.virtualThreadScheduler.minRunnable=1
+      -XX:ActiveProcessorCount=4
+      -Xmx2g
+      -XX:ConcGCThreads=1
+      -Dcommon.property.file.location=/global.properties
+      -Dkafka.2.elasticsearch.config.file=/kafka2es.properties
+      -Dlog4j.configurationFile=file:/log4j2-common.xml
+      -Djavax.xml.bind.JAXBContextFactory=com.sun.xml.bind.v2.ContextFactory
+      -Djavax.xml.bind.JAXBContext=com.sun.xml.bind.v2.ContextFactory
+      -jar /mainmodule-1.0-executable.jar > /dev/null 2>&1"
+    networks:
+      - backend
+
+networks:
+  backend:
+    external: true

@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mysql-production
+    environment:
+      MYSQL_ROOT_PASSWORD: root123
+      MYSQL_USER: amapi
+      MYSQL_PASSWORD: amapi123
+      MYSQL_DATABASE: gw
+      TZ: Asia/Kolkata
+      MYSQL_MAX_CONNECTIONS: 2000 
+    ports:
+      - "3306:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./config/my.cnf:/etc/mysql/my.cnf
+      - ./scripts/init:/docker-entrypoint-initdb.d
+      - ./backups:/backups
+    networks:
+      - app-network
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 40s
+    deploy:
+      resources:
+        limits:
+          memory: 2G
+          cpus: '2'
+        reservations:
+          memory: 1G
+          cpus: '1'
+
+volumes:
+  mysql_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/mysqldata  # Optional: specify host path
+      o: bind
+
+networks:
+  app-network:
+    driver: bridge

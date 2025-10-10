@@ -1,0 +1,13 @@
+version: '3'
+services:
+  api:
+    image: dockerregistry:5000/node-cm:10oct2025
+    ports:
+      - "3000:3000"
+    volumes: ['./logs:/usr/src/app/log','./.env:/usr/src/app/.env','/home/data/fileprocessor:/fileprocessordata']
+    restart: always
+    networks:
+      - uibackendnetwork
+networks:
+  uibackendnetwork:
+    external: true

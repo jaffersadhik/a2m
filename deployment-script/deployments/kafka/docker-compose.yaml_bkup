@@ -1,0 +1,39 @@
+version: '3.9'
+
+services:
+  kafka:
+    image: bitnami/kafka:latest
+    container_name: kafkanode166
+    environment:
+      # KRaft Mode Configuration
+      KAFKA_CFG_PROCESS_ROLES: "broker,controller"
+      KAFKA_CFG_NODE_ID: "1"
+      KAFKA_CFG_CONTROLLER_QUORUM_VOTERS: "1@10.122.0.20:30093"
+      
+      # Broker Configuration
+      KAFKA_CFG_BROKER_ID: "1"
+      KAFKA_CFG_NUM_PARTITIONS: "10"
+      KAFKA_CFG_LOG_RETENTION_HOURS: "28"
+      
+      # Listeners Configuration
+      KAFKA_CFG_LISTENERS: "PLAINTEXT://:9092,CONTROLLER://:9093"
+      KAFKA_CFG_ADVERTISED_LISTENERS: "PLAINTEXT://10.122.0.20:30091"
+      KAFKA_CFG_LISTENER_SECURITY_PROTOCOL_MAP: "CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT"
+      KAFKA_CFG_CONTROLLER_LISTENER_NAMES: "CONTROLLER"
+      KAFKA_CFG_INTER_BROKER_LISTENER_NAME: "PLAINTEXT"
+      
+      # Storage
+      KAFKA_CFG_LOG_DIRS: "/bitnami/kafka/data"
+    ports:
+      - "30091:9092"  # Client connections
+      - "30093:9093"  # Controller connections (for KRaft)
+    volumes:
+      - kafka-storage:/bitnami/kafka
+
+volumes:
+  kafka-storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/kafkadata
+      o: bind

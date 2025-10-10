@@ -1,0 +1,32 @@
+version: '3.9'
+
+services:
+  kafka:
+    image: apache/kafka:latest
+    container_name: kafkanode166
+    user: "1000:1000"  # Match the container user with host directory owner
+    environment:
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@10.122.0.20:30093
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://10.122.0.20:30091
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_NUM_PARTITIONS: 10
+      KAFKA_LOG_RETENTION_HOURS: 28
+      KAFKA_LOG_DIRS: /opt/kafka/data  # Use a path that the user can write to
+    ports:
+      - "30091:9092"
+      - "30093:9093"
+    volumes:
+      - kafka-storage:/opt/kafka/data  # Changed to match KAFKA_LOG_DIRS
+
+volumes:
+  kafka-storage:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/kafkadata
+      o: bind

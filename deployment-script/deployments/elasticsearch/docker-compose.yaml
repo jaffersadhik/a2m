@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.10.2
+    container_name: elasticsearch-single-node
+    environment:
+      - discovery.type=single-node  # Run as a single node cluster
+      - xpack.security.enabled=false  # Disable security features (useful for local development)
+      - ES_JAVA_OPTS=-Xms1g -Xmx1g  # Set Java heap size (adjust as needed)
+      - DATA_EXPIRY_DAYS=3  # Custom environment variable for data expiry
+    ports:
+      - "31200:9200"  # Expose HTTP port
+      - "31300:9300"  # Expose Transport port
+    volumes:
+      - es-data:/usr/share/elasticsearch/data  # Persistent data storage
+    networks:
+      - es_network
+    restart: unless-stopped  # Restart the container unless manually stopped
+
+volumes:
+  es-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: /home/esdata  # Replace with a local directory on your host
+      o: bind
+
+networks:
+  es_network:
+    driver: bridge
