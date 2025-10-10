@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
-@RequestMapping("/password/health")
+@RequestMapping("/password/reset")
 public class PasswordResetController {
 
     private static final Log log = LogFactory.getLog(PasswordResetController.class);

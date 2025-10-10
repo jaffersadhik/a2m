@@ -24,7 +24,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
-@RequestMapping("/encryption/health")
+@RequestMapping("/password/encryption")
 public class EncryptionController {
 
     private static final Log log = LogFactory.getLog(EncryptionController.class);
