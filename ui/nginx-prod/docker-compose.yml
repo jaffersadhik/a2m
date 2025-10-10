@@ -1,6 +1,6 @@
 version: "3.1"
 services:
   beacon-ui:
-    image: dockerregistry:5000/beacon-nginx:10oct2024
+    image: dockerregistry:5000/beacon-nginx:10oct2025
     build: .
     ports: ['80:80']
