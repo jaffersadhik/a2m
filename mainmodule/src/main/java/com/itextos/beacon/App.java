@@ -23,7 +23,6 @@ import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.annotation.Bean;
 
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.StartupTimeLog;
 import com.itextos.beacon.web.generichttpapi.controller.ReactiveQSRequestReader;
@@ -480,27 +479,7 @@ public class App {
 
 	
 
-	public static void startPrometheusServer(
-	            boolean aStartJettyServer,String[] args)
-	    {
-
-	        try
-	        {
-
-	            if (aStartJettyServer)
-	            {
-	            	
-	                PrometheusMetrics.registerPlatformMetrics();
-
-	            }
-	        }
-	        catch (final Exception e)
-	        {
-	            // Add this exception in INFO mode.
-	            if (log.isInfoEnabled())
-	                log.info("IGNORE: Exception while working on prometheus counter", e);
-	        }
-	    }
+	
 
 	private static void addShutdownHook() {
 	

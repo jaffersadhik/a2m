@@ -3,7 +3,6 @@ package com.winnovature.downloadhandler.servlets;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.downloadhandler.consumers.CsvToExcelConvertionRequestConsumer;
 import com.winnovature.downloadhandler.consumers.PollerDownloadReq;
@@ -59,7 +58,6 @@ public class ServletInitializer {
 				}
 
 				
-		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + " Exception:", e);
 				log.error(className + " RESTART FP-DownloadHandler MODULE ");

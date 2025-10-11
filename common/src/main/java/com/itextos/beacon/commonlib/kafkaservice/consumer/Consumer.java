@@ -30,7 +30,6 @@ import com.itextos.beacon.commonlib.kafkaservice.consumer.partitionlogger.Partit
 import com.itextos.beacon.commonlib.kafkaservice.consumer.partitionlogger.PartitionInfoCollection;
 import com.itextos.beacon.commonlib.kafkaservice.producer.Producer;
 import com.itextos.beacon.commonlib.message.IMessage;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.ConsumerLog;
@@ -120,7 +119,6 @@ public class Consumer
                     ConsumerLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
                     mAreRecordsInProcess = false;
 
-                    PrometheusMetrics.kafkaConsumerIncrement(mTopicName, pollCount);
 
                     processRecords(records);
 

@@ -3,7 +3,6 @@ package com.winnovature.cronjobs.servlets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.cronjobs.consumers.CurrencyRatesUpdater;
 import com.winnovature.cronjobs.consumers.UnwantedFilesRemoval;
@@ -48,7 +47,6 @@ public class ServletInitializer  {
 		//		unwantedFilesRemoval.start();
 			//	ExecutorSheduler.addTask(unwantedFilesRemoval);
 				
-		        PrometheusMetrics.registerApiMetrics();
 
 			} catch (Exception e) {
 				log.error(className + " Exception:", e);

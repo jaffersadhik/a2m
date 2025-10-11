@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.DateTimeFormat;
 import com.itextos.beacon.commonlib.constants.InterfaceStatusCode;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.http.generichttpapi.common.data.InterfaceRequestStatus;
 import com.itextos.beacon.http.generichttpapi.common.data.response.ResponseObject;
@@ -154,7 +153,6 @@ abstract class GenerateAbstractResponse
             final String              lStatusInfo = (lStatusCode != InterfaceStatusCode.SUCCESS) ? APIConstants.STATUS_INFO_REJECT : APIConstants.STATUS_INFO_ACCEPT;
             final String              lUserName   = CommonUtility.nullCheck(mUserName, true).isBlank() ? "" : mUserName;
 
-            PrometheusMetrics.apiIncrementStatusCount(InterfaceType.HTTP_JAPI, mReqType, APIConstants.CLUSTER_INSTANCE, mCustIp, lStatusCode.getStatusCode(), lUserName);
 
             if (!CommonUtility.nullCheck(mRequestStatus.getStatusDesc(), true).isBlank())
                 lReason = lReason + " ( " + mRequestStatus.getStatusDesc() + " )";

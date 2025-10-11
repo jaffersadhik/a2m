@@ -3,7 +3,6 @@ package com.winnovature.initialstate.servlets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.initialstate.pollers.CampaignGroupsPoller;
 import com.winnovature.initialstate.pollers.CampaignMasterPoller;
@@ -54,7 +53,6 @@ public class InitializePoller {
 
 				if (log.isDebugEnabled())
 					log.debug(className + " CampaignGroupsPoller started.");
-		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + " Exception:", e);
 				log.error(className + " RESTART FP-InitialStage MODULE ");

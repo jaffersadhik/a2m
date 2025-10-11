@@ -5,7 +5,6 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.campaignfinisher.consumers.DQRedisCleaner;
 import com.winnovature.campaignfinisher.consumers.PollerCampaignFilesCompleted;
@@ -74,7 +73,6 @@ public class ServletInitializer  {
 			//	dqRedisCleaner.start();
 			//	ExecutorSheduler.addTask(dqRedisCleaner);
 				
-		        PrometheusMetrics.registerApiMetrics();
 
 			} catch (Exception e) {
 				log.error(className + " Exception:", e);

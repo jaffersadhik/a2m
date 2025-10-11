@@ -30,8 +30,6 @@ import com.cloudhopper.smpp.pdu.UnbindResp;
 import com.google.gson.Gson;
 import com.itextos.beacon.commonlib.constants.ErrorMessage;
 import com.itextos.beacon.commonlib.message.DeliveryObject;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.smpp.SmppPrometheusInfo;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.smpputil.DeliverSmInfo;
 import com.itextos.beacon.smpp.interfaces.sessionhandlers.ItextosSessionManager;
@@ -217,7 +215,6 @@ abstract class ItextosSmppSessionHelper
         int    seqNum   = -1;
         String bindType = BIND_TYPE_UNKNOWN;
         String userName = USER_UNKNOWN;
-        Timer  lTimer   = null;
 
         StringBuffer sb=new StringBuffer();
         sb.append("\n#######################################################################\n");
@@ -230,9 +227,7 @@ abstract class ItextosSmppSessionHelper
             sb.append(" smpp : "+userName+ " :  "+bindType+ " : " +aSubmitSmResponse.getMessageId()+ " : "+ aSubmitSmResponse.getResultMessage()).append("\n");
 
             
-            lTimer   = PrometheusMetrics
-                    .smppSubmitSmStartTimer(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), mSessionDetail.getInstanceId(), userName, mSessionDetail.getHost(), bindType));
-
+      
             if (mSessionDetail.getBindType() == SmppBindType.RECEIVER)
             {
                 aSubmitSmResponse.setCommandStatus(SmppConstants.STATUS_SYSERR);
@@ -262,10 +257,7 @@ abstract class ItextosSmppSessionHelper
             EntryLog.log(" smpp : "+userName+ " :  "+bindType+ " : " +aSubmitSmResponse.getMessageId()+ " : "+ aSubmitSmResponse.getResultMessage()+" error : "+ErrorMessage.getStackTraceAsString(e));
         }
         finally
-        {
-            PrometheusMetrics.smppSubmitSmEndTimer(
-                    new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), mSessionDetail.getInstanceId(), userName, mSessionDetail.getHost(), bindType), lTimer);
-            Communicator.sendSubmitSmResLog(mSessionDetail, aSubmitSmResponse);
+        {     Communicator.sendSubmitSmResLog(mSessionDetail, aSubmitSmResponse);
         }
         
         sb.append("\n#######################################################################\n");
@@ -279,7 +271,6 @@ abstract class ItextosSmppSessionHelper
     {
         String bindType = BIND_TYPE_UNKNOWN;
         String userName = USER_UNKNOWN;
-        Timer  lTimer   = null;
 
         try
         {
@@ -290,9 +281,7 @@ abstract class ItextosSmppSessionHelper
                 log.debug("Unbind Request rised ......" + userName);
 
             Communicator.sendUnbindRequestLog(mSessionDetail, aUnbindRequest);
-            lTimer = PrometheusMetrics
-                    .smppUnbindStartTimer(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), mSessionDetail.getInstanceId(), userName, mSessionDetail.getHost(), bindType));
-        }
+         }
         catch (final Exception e)
         {
             log.error("Exception while handling Unbind for user '" + userName + "'", e);
@@ -300,9 +289,7 @@ abstract class ItextosSmppSessionHelper
         }
         finally
         {
-            PrometheusMetrics.smppUnbindEndTimer(
-                    new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), mSessionDetail.getInstanceId(), userName, mSessionDetail.getHost(), bindType), lTimer);
-
+           
             Communicator.sendUnbindResponsetLog(mSessionDetail, aUnbindResponse);
         }
     }
@@ -313,7 +300,6 @@ abstract class ItextosSmppSessionHelper
     {
         String bindType = BIND_TYPE_UNKNOWN;
         String userName = USER_UNKNOWN;
-        Timer  lTimer   = null;
 
         try
         {
@@ -321,8 +307,6 @@ abstract class ItextosSmppSessionHelper
             userName = mSessionDetail.getSystemId();
 
             Communicator.sendEnquireLinkRequestLog(mSessionDetail, aEnquireLink);
-            lTimer = PrometheusMetrics
-                    .smppEnquiryLinkStartTimer(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), mSessionDetail.getInstanceId(), userName, mSessionDetail.getHost(), bindType));
             aEnquireLinkResponse.setCommandStatus(SmppConstants.STATUS_OK);
         }
         catch (final Exception e)
@@ -332,8 +316,6 @@ abstract class ItextosSmppSessionHelper
         }
         finally
         {
-            PrometheusMetrics.smppEnquiryLinkEndTimer(
-                    new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), mSessionDetail.getInstanceId(), userName, mSessionDetail.getHost(), bindType), lTimer);
             Communicator.sendEnquireLinkResponseLog(mSessionDetail, aEnquireLinkResponse);
         }
     }

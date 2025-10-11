@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.commondbpool.DBDataSourceFactory;
 import com.itextos.beacon.commonlib.commondbpool.DatabaseSchema;
 import com.itextos.beacon.commonlib.commondbpool.JndiInfoHolder;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.templatefinder.TemplateScrubber;
 
@@ -93,8 +92,6 @@ public class TemplateLoaderTask
         {
             hasError = true;
             log.error("Exception while getting the template details from database.", e);
-            PrometheusMetrics.incrementGenericError(TemplateScrubber.getClusterType(), TemplateScrubber.getComponent(), CommonUtility.getApplicationServerIp(), "TMCHK-002",
-                    "Inmemory Template Data Loading Issue Entity Level. Entity '" + entityId + "'");
         }
         finally
         {

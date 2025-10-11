@@ -18,7 +18,6 @@ import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.Name;
 import com.itextos.beacon.inmemory.clidlrpref.ClientDlrConfig;
@@ -101,8 +100,6 @@ public class PRCUtil
         {
             setStatusDesc(aSubmissionObject);
 
-            PrometheusMetrics.incrementPlatformRejection(aSubmissionObject.getClusterType(), Component.PRC, CommonUtility.getApplicationServerIp(), aSubmissionObject.getSubOriginalStatusCode(),
-                    aSubmissionObject.getDnOriStatusDesc());
 
             final int    lRetryAttempt = aSubmissionObject.getRetryAttempt();
             final String lMessageId    = aSubmissionObject.getMessageId();

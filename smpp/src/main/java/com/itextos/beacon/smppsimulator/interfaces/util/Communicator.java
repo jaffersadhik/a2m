@@ -18,8 +18,6 @@ import com.cloudhopper.smpp.pdu.SubmitSmResp;
 import com.cloudhopper.smpp.pdu.Unbind;
 import com.cloudhopper.smpp.pdu.UnbindResp;
 import com.itextos.beacon.commonlib.constants.DateTimeFormat;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.smpp.SmppPrometheusInfo;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.platform.smppsimulator.util.ISmppInfo;
@@ -45,16 +43,12 @@ public class Communicator
             SmppSessionConfiguration aSessionConfiguration,
             BaseBind aBindRequest)
     {
-        PrometheusMetrics.smppIncBindRequest(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionConfiguration.getSystemId()), aSessionConfiguration.getHost(), ItextosSmppUtil.getBindName(aBindRequest.getCommandId())));
-    }
+        }
 
     public static final void sendBindActiveLog(
             SessionDetail aSessionDetail)
     {
-        PrometheusMetrics.smppIncBindActiveCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionDetail.getSystemId()), aSessionDetail.getHost(), aSessionDetail.getBindName()));
-
+  
         sendBindResposeLog(aSessionDetail);
     }
 
@@ -62,52 +56,37 @@ public class Communicator
             SessionDetail aSessionDetail,
             SubmitSm aSubmitSmRequest)
     {
-        PrometheusMetrics.smppIncSubmitSmRequest(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
     }
 
     public static void sendSubmitSmResLog(
             SessionDetail aSessionDetail,
             SubmitSmResp aSubmitSmResponse)
     {
-        PrometheusMetrics.smppIncSubmitSmResponse(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
-    }
+     }
 
     public static void sendUnbindRequestLog(
             SessionDetail aSessionDetail,
             Unbind aUnbindRequest)
     {
-        PrometheusMetrics.smppIncUnbindRequest(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
-
-        PrometheusMetrics.smppDecBindActiveCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
-    }
+       }
 
     public static void sendUnbindResponsetLog(
             SessionDetail aSessionDetail,
             UnbindResp aUnbindResponse)
     {
-        PrometheusMetrics.smppIncUnbindResponse(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
-    }
+      }
 
     public static void sendEnquireLinkRequestLog(
             SessionDetail aSessionDetail,
             EnquireLink aEnquireLink)
     {
-        PrometheusMetrics.smppIncEnquiryLinkRequest(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
-    }
+     }
 
     public static void sendEnquireLinkResponseLog(
             SessionDetail aSessionDetail,
             EnquireLinkResp aEnquireLinkResponse)
     {
-        PrometheusMetrics.smppIncEnquiryLinkResponse(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), aSessionDetail.getInstanceId(), nullCheck(aSessionDetail.getSystemId()),
-                aSessionDetail.getHost(), aSessionDetail.getBindName()));
-    }
+       }
 
     public static void sendBindLog(
             SessionDetail aSessionDetail,
@@ -121,24 +100,18 @@ public class Communicator
             UnbindInfo aUnBindinfolog)
     {
         InfoCollection.getInstance().addInfoObject(SmppObjectType.UNBIND_INFO_DB, aUnBindinfolog);
-        PrometheusMetrics.smppIncUnbindCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionDetail.getSystemId()), aSessionDetail.getHost(), aSessionDetail.getBindName()), "Network Unbind");
     }
 
     public static void sendDeliverSMResponseLog(
             SessionDetail aSessionDetail,
             DeliverSmResp aResponse)
     {
-        PrometheusMetrics.smppIncDeliverSmResponse(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionDetail.getSystemId()), aSessionDetail.getHost(), aSessionDetail.getBindName()));
     }
 
     public static void sendBindResposeLog(
             SessionDetail aSessionDetail)
     {
-        PrometheusMetrics.smppIncBindResponse(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionDetail.getSystemId()), aSessionDetail.getHost(), aSessionDetail.getBindName()));
-    }
+     }
 
     public static void sendBindFailureLog(
             SessionDetail aSessionDetail,
@@ -147,35 +120,22 @@ public class Communicator
     {
         sendBindResposeLog(aSessionDetail);
 
-        PrometheusMetrics.smppIncFailureCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionDetail.getSystemId()), aSessionDetail.getHost(), aSessionDetail.getBindName()), aErrorCode, aReason);
     }
 
     public static void sendUnbindLog(
             SmppServerSession aServerSession,
             String aReason)
     {
-        PrometheusMetrics.smppIncUnbindCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aServerSession.getConfiguration().getSystemId()), aServerSession.getConfiguration().getHost(), ItextosSmppUtil.getBindName(aServerSession.getBindType())), aReason);
-
-        PrometheusMetrics.smppIncUnbindRequest(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aServerSession.getConfiguration().getSystemId()), aServerSession.getConfiguration().getHost(), ItextosSmppUtil.getBindName(aServerSession.getBindType())));
-        PrometheusMetrics.smppDecBindActiveCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aServerSession.getConfiguration().getSystemId()), aServerSession.getConfiguration().getHost(), ItextosSmppUtil.getBindName(aServerSession.getBindType())));
-    }
+       }
 
     public static void sendUnBindResponseLog(
             SmppServerSession aServerSession)
     {
-        PrometheusMetrics.smppIncUnbindResponse(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aServerSession.getConfiguration().getSystemId()), aServerSession.getConfiguration().getHost(), ItextosSmppUtil.getBindName(aServerSession.getBindType())));
     }
 
     public static void sendDeliverSMRequestLog(
             SessionDetail aSessionDetail)
     {
-        PrometheusMetrics.smppIncDeliverSmRequest(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                nullCheck(aSessionDetail.getSystemId()), aSessionDetail.getHost(), aSessionDetail.getBindName()));
     }
 
     public static String nullCheck(

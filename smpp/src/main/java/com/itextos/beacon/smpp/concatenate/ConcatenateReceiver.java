@@ -6,8 +6,6 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.ClusterType;
 import com.itextos.beacon.commonlib.constants.PlatformStatusCode;
 import com.itextos.beacon.commonlib.message.MessageRequest;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.smpp.SmppPrometheusInfo;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.http.interfaceutil.InterfaceUtil;
 import com.itextos.beacon.smpp.objects.SmppUserInfo;
@@ -116,9 +114,7 @@ public class ConcatenateReceiver
 
         try
         {
-            PrometheusMetrics.smppIncFailureCounts(new SmppPrometheusInfo(SmppProperties.getInstance().getInstanceCluster(), SmppProperties.getInstance().getInstanceId(),
-                    aSmppMessageRequest.getSystemId(), aSmppMessageRequest.getClientIp(), aSmppMessageRequest.getBindType()), aPlatformStatusCode.getKey(), aPlatformStatusCode.getStatusDesc());
-
+            
             final SmppUserInfo lSmppUserInfo = ConcatBuildMessageRequest.updateUserInfo(aSmppMessageRequest.getClientId());
             // Setting PartNumer '1' for Rejection Cases
             aSmppMessageRequest.setPartNumber(1);

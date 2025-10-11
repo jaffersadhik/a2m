@@ -18,7 +18,6 @@ import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.constants.RouteType;
 import com.itextos.beacon.commonlib.message.MessagePart;
 import com.itextos.beacon.commonlib.message.MessageRequest;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.Name;
@@ -198,7 +197,6 @@ public class MiddlewareHandler
             if (log.isDebugEnabled())
                 log.debug("User name used for promethues .. " + userName);
 
-            PrometheusMetrics.apiIncrementStatusCount(aReqType, APIConstants.CLUSTER_INSTANCE, aMessageRequest.getClientSourceIp(), aStatusId, userName);
         }
         catch (final Exception e)
         {

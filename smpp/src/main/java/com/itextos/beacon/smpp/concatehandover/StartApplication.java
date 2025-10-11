@@ -14,7 +14,6 @@ import com.itextos.beacon.commonlib.constants.Component;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.commonlib.messageidentifier.MessageIdentifier;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvider;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.smpputil.ISmppInfo;
@@ -70,7 +69,6 @@ public class StartApplication
 
         log.fatal("Smpp interface starting with Instance Id : '" + lInstanceId + "' on port '" + SmppProperties.getInstance().getApiListenPort() + "'");
 
-        PrometheusMetrics.registerSmppMetrics();
 
         final MessageIdentifier lMsgIdentifier = MessageIdentifier.getInstance();
         lMsgIdentifier.init(InterfaceType.SMPP);

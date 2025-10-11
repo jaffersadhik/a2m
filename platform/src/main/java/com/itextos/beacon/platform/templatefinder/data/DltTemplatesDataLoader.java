@@ -20,7 +20,6 @@ import com.itextos.beacon.commonlib.commondbpool.DBDataSourceFactory;
 import com.itextos.beacon.commonlib.commondbpool.DatabaseSchema;
 import com.itextos.beacon.commonlib.commondbpool.JndiInfoHolder;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
@@ -124,8 +123,7 @@ public class DltTemplatesDataLoader
         catch (final Exception e)
         {
             log.error("Exception while getting the template details from database.", e);
-            PrometheusMetrics.incrementGenericError(TemplateScrubber.getClusterType(), TemplateScrubber.getComponent(), CommonUtility.getApplicationServerIp(), "TMCHK-001",
-                    "Inmemory Template Data Loading Issue Global Level.");
+
         }
         finally
         {

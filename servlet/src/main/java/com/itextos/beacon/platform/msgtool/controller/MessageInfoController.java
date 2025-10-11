@@ -9,7 +9,6 @@ import reactor.core.scheduler.Schedulers;
 
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
@@ -65,13 +64,7 @@ public class MessageInfoController {
         sb.append("QS request received in ").append(method).append("\n");
         logBuffer.set(sb);
 
-        // Track metrics
-        PrometheusMetrics.apiIncrementAcceptCount(
-            InterfaceType.HTTP_JAPI, 
-            MessageSource.GENERIC_QS, 
-            APIConstants.CLUSTER_INSTANCE, 
-            clientIp != null ? clientIp : "unknown"
-        );
+        
 
         // Process request reactively
         return Mono.fromCallable(new Callable<String>() {

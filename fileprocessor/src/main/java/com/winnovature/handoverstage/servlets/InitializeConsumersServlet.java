@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.messageidentifier.MessageIdentifier;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.itextos.beacon.http.interfacefallback.inmem.FallbackQReaper;
 import com.winnovature.handoverstage.consumers.SplitFileConsumer;
@@ -85,7 +84,6 @@ public class InitializeConsumersServlet {
 
 				}
 				
-		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + "[init]  Exception:", e);
 			}

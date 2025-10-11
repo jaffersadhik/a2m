@@ -9,7 +9,6 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.exclude.consumers.ExcludeConsumer;
 import com.winnovature.exclude.singletons.ExcludeProcessorPropertiesTon;
@@ -76,7 +75,6 @@ public class InitializeExcludeConsumer {
 
 				}
 				
-		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + "[init]  Exception:", e);
 			}

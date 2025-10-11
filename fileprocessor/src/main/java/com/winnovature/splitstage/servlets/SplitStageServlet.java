@@ -7,7 +7,6 @@ import java.util.Map;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.logger.SplitStageLog;
 import com.winnovature.splitstage.consumers.FileSplitQConsumer;
@@ -82,7 +81,6 @@ public class SplitStageServlet  {
 				} // end of REDIS servers iteration
 
 				
-		        PrometheusMetrics.registerApiMetrics();
 			} catch (Exception e) {
 				log.error(className + methodName + " >>>> Exception: ", e);
 				log.error(className + methodName + " >>>> Please restart SplitStage module. ");

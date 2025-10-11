@@ -5,7 +5,6 @@ import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.componentconsumer.processor.ProcessorInfo;
 import com.itextos.beacon.commonlib.constants.Component;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 
 public class StartApplication
 {
@@ -21,7 +20,6 @@ public class StartApplication
 
         try
         {
-            PrometheusMetrics.registerPlatformRejection();
             final ProcessorInfo lProcessor = new ProcessorInfo(THIS_COMPONENT);
             lProcessor.process();
         }

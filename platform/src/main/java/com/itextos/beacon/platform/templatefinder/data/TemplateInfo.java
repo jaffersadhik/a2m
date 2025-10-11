@@ -14,7 +14,6 @@ import java.util.regex.Pattern;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.templatefinder.Result;
 import com.itextos.beacon.platform.templatefinder.TemplateResult;
@@ -265,8 +264,7 @@ class TemplateInfo
         }
         catch (final Exception e)
         {
-            PrometheusMetrics.incrementGenericError(TemplateScrubber.getClusterType(), TemplateScrubber.getComponent(), CommonUtility.getApplicationServerIp(), "TMCHK-003",
-                    "Template Check '" + e.getMessage() + "'");
+            
 
             aTemplateResult.setResult(Result.TEMPLATE_NOT_FOUND);
             updateResults(aTemplateResult);

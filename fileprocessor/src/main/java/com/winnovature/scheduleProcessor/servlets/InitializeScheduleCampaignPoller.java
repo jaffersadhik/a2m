@@ -3,7 +3,6 @@ package com.winnovature.scheduleProcessor.servlets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
 import com.winnovature.scheduleProcessor.pollers.ScheduleCampaignPoller;
 import com.winnovature.scheduleProcessor.utils.Constants;
@@ -33,7 +32,6 @@ public class InitializeScheduleCampaignPoller  {
 	//			CSAPoller.start();
 	//			ExecutorSheduler.addTask(CSAPoller);
 
-		        PrometheusMetrics.registerApiMetrics();
 				if (log.isDebugEnabled())
 					log.debug(className + " CampaignMasterPoller[CSAPoller] started.");
 

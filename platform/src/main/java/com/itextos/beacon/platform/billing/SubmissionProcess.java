@@ -14,7 +14,6 @@ import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.constants.PlatformStatusCode;
 import com.itextos.beacon.commonlib.constants.exception.ItextosException;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.errorlog.SMSLog;
@@ -151,7 +150,6 @@ public class SubmissionProcess
 
     private void sendToBillingTopic(SMSLog sb)
     {
-        PrometheusMetrics.platformIncrement(Component.T2DB_SUBMISSION, mSubmissionObject.getClusterType(), "SUB_BILLING");
         sendToOtherTopic(NextTopic.SUB_BILLING,sb);
     }
 

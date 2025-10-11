@@ -13,7 +13,6 @@ import com.itextos.beacon.commonlib.constants.ConfigParamConstants;
 import com.itextos.beacon.commonlib.constants.InterfaceStatusCode;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.Name;
 import com.itextos.beacon.http.generichttpapi.common.data.InterfaceMessage;
@@ -62,11 +61,9 @@ public class JSONRequestReader
         if (log.isDebugEnabled())
             log.debug(" CustIp:  '" + params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()) + "' request time: '" + System.currentTimeMillis() + " '");
 
-        Timer overAllProcess = null;
 
         try
         {
-            overAllProcess = PrometheusMetrics.apiStartTimer(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_JSON, APIConstants.CLUSTER_INSTANCE, params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), OVERALL);
 
             final JSONObject        lJsonObj         = getParsedJson(params.get("http_request_body"), mRequestType);
             final String            lReqJson         = lJsonObj.toJSONString();
@@ -83,11 +80,7 @@ public class JSONRequestReader
             log.error("Excception while processig Request JSON .", e);
             return handleException(params.get("http_request_body"));
         }
-        finally
-        {
-          //  PrometheusMetrics.apiEndTimer(InterfaceType.HTTP_JAPI, APIConstants.CLUSTER_INSTANCE, jsonTimer);
-            PrometheusMetrics.apiEndTimer(InterfaceType.HTTP_JAPI, APIConstants.CLUSTER_INSTANCE, overAllProcess);
-        }
+        
     }
 
     private String handleException(
@@ -214,10 +207,7 @@ public class JSONRequestReader
         sb.append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(" lMessagesCount : "+lMessagesCount).append("\t"); 
 
         final String lUserName         = getUserName(aRequestProcessor);
-        final Timer  userSpecificTimer = PrometheusMetrics.apiStartTimer(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_JSON, APIConstants.CLUSTER_INSTANCE,  params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), lUserName);
 
-        for (int i = 0; i < lMessagesCount; i++)
-            PrometheusMetrics.apiIncrementAcceptCount(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_JSON, APIConstants.CLUSTER_INSTANCE,  params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), lUserName);
 
         if (lMessagesCount == 1)
             processSingleMessage(aRequestProcessor, aReqStatus, lMessageId,sb);

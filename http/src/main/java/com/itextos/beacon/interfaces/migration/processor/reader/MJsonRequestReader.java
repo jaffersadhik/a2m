@@ -14,7 +14,6 @@ import com.itextos.beacon.commonlib.constants.Constants;
 import com.itextos.beacon.commonlib.constants.InterfaceStatusCode;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.http.generichttpapi.common.data.InterfaceMessage;
 import com.itextos.beacon.http.generichttpapi.common.data.InterfaceRequestStatus;
 import com.itextos.beacon.http.generichttpapi.common.interfaces.IRequestProcessor;
@@ -59,11 +58,9 @@ public class MJsonRequestReader
     {
         if (log.isDebugEnabled())
             log.debug(" CustIp:  '" +params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()) + "' request time: '" + System.currentTimeMillis() + " '");
-        Timer overAllProcess = null;
 
         try
         {
-            overAllProcess = PrometheusMetrics.apiStartTimer(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_JSON, APIConstants.CLUSTER_INSTANCE, params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), OVERALL);
 
             final JSONObject lJsonObj  = getParsedJson(params.get("http_request_body"));
             JSONArray        jsonArray = (JSONArray) lJsonObj.get("smslist");
@@ -93,10 +90,7 @@ public class MJsonRequestReader
             
             return null;
         }
-        finally
-        {
-            PrometheusMetrics.apiEndTimer(InterfaceType.HTTP_JAPI, APIConstants.CLUSTER_INSTANCE, overAllProcess);
-        }
+      
     }
 
     private static JSONObject getParsedJson(

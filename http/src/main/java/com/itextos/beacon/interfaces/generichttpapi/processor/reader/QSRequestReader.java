@@ -12,7 +12,6 @@ import com.itextos.beacon.commonlib.constants.ConfigParamConstants;
 import com.itextos.beacon.commonlib.constants.InterfaceStatusCode;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.http.generichttpapi.common.data.InterfaceMessage;
 import com.itextos.beacon.http.generichttpapi.common.data.InterfaceRequestStatus;
@@ -85,12 +84,9 @@ public class QSRequestReader
             JSONObject aJsonObj)
     {
        String lUserName      = NO_USER;
-        Timer  overAllProcess = null;
-        Timer  jsonProcess    = null;
 
         try
         {
-            overAllProcess = PrometheusMetrics.apiStartTimer(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_QS, APIConstants.CLUSTER_INSTANCE, params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), OVERALL);
 
             String jsonString = aJsonObj.toString();
 
@@ -110,8 +106,6 @@ public class QSRequestReader
             {
                 lUserName   = getUserName(requestProcessor);
 
-                jsonProcess = PrometheusMetrics.apiStartTimer(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_QS, APIConstants.CLUSTER_INSTANCE, params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), lUserName);
-                PrometheusMetrics.apiIncrementAcceptCount(InterfaceType.HTTP_JAPI, MessageSource.GENERIC_QS, APIConstants.CLUSTER_INSTANCE, params.get(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey()), lUserName);
 
                 updateRequestObjectBasedOnRequestType(requestProcessor, aJsonObj);
 
@@ -144,11 +138,7 @@ public class QSRequestReader
             log.error("Excception while processig QueryString request", e);
            return  handleException(aJsonObj.toJSONString());
         }
-        finally
-        {
-            PrometheusMetrics.apiEndTimer(InterfaceType.HTTP_JAPI, APIConstants.CLUSTER_INSTANCE, jsonProcess);
-            PrometheusMetrics.apiEndTimer(InterfaceType.HTTP_JAPI, APIConstants.CLUSTER_INSTANCE, overAllProcess);
-        }
+        
         
     }
 

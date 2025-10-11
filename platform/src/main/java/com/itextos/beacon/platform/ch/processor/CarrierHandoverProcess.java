@@ -31,7 +31,6 @@ import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
 import com.itextos.beacon.commonlib.message.utility.MessageUtil;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.Name;
@@ -92,7 +91,6 @@ public class CarrierHandoverProcess
     	
     	   try
            {
-               final Timer   lPlatformRejection = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "platformRejection");
                final boolean isHexMsg           = lMessageRequest.isHexMessage();
 
                if (isHexMsg)
@@ -104,7 +102,6 @@ public class CarrierHandoverProcess
                    	lMessageRequest.getLogBuffer().append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(lMessageRequest.getBaseMessageId()+" :: Invalid HEX Message : ");
 
                        sendToPlatfromRejection(lMessageRequest, PlatformStatusCode.INVALID_HEX_MESSAGE);
-                       PrometheusMetrics.componentMethodEndTimer(Component.CH, lPlatformRejection);
                        return;
                    }
                }
@@ -117,7 +114,6 @@ public class CarrierHandoverProcess
                	lMessageRequest.getLogBuffer().append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(lMessageRequest.getBaseMessageId()+" :: Unable to find out the Route Id : ");
 
                    sendToPlatfromRejection(lMessageRequest, PlatformStatusCode.EMPTY_ROUTE_ID);
-                   PrometheusMetrics.componentMethodEndTimer(Component.CH, lPlatformRejection);
                    return;
                }
 
@@ -127,21 +123,15 @@ public class CarrierHandoverProcess
                   	lMessageRequest.getLogBuffer().append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(lMessageRequest.getBaseMessageId()+" :: Unable to find out the Feature Code : ");
 
                    sendToPlatfromRejection(lMessageRequest, PlatformStatusCode.EMPTY_FEATURE_CODE);
-                   PrometheusMetrics.componentMethodEndTimer(Component.CH, lPlatformRejection);
                    return;
                }
-               PrometheusMetrics.componentMethodEndTimer(Component.CH, lPlatformRejection);
 
-               final Timer   lBlockoutTimer = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "isMessageBlockout");
                final boolean isBlockout     = CHProcessUtil.isMessageBlockout(lMessageRequest);
-               PrometheusMetrics.componentMethodEndTimer(Component.CH, lBlockoutTimer);
 
                if (isBlockout)
                    return;
 
-               final Timer   lExpiredtimer = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "isExpired");
                final boolean isExpired     = CHUtil.isExpired(lMessageRequest);
-               PrometheusMetrics.componentMethodEndTimer(Component.CH, lExpiredtimer);
 
                if (isExpired)
                {
@@ -152,9 +142,7 @@ public class CarrierHandoverProcess
                    return;
                }
 
-               final Timer           lDeliveryRouteInfo = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "getDeliveryRouteInfo");
                final RouteKannelInfo lKannelRouteInfo   = ICHUtil.getDeliveryRouteInfo(lRouteId, lFeatureCode);
-               PrometheusMetrics.componentMethodEndTimer(Component.CH, lDeliveryRouteInfo);
 
                if (lKannelRouteInfo == null)
                {
@@ -259,12 +247,10 @@ public class CarrierHandoverProcess
                            continue;
                        }
 
-                       final Timer      lKannelConnect = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "KannelConnect");
 
                        final HttpResult lHttpResult    = BasicHttpConnector.connect(lKannelUrl);
                        final boolean    lResponse      = lHttpResult.isSuccess();
 
-                       PrometheusMetrics.componentMethodEndTimer(Component.CH, lKannelConnect);
 
                       
                    	lMessageRequest.getLogBuffer().append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(lMessageRequest.getBaseMessageId()+" :: kannel URL--->" + lKannelUrl + "', Response : '" + lResponse + "'");
@@ -454,14 +440,11 @@ public class CarrierHandoverProcess
 
         lSubmissionObject.setCarrierFullDn(lKannelRouteInfo.getCarrierFullDn());
 
-        final Timer setCarrierSMTime = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "SetCarrierSMTime");
 
         // Set the Retry-attempt
         GenerateDNUrl.setDlrUrl(lSubmissionObject, lMessageRequest.getRetryAttempt());
 
-        PrometheusMetrics.componentMethodEndTimer(Component.CH, setCarrierSMTime);
 
-        final Timer dummyHandover = PrometheusMetrics.componentMethodStartTimer(Component.CH, mPlatformCluster, "DummyHandover");
 
  
       	lMessageRequest.getLogBuffer().append("\n").append(Name.getLineNumber()).append("\t").append(Name.getClassName()).append("\t").append(Name.getCurrentMethodName()).append("\t").append(lMessageRequest.getBaseMessageId()+" Sending to dummy route q:" + lSubmissionObject.getMessageId() + " retry attempt:" + lMessageRequest.getRetryAttempt() );
@@ -476,7 +459,6 @@ public class CarrierHandoverProcess
             CHProducer.sendToSubBilling(lSubmissionObject,lMessageRequest.getLogBuffer());
         }
 
-        PrometheusMetrics.componentMethodEndTimer(Component.CH, dummyHandover);
 
 
 		
@@ -519,9 +501,7 @@ public class CarrierHandoverProcess
         final String lClusterDNReceiverInfo = ICHUtil.getClusterDNReceiverInfo(aMessageRequest.getClusterType().getKey());
         String       lDlrUrl                = null;
 
-        final Timer  removePayloadTimer     = PrometheusMetrics.componentMethodStartTimer(Component.CH, aMessageRequest.getClusterType(), "removeAndStorePayload");
         removeAndStorePayload(aSubmissionObject);
-        PrometheusMetrics.componentMethodEndTimer(Component.CH, removePayloadTimer);
 
         final String additionalInfoString = CHUtil.getCallBackParams(aSubmissionObject);
 

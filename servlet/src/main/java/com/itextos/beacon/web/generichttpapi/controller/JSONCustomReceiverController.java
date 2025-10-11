@@ -18,7 +18,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.ClientIP;
 import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
@@ -77,13 +76,7 @@ public class JSONCustomReceiverController {
         
         params.put("http_request_body", requestBody);
         
-        // Track metrics
-        PrometheusMetrics.apiIncrementAcceptCount(
-            InterfaceType.HTTP_JAPI, 
-            MessageSource.GENERIC_JSON, 
-            APIConstants.CLUSTER_INSTANCE, 
-            clientIp != null ? clientIp : "unknown"
-        );
+        
 
         // Process request reactively
         return Mono.fromCallable(new Callable<String>() {

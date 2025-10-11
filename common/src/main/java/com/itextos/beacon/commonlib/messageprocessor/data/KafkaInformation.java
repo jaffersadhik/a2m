@@ -27,7 +27,6 @@ import com.itextos.beacon.commonlib.kafkaservice.producer.ProducerInMemCollectio
 import com.itextos.beacon.commonlib.messageprocessor.data.db.KafkaClusterComponentMap;
 import com.itextos.beacon.commonlib.messageprocessor.data.db.KafkaClusterInfo;
 import com.itextos.beacon.commonlib.messageprocessor.request.ProducerKafkaRequest;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.RoundRobin;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaConsumer;
@@ -78,7 +77,6 @@ public class KafkaInformation
 
     private KafkaInformation()
     {
-        PrometheusMetrics.registerKafkaCountersMetrics();
     }
 
     public Producer getProducer(

@@ -12,7 +12,6 @@ import com.itextos.beacon.commonlib.kafkaservice.consumer.ConsumerInMemCollectio
 import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.messageprocessor.process.MessageProcessor;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.LossLog;
 import com.itextos.beacon.smslog.StartupFlowLog;
@@ -46,12 +45,9 @@ public abstract class AbstractKafkaComponentProcessor
     {
         if (log.isDebugEnabled())
             log.debug("Processing message " + aMessage);
-        Timer timer = null;
 
         try
         {
-            timer = addPrometheusCounters(aMessage);
-
             doProcess((BaseMessage) aMessage);
         }
         catch (final Exception e)
@@ -64,48 +60,10 @@ public abstract class AbstractKafkaComponentProcessor
             
        //     sendBackToTopic(aMessage);
         }
-        finally
-        {
-            endPrometheusTimer(timer);
-        }
+        
     }
 
-    private void endPrometheusTimer(
-            Timer aTimer)
-    {
-
-        try
-        {
-            PrometheusMetrics.platformEndTimer(mComponent, aTimer);
-        }
-        catch (final Exception e)
-        {
-            // Add this exception in INFO mode.
-            if (log.isInfoEnabled())
-                log.info("IGNORE: Exception while working on prometheus counter", e);
-        }
-    }
-
-    private Timer addPrometheusCounters(
-            IMessage aMessage)
-    {
-        Timer timer = null;
-
-        try
-        {
-            final BaseMessage baseMessage = (BaseMessage) aMessage;
-            PrometheusMetrics.platformIncrement(mComponent, baseMessage.getClusterType(), mTopicName);
-            timer = PrometheusMetrics.platformStartTimer(mComponent, baseMessage.getClusterType(), mTopicName);
-        }
-        catch (final Exception e)
-        {
-            // Add this exception in INFO mode.
-            if (log.isInfoEnabled())
-                log.info("IGNORE: Exception while working on prometheus counter", e);
-        }
-        return timer;
-    }
-
+    
     /*
     @Override
     protected void sendBackToTopic(

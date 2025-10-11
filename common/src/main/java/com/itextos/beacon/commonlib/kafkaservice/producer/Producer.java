@@ -22,7 +22,6 @@ import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.message.MessagePart;
 import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaProducer;
 import com.itextos.beacon.smslog.ProducerFlushLog;
@@ -196,7 +195,6 @@ public class Producer
 
             flushBasedOnCount();
 
-            PrometheusMetrics.kafkaProducerIncrement(mTopicName, 1);
 
             if (log.isDebugEnabled())
                 log.debug(msgid+ " "+ mLogTopicName + " IMessage sent successfully in Non-Trans mode (Async)");
@@ -295,7 +293,6 @@ public class Producer
 
             flushBasedOnCount();
 
-            PrometheusMetrics.kafkaProducerIncrement(mTopicName, 1);
 
             if (log.isDebugEnabled())
                 log.debug(msgid+ " "+ mLogTopicName + " IMessage sent successfully in Non-Trans mode (Async)");

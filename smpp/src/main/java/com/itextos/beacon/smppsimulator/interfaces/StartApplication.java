@@ -13,7 +13,6 @@ import com.cloudhopper.smpp.type.SmppChannelException;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.commonlib.messageidentifier.MessageIdentifier;
-import com.itextos.beacon.commonlib.prometheusmetricsutil.PrometheusMetrics;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.http.interfacefallback.inmem.FallbackQReaper;
 import com.itextos.beacon.platform.smppsimulator.util.ISmppInfo;
@@ -85,7 +84,6 @@ public class StartApplication
 
         log.fatal("Smpp interface starting with Instance Id : '" + lInstanceId + "' on port '" + SmppProperties.getInstance().getApiListenPort() + "'");
 
-        PrometheusMetrics.registerSmppMetrics();
 
         final MessageIdentifier lMsgIdentifier = MessageIdentifier.getInstance();
         lMsgIdentifier.init(InterfaceType.SMPP);
