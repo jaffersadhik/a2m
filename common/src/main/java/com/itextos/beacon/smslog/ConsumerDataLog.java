@@ -17,7 +17,7 @@ public class ConsumerDataLog {
         int limit = 1024 * 1024*5; // 1 MB file size limit
         int count = 1; // N
 
-        String logFileNamePattern = "/opt/jboss/wildfly/logs/consumer/consumer.%g.log";
+        String logFileNamePattern = "/opt/jboss/wildfly/logs/consumer/consumerdata.%g.log";
 
         Level loglevel=Level.INFO;
         

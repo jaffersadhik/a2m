@@ -24,7 +24,7 @@ public class ProducerFlushDataLog {
   
          FolderCreation.foldercreaton(folder);
          
-         String logFileNamePattern = folder+"/producerflush.%g.log";
+         String logFileNamePattern = folder+"/producerflushdata.%g.log";
 
         Level loglevel=Level.INFO;
         
