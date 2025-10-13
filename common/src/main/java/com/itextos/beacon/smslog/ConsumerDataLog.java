@@ -1,60 +1,23 @@
 package com.itextos.beacon.smslog;
 
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
 
-public class ConsumerTPLog {
+public class ConsumerDataLog {
 
 
-    private  final  Logger logger = Logger.getLogger(ConsumerTPLog.class.getName());
-
-	private static LinkedHashMap<String,ConsumerTPLog> objmap=new LinkedHashMap<String,ConsumerTPLog>();
-	
-	
-	public static synchronized ConsumerTPLog getInstance(String topicname) {
-	
-		synchronized (objmap) {
-			
-			ConsumerTPLog obj=objmap.get(topicname);
-			
-			if(obj==null) {
-				
-				obj=new ConsumerTPLog(topicname);
-				
-				objmap.put(topicname, obj);
-			}
-			
-			return obj;
-		}
-			
-			
-
-		
-		
-		
-		
-	}
-	
-	
-	private ConsumerTPLog() {
-		
-	}
-	
-	private ConsumerTPLog(String username) {
-		
-
+    private static final  Logger logger = Logger.getLogger(ConsumerDataLog.class.getName());
+    
+    static {
     	
-        int limit = 1024 * 5; // 1 MB file size limit
+        int limit = 1024 * 1024*5; // 1 MB file size limit
         int count = 1; // N
 
-        String logFileNamePattern = "/opt/jboss/wildfly/logs/consumer/consumertplog_"+username+".%g.log";
+        String logFileNamePattern = "/opt/jboss/wildfly/logs/consumer/consumer.%g.log";
 
         Level loglevel=Level.INFO;
         
@@ -99,10 +62,9 @@ public class ConsumerTPLog {
      
 
         // Set the logging level for the logger
-    
-	}
+    }
 
-    public void log(String string) {
+    public static void log(String string) {
 
     	logger.info(string);
     	

@@ -6,8 +6,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import java.util.StringTokenizer;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -376,17 +375,24 @@ public abstract class InmemoryProcessor
     public static String getFirstTableName(String sql) {
         if (sql == null) return null;
         
-        // Simple regex to find table after FROM
-        Pattern pattern = Pattern.compile(
-            "FROM\\s+(\\w+)", 
-            Pattern.CASE_INSENSITIVE
-        );
         
-        Matcher matcher = pattern.matcher(sql);
-        if (matcher.find()) {
-            return matcher.group(1);
+        StringTokenizer st=new StringTokenizer(sql," ");
+        
+        
+        while(st.hasMoreElements()) {
+        	
+        	String t=st.nextElement().toString();
+        	
+        	if(t.equalsIgnoreCase("from")) {
+        		
+        		return st.nextElement().toString();
+        	}
         }
         
         return null;
+    }
+    
+    public static void main(String args[]) {
+    	System.out.println(getFirstTableName("select SUBSTR(mnumber, 1, 5) as prefix, mnumber from listing.block_list_numbers where is_active =1"));
     }
 }

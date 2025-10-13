@@ -32,8 +32,8 @@ import com.itextos.beacon.commonlib.kafkaservice.producer.Producer;
 import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.errorlog.ErrorLog;
+import com.itextos.beacon.smslog.ConsumerDataLog;
 import com.itextos.beacon.smslog.ConsumerLog;
-import com.itextos.beacon.smslog.ConsumerTPLog;
 import com.itextos.beacon.smslog.KafkaReceiver;
 
 public class Consumer
@@ -96,7 +96,6 @@ public class Consumer
             
             while (!mClosed)
             {
-            	ConsumerTPLog.getInstance(mTopicName).log(mTopicName+" : "+new Date());
             	
             
             
@@ -116,7 +115,7 @@ public class Consumer
                     if (log.isDebugEnabled())
                         log.debug(mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
 
-                    ConsumerLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
+                    ConsumerDataLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
                     mAreRecordsInProcess = false;
 
 
@@ -128,6 +127,8 @@ public class Consumer
                 else
                 {
                 
+                    ConsumerLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
+
                 	 checkAndCommit(0);
                     
                  	
@@ -135,14 +136,12 @@ public class Consumer
                  		
                    	 CommonUtility.sleepForAWhile(100);
                    	 
-                  	ConsumerTPLog.getInstance(mTopicName).log("sleepForAWhile(100); : mTopicName "+mTopicName+" : "+new Date());
 
 
                  	}else {
                  		
                  		 CommonUtility.sleepForAWhile(1000);
                        	 
-                       	ConsumerTPLog.getInstance(mTopicName).log("sleepForAWhile(1000); : mTopicName "+mTopicName+" : "+new Date());
 
                  	}
 

@@ -24,11 +24,11 @@ import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaProducer;
+import com.itextos.beacon.smslog.ProducerFlushDataLog;
 import com.itextos.beacon.smslog.ProducerFlushLog;
-import com.itextos.beacon.smslog.PromosenderLog;
-import com.itextos.beacon.smslog.StartupFlowLog;
-import com.itextos.beacon.smslog.TranssenderLog;
 import com.itextos.beacon.smslog.ProducerTPLog;
+import com.itextos.beacon.smslog.PromosenderLog;
+import com.itextos.beacon.smslog.TranssenderLog;
 
 public class Producer
 {
@@ -343,13 +343,16 @@ public class Producer
 
         if (aEvent != null) {
             log.fatal(threadName+" aEvent "+aEvent + " Producer " + KafkaUtility.formatTopicName(mTopicName) + " Batch count :" + String.format("%8s", mBatchCounter));
-       
-            ProducerFlushLog.log("mTopicName : "+mTopicName+ " : "+threadName+" aEvent "+aEvent + " Producer " + KafkaUtility.formatTopicName(mTopicName) + " Batch count :" + String.format("%8s", mBatchCounter));
-        } else {
-            if (log.isDebugEnabled())
+         } else {
+         if (log.isDebugEnabled())
                 log.debug("Producer " + KafkaUtility.formatTopicName(mTopicName) + " Batch count :" + String.format("%8s", mBatchCounter));
         
-            ProducerFlushLog.log("mTopicName : "+mTopicName+ " : "+threadName+" aEvent "+aEvent + " Producer " + KafkaUtility.formatTopicName(mTopicName) + " Batch count :" + String.format("%8s", mBatchCounter));
+       
+        }
+        if(mBatchCounter==0) {
+        	ProducerFlushLog.log("mTopicName : "+mTopicName+ " : "+threadName+" aEvent "+aEvent + " Producer " + KafkaUtility.formatTopicName(mTopicName) + " Batch count :" + String.format("%8s", mBatchCounter));
+        }else{
+            ProducerFlushDataLog.log("mTopicName : "+mTopicName+ " : "+threadName+" aEvent "+aEvent + " Producer " + KafkaUtility.formatTopicName(mTopicName) + " Batch count :" + String.format("%8s", mBatchCounter));
 
         }
         mProducer.flush();
