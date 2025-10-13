@@ -22,6 +22,7 @@ import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.message.utility.MessageUtil;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.MessageConvertionUtility;
+import com.itextos.beacon.errorlog.SMSLog;
 import com.itextos.beacon.inmemory.configvalues.ApplicationConfiguration;
 import com.itextos.beacon.inmemory.customfeatures.InmemCustomFeatures;
 import com.itextos.beacon.inmemory.inmemdata.mccmnc.MCCMNCFinder;
@@ -283,6 +284,8 @@ public class ICUtility
     		if(mccmnc!=null) {
     			
     			log.debug("lMobileNo : "+lMobileNo+" searchPrefix : "+searchPrefix+" mccmnc : "+mccmnc);
+    			
+    			SMSLog.getInstance().log("lMobileNo : "+lMobileNo+" searchPrefix : "+searchPrefix+" mccmnc : "+mccmnc);
     		
     			aMessageRequest.setMcc(mccmnc.getMcc());
     			aMessageRequest.setMnc(mccmnc.getMnc());
