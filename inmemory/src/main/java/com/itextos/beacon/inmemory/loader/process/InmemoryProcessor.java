@@ -55,30 +55,8 @@ public abstract class InmemoryProcessor
     	data.put("recordcount", ""+getCount(getFirstTableName(mInmemoryInput.getSQL())));
     	data.put("tablename", getFirstTableName(mInmemoryInput.getSQL()));
     	
-        if(this instanceof MccMncCollection) {
-            doWithPagination();
-        }else if (this instanceof AccountInfo) {
-         /*
-        	  doWithPagination();
-            DEFAULT_PAGE_SIZE = 50;
-            DEFAULT_FETCH_SIZE = 50;
-        	
-       	doWithoutPagination();
-            
-            try {
-				new InmemoryProcessorAccountsView(mInmemoryInput,(AccountInfo) this).doWithPagination();
-			} catch (Exception e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-        	
-     */
-        //	mInmemoryInput.setSQL("select cli_id, user, ui_pass, api_pass, smpp_pass, acc_status from user_config");
-        	
-        	doWithoutPagination();
-        } else {
-            doWithoutPagination();
-        }
+        doWithoutPagination();
+        
         
     	long end=System.currentTimeMillis();
     	
