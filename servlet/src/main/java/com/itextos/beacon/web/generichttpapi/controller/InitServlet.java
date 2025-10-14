@@ -41,14 +41,12 @@ public final class InitServlet
 
             
             String module=System.getenv("module");
-            if(module!=null&&(module.equals("japi")||module.equals("all"))) {
             	
             	FallbackQReaper.getInstance();
 
             	com.itextos.beacon.platform.dnrfallback.inmem.DlrFallbackQReaper.getInstance();
 
-   //         	startConsumers();
-            }
+  
         }
         catch (final Exception e)
         {

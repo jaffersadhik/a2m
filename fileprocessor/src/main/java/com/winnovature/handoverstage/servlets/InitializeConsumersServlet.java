@@ -40,7 +40,7 @@ public class InitializeConsumersServlet {
 
 			try {
 				lMsgIdentifier.init(InterfaceType.GUI);
-				FallbackQReaper.getInstance();
+			//	FallbackQReaper.getInstance();
 				
 				prop = HandoverStagePropertiesTon.getInstance()
 						.getPropertiesConfiguration();

@@ -65,7 +65,7 @@ public class StartApplication
 
             System.out.println("Entering after addShutdownhook()");
 
-            FallbackQReaper.getInstance();
+      //      FallbackQReaper.getInstance();
             
             System.out.println("going to start Monitroing thread");
     //        new Monitor().start();
