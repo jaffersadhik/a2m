@@ -38,6 +38,7 @@ import com.itextos.beacon.commonlib.messageprocessor.data.db.KafkaComponentInfo;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorTopic;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorkannelSubmit;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.StartupFlowLog;
@@ -182,11 +183,16 @@ public class ProcessorInfo
   
             final KafkaClusterComponentMap             lKafkaCLusterInformation = KafkaDataLoader.getInstance().getKafkaClusterComponentMap(mComponent, platformCluster);
             final String                               className                = aKafkaComponentInfo.getComponentProcessClass();
-            final int                                  threadsCount             = lKafkaCLusterInformation.getThreadsCount();
+            
+            int                                  threadsCount             = lKafkaCLusterInformation.getThreadsCount();
             final int                                  sleepInMillis            = lKafkaCLusterInformation.getSleepTimeInMillis();
 
             final Map<String, ConsumerInMemCollection> topicInMemCollection     = aConsumerInmemCollection.get(platformCluster.getKey());
 
+            if(mComponent==Component.IC) {
+            	
+            	threadsCount=3;
+            }
     
             StartupFlowLog.log("Consumer to start for the Cluster Type Name : '" + platformCluster.getKey() + "' Cluster " + platformCluster+ " topics : "+platformCluster.getKey()+" topicInMemCollection : "+topicInMemCollection);
        
@@ -270,8 +276,11 @@ public class ProcessorInfo
             allProcessors.add(currentComponentProcessor);
 
             TopicLog.getInstance(aTopicName+"_initiated").log(aTopicName+" : "+new Date());
+            if(mComponent==Component.IC) {
+            ExecutorkannelSubmit.getInstance().addTask(currentComponentProcessor, threadName);
+            }else {
             ExecutorTopic.getInstance().addTask(currentComponentProcessor, threadName);
-            
+            }
             StartupFlowLog.log("Thread '" + threadName + "'started for Component '" + mComponent + "' Cluster '" + aClusterName + "' Actual Cluster '" + aPlatformCluster + "' Topic name '" + aTopicName
                     + "' Thread index '" + aThreadIndex + "' with sleep time millis '" + aSleepInMillis + "'");
             
