@@ -30,6 +30,7 @@ import com.itextos.beacon.commonlib.messageprocessor.request.ProducerKafkaReques
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.RoundRobin;
 import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaConsumer;
+import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaICConsumer;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.KILog;
 import com.itextos.beacon.smslog.ProducerTopicLog;
@@ -433,7 +434,7 @@ public class KafkaInformation
             KafkaClusterInfo aKafkaClusterInfo)
     {
         final KafkaClusterComponentMap lKafkaCLusterInformation = KafkaDataLoader.getInstance().getKafkaClusterComponentMap(aComponent, aClusterType);
-        final int                      consumerClientCount      = lKafkaCLusterInformation.getKafkaClientConsumerCount();
+        int                      consumerClientCount      = lKafkaCLusterInformation.getKafkaClientConsumerCount();
         final String                   topicName                = KafkaDataLoaderUtility.updateTopicName(aTopicName);
 
         if (log.isDebugEnabled())
@@ -457,7 +458,10 @@ public class KafkaInformation
         final ConsumerInMemCollection consumerInMemCollection = new ConsumerInMemCollection(topicName);
         
         
-         
+        if(aComponent==Component.IC) {
+        	
+        	consumerClientCount=3;
+        }
 
 
                 for (int consumerClientIndex = 1; consumerClientIndex <= consumerClientCount; consumerClientIndex++)
@@ -480,9 +484,11 @@ public class KafkaInformation
 
                     mTotalConsumersCount++;
                     
-                   
-                    ExecutorKafkaConsumer.getInstance().addTask(consumer,  topicName + "-" + consumerClientIndex);
-        
+                    if(aComponent==Component.IC) {
+                    	ExecutorKafkaICConsumer.getInstance().addTask(consumer,  topicName + "-" + consumerClientIndex);
+                    }else {
+                    	ExecutorKafkaConsumer.getInstance().addTask(consumer,  topicName + "-" + consumerClientIndex);
+                    }
                     StartupFlowLog.log("createConsumerClients : "+clientId+"  topicName : "+topicName);
                     
                     if (log.isDebugEnabled())
