@@ -202,7 +202,7 @@ public class App {
         
         // Module-specific initialization with throttling
         if ("japi".equals(module)||"kannelsubmit".equals(module)||"smppinterface".equals(module)) {
-           // throttleStartup("japi-init", 500); // 2-second delay before init
+            throttleStartup("japi-init", 2000); // 2-second delay before init
             try {
                 init();
                 ReactiveQSRequestReader.initSMS();
@@ -238,8 +238,7 @@ public class App {
     private static void throttleStartup(String phase, long baseDelay) {
         try {
             // Adaptive delay based on system load
-            long delay = calculateAdaptiveDelay(phase, baseDelay);
-            Thread.sleep(delay);
+            Thread.sleep(baseDelay);
             
             // Yield CPU to prevent monopolization
             Thread.yield();
@@ -249,20 +248,7 @@ public class App {
         }
     }
 
-    private static long calculateAdaptiveDelay(String phase, long baseDelay) {
-        // Simple CPU load detection
-        Runtime runtime = Runtime.getRuntime();
-        long usedMemory = runtime.totalMemory() - runtime.freeMemory();
-        double memoryPressure = (double) usedMemory / runtime.maxMemory();
-        
-        // Increase delay if system is under memory pressure
-        if (memoryPressure > 0.7) {
-            return baseDelay * 2;
-        }
-        
-        return baseDelay;
-    }
-
+   
    
 
     // Interface for module processors
