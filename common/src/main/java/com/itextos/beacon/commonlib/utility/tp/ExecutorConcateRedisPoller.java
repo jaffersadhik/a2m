@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExecutorConcateRedisPoller {
+	
+	private static ExecutorConcateRedisPoller obj=new ExecutorConcateRedisPoller();
+	
     private final ExecutorService virtualThreadPool;
     
     // Private constructor for singleton
@@ -14,7 +17,12 @@ public class ExecutorConcateRedisPoller {
     
     // Public method to get the singleton instance
     public static ExecutorConcateRedisPoller getInstance() {
-        return new ExecutorConcateRedisPoller();
+    	
+    	if(obj==null) {
+    		
+    		obj=new ExecutorConcateRedisPoller();
+    	}
+        return obj;
     }
 
     // Method to add tasks to the thread pool

@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExecutorKafkaProducer {
+	
+	private static ExecutorKafkaProducer obj=new ExecutorKafkaProducer();
+	
     private final ExecutorService virtualThreadPool;
     
     // Private constructor for singleton
@@ -14,7 +17,13 @@ public class ExecutorKafkaProducer {
     
     // Public method to get the singleton instance
     public static ExecutorKafkaProducer getInstance() {
-        return new ExecutorKafkaProducer();
+    	
+    	if(obj==null) {
+    		
+    		obj=new ExecutorKafkaProducer();
+    	}
+    	
+    	return obj;
     }
 
     // Method to add tasks to the thread pool

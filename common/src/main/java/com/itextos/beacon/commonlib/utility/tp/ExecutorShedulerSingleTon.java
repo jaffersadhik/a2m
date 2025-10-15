@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExecutorShedulerSingleTon {
+	
+	private static ExecutorShedulerSingleTon obj=new ExecutorShedulerSingleTon();
+	
     private final ExecutorService singleVirtualThreadExecutor;
     
     // Private constructor for singleton
@@ -16,7 +19,12 @@ public class ExecutorShedulerSingleTon {
     
     // Public method to get the singleton instance
     public static ExecutorShedulerSingleTon getInstance() {
-        return new ExecutorShedulerSingleTon();
+    	
+    	if(obj==null) {
+    		
+    		obj=new ExecutorShedulerSingleTon();
+    	}
+        return obj;
     }
 
     // Method to add tasks to the single virtual thread

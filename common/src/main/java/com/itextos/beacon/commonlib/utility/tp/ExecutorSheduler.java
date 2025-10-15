@@ -4,6 +4,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExecutorSheduler {
+	private static ExecutorSheduler obj=new ExecutorSheduler();
+	
     private final ExecutorService virtualThreadPool;
     
     // Private constructor for singleton
@@ -14,7 +16,12 @@ public class ExecutorSheduler {
     
     // Public method to get the singleton instance
     public static ExecutorSheduler getInstance() {
-        return new ExecutorSheduler();
+    	
+    	if(obj==null) {
+    		
+    		obj=new ExecutorSheduler();
+    	}
+        return obj;
     }
 
     // Method to add tasks to the thread pool

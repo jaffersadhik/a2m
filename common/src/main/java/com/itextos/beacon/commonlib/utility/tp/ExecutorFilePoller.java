@@ -4,6 +4,9 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ExecutorFilePoller {
+	
+	private static ExecutorFilePoller obj= new ExecutorFilePoller();
+	
     private final ExecutorService virtualThreadPool;
     
     // Private constructor for singleton
@@ -14,7 +17,11 @@ public class ExecutorFilePoller {
     
     // Public method to get the singleton instance
     public static ExecutorFilePoller getInstance() {
-        return new ExecutorFilePoller();
+    	
+    	if(obj==null) {
+    		obj= new ExecutorFilePoller();
+    	}
+        return obj;
     }
 
     // Method to add tasks to the thread pool
