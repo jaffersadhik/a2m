@@ -35,6 +35,7 @@ import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.ConsumerDataLog;
 import com.itextos.beacon.smslog.ConsumerLog;
 import com.itextos.beacon.smslog.KafkaReceiver;
+import com.itextos.beacon.smslog.TopicOffSetLog;
 
 public class Consumer
         implements
@@ -375,6 +376,8 @@ public class Consumer
             final Long redisOffset = lPartitionOffsets.get(partNo);
             final long curOffset   = mConsumer.position(partition);
 
+            TopicOffSetLog.log("Topic '" + mTopicName + "' Partition '" + partNo + "' Redis offSet '" + redisOffset + "' Curr Offset '" + curOffset + "'");
+            
             log.fatal("Topic '" + mTopicName + "' Partition '" + partNo + "' Redis offSet '" + redisOffset + "' Curr Offset '" + curOffset + "'");
 
             if ((redisOffset == null) || (redisOffset == -1))
@@ -383,6 +386,7 @@ public class Consumer
             if (curOffset < redisOffset)
             {
                 log.fatal("Because of the Parition Assigned the offset value was updated from '" + curOffset + "' to '" + redisOffset + "'");
+                TopicOffSetLog.log("Topic '" + mTopicName + "' Partition '" + partNo +" Because of the Parition Assigned the offset value was updated from '" + curOffset + "' to '" + redisOffset + "'");
                 mConsumer.seek(partition, redisOffset);
             }
         }
