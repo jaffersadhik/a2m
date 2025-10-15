@@ -82,7 +82,13 @@ public class KafkaUtility
                 values.put(OFF_SET, Long.toString(entry.getValue()));
                 values.put(TIME_STAMP, DateTimeUtility.getFormattedCurrentDateTime(DateTimeFormat.DEFAULT_WITH_MILLI_SECONDS));
 
-                pipe.hmset(CommonUtility.combine(REDIS_SEPARATOR, KAFKA_KEY, aTopicName, Integer.toString(entry.getKey())), values);
+                String key=CommonUtility.combine(REDIS_SEPARATOR, KAFKA_KEY, aTopicName, Integer.toString(entry.getKey()));
+                
+                if(!System.getenv("profile").equals("do1")) {
+                	
+                	key=CommonUtility.combine(REDIS_SEPARATOR, KAFKA_KEY, aTopicName,System.getenv("profile"), Integer.toString(entry.getKey()));
+                }
+                pipe.hmset(key, values);
             }
             pipe.sync();
 
@@ -115,7 +121,15 @@ public class KafkaUtility
             for (final TopicPartition tp : aPartitions)
             {
                 final int              partition    = tp.partition();
-                final String           key          = CommonUtility.combine(REDIS_SEPARATOR, KAFKA_KEY, aTopicName, Integer.toString(partition));
+                String           key          = CommonUtility.combine(REDIS_SEPARATOR, KAFKA_KEY, aTopicName, Integer.toString(partition));
+                
+                
+                if(!System.getenv("profile").equals("do1")) {
+                	
+                	key=CommonUtility.combine(REDIS_SEPARATOR, KAFKA_KEY, aTopicName,System.getenv("profile"), Integer.toString(partition));
+                }
+                
+                
                 final Response<String> offsetString = pipe.hget(key, OFF_SET);
                 responseMap.put(partition, offsetString);
             }
