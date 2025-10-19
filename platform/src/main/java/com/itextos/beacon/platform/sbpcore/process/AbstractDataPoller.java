@@ -63,11 +63,11 @@ public abstract class AbstractDataPoller
     @Override
     public boolean processNow()
     {
-        doProcess();
-        return false;
+        return doProcess();
+        
     }
 
-    private void doProcess()
+    private boolean doProcess()
     {
 
         try
@@ -80,14 +80,21 @@ public abstract class AbstractDataPoller
             if (log.isDebugEnabled())
                 log.debug("Records list : " + lRecords.size());
 
-       
-            sendToNextQueue(lRecords,mTableName);
+        
+            if(lRecords.size()>0) {
+            	sendToNextQueue(lRecords,mTableName);
+            	return true;
+            }else {
+            	return false;
+            }
 
         }
         catch (final Exception e)
         {
             log.error("Exception while sending the message to " + Component.VC, e);
         }
+        
+        return false;
     }
 
     private static void sendToNextQueue(

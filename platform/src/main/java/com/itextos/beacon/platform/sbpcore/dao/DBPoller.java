@@ -236,14 +236,5 @@ public abstract class DBPoller
         return lSBInstanceInfo;
     }
 
-    public static Map<String, List<String>> getAllInstances()
-    {
-        final String lInstanceIds = CommonUtility.nullCheck(System.getProperty("instance.ids"), true);
-
-        if (!lInstanceIds.isEmpty())
-            return (Map<String, List<String>>) new HashMap<>().put("all", Arrays.asList(lInstanceIds.split(",")));
-
-        return null;
-    }
-
+  
 }

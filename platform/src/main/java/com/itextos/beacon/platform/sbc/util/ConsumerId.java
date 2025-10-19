@@ -5,48 +5,41 @@ import java.util.List;
 
 public class ConsumerId {
 
-	private static ConsumerId obj=new ConsumerId();
-	
-	private static List<String> COUNSUMERIDLIST=new ArrayList<String>();
-	
-	
-	private int INDEX=0;
-	
-	static {
-		
-		for(int i=1;i<6;i++) {
-			
-			COUNSUMERIDLIST.add(i+"");
-		}
-	}
-	
-	private ConsumerId() {
-		
-	}
-	
-	public static ConsumerId getInstance() {
-		
-		if(obj==null) {
-			
-			 obj=new ConsumerId();
-		}
-		
-		return obj;
-	}
-	
-	public synchronized String getConsumerId() {
-		
-		if(INDEX<COUNSUMERIDLIST.size()) {		
-			String result= COUNSUMERIDLIST.get(INDEX);
-			INDEX++;
-			return result;
-		}else {
-			INDEX=0;
-			
-			return COUNSUMERIDLIST.get(INDEX);
+    private static ConsumerId obj = new ConsumerId();
+    
+    final List<String> CONSUMER_ID_LIST = new ArrayList<String>();
+    
+    private int index = 0;
+    
+    private void init() {
+        for(int i = 1; i < 6; i++) {
+            CONSUMER_ID_LIST.add(i + "");
+        }
+    }
+    
+    private ConsumerId() {
 
-		}
-		
-
-	}
+    	init();
+    }
+    
+    public static ConsumerId getInstance() {
+        return obj;
+    }
+    
+    public synchronized String getConsumerId() {
+        if (CONSUMER_ID_LIST.isEmpty()) {
+            throw new IllegalStateException("Consumer ID list is empty");
+        }
+        
+        String result = CONSUMER_ID_LIST.get(index);
+        index = (index + 1) % CONSUMER_ID_LIST.size();
+        return result;
+    }
+    
+    
+    public List<String> getConsumerList(){
+    	
+    	return CONSUMER_ID_LIST;
+    }
+  
 }

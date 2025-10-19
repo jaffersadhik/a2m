@@ -12,7 +12,7 @@ public class ExecutorShedulePoller {
     // Private constructor for singleton
     private ExecutorShedulePoller() {
         // Create a fixed pool of 5 virtual threads
-        this.virtualThreadPool = Executors.newFixedThreadPool(5, Thread.ofVirtual().factory());
+        this.virtualThreadPool = Executors.newFixedThreadPool(3, Thread.ofVirtual().factory());
     }
     
     // Public method to get the singleton instance
