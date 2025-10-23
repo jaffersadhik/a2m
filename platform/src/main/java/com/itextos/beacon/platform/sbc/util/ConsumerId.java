@@ -2,6 +2,7 @@ package com.itextos.beacon.platform.sbc.util;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class ConsumerId {
 
@@ -9,7 +10,7 @@ public class ConsumerId {
     
     final List<String> CONSUMER_ID_LIST = new ArrayList<String>();
     
-    private int index = 0;
+    private final AtomicInteger index = new AtomicInteger(0);
     
     private void init() {
         for(int i = 1; i < 6; i++) {
@@ -26,18 +27,13 @@ public class ConsumerId {
         return obj;
     }
     
-    public synchronized String getConsumerId() {
+    public String getConsumerId() {
         if (CONSUMER_ID_LIST.isEmpty()) {
             throw new IllegalStateException("Consumer ID list is empty");
         }
         
-        if(index>=CONSUMER_ID_LIST.size()) {
-        	
-        	index=0;
-        }
-        String result = CONSUMER_ID_LIST.get(index);
-        index++;
-        return result;
+        int currentIndex = index.getAndUpdate(i -> (i + 1) % CONSUMER_ID_LIST.size());
+        return CONSUMER_ID_LIST.get(currentIndex);
     }
     
     
