@@ -80,11 +80,12 @@ public abstract class DBHandler
             List<MessageRequest> aMessageRequestList)
             throws SQLException
     {
-
-        for (final MessageRequest lMessageRequest : aMessageRequestList)
+        ConsumerId consumerId = ConsumerId.getInstance();
+        
+        for (int i = 0; i < aMessageRequestList.size(); i++)
         {
-        //    aPstmt.setString(1, CommonUtility.nullCheck(lMessageRequest.getAppInstanceId(), true));
-            aPstmt.setString(1, ConsumerId.getInstance().getConsumerId());
+            final MessageRequest lMessageRequest = aMessageRequestList.get(i);
+            aPstmt.setString(1, consumerId.getConsumerId()); // This will round-robin within the batch
             aPstmt.setString(2, lMessageRequest.getClientId());
 
             final Date processTime = getProcessTime(lMessageRequest);
