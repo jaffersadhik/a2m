@@ -31,8 +31,12 @@ public class ConsumerId {
             throw new IllegalStateException("Consumer ID list is empty");
         }
         
+        if(index>=CONSUMER_ID_LIST.size()) {
+        	
+        	index=0;
+        }
         String result = CONSUMER_ID_LIST.get(index);
-        index = (index + 1) % CONSUMER_ID_LIST.size();
+        index++;
         return result;
     }
     
