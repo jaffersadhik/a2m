@@ -11,10 +11,11 @@ import com.itextos.beacon.errorlog.FolderCreation;
 
 public class ScheduleConsumerIdLog {
 
+	private static ScheduleConsumerIdLog obj=new ScheduleConsumerIdLog();
 
-    private static final  Logger logger = Logger.getLogger(ScheduleConsumerIdLog.class.getName());
+    private final  Logger logger = Logger.getLogger(ScheduleConsumerIdLog.class.getName());
     
-    static {
+    private void init() {
     	
     	 int limit = 1024 * 1024*5; // 1 MB file size limit
          int count = 1; // N
@@ -70,7 +71,16 @@ public class ScheduleConsumerIdLog {
         // Set the logging level for the logger
     }
 
-    public static void log(String string) {
+    
+    private ScheduleConsumerIdLog() {
+    	init();
+    }
+    
+    public static ScheduleConsumerIdLog getInstance() {
+    	
+    	return obj;
+    }
+    public void log(String string) {
 
     	logger.info(string);
     	

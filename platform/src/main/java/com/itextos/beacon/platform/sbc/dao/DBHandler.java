@@ -85,7 +85,7 @@ public  class DBHandler
         {
             final MessageRequest lMessageRequest = aMessageRequestList.get(i);
             String consumerID=ConsumerId.getInstance().getConsumerId();
-            ScheduleConsumerIdLog.log(consumerID);
+            ScheduleConsumerIdLog.getInstance().log(consumerID);
             aPstmt.setString(1, consumerID); // This will round-robin within the batch
             aPstmt.setString(2, lMessageRequest.getClientId());
 
