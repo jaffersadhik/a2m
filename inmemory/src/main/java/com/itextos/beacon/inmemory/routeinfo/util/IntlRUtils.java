@@ -441,7 +441,7 @@ public class IntlRUtils
             if ((lRoutelist != null) && !lRoutelist.isEmpty())
             {
                 final int lIndex = RouteUtil.getRRPointer(Integer.toString(logicId), lRoutelist.size());
-                return lRoutelist.get(lIndex - 1);
+                return lRoutelist.get(lIndex );
             }
         }
 

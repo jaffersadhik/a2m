@@ -214,7 +214,7 @@ public class PayloadProcessor
             final Date   dateStime            = lSTime;
 
             final int    lPayloadRedisPoolCnt = RedisConnectionProvider.getInstance().getRedisPoolCount(lClusterType, Component.DN_PAYLOAD);
-            final int    lPayloadRedisIndex   = RoundRobin.getInstance().getCurrentIndex("payload", lPayloadRedisPoolCnt);
+            final int    lPayloadRedisIndex   = RoundRobin.getInstance().getCurrentIndex("payload", lPayloadRedisPoolCnt)+1;
             final String lRedisIndex          = Integer.toString(lPayloadRedisIndex);
 
             aSubmissionObject.setPayloadExpiry(payloadExpiryTime);

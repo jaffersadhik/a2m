@@ -258,7 +258,7 @@ public class KafkaInformation
         if (producerIndex == null)
             producerIndex = RoundRobin.getInstance().getCurrentIndex(keyForQueue, maxProducersPerTopic);
 
-        mKafkaProducerThreadMap.put(key, producerIndex);
+        mKafkaProducerThreadMap.put(key, producerIndex+1);
 
         addOrUpdate(keyForQueue, producerIndex, maxProducersPerTopic);
         return producerIndex;

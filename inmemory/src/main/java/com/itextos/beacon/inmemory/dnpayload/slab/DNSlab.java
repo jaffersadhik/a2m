@@ -92,7 +92,7 @@ public class DNSlab
         final String lRoundRobinKey = RR_KEY + aClientId;
         int          lRRIndex       = RoundRobin.getInstance().getCurrentIndex(lRoundRobinKey, aSlablist.size());
 
-        lRRIndex = (lRRIndex - 1);
+        lRRIndex = (lRRIndex);
 
         if (log.isDebugEnabled())
             log.debug("slablist size :" + aSlablist.size() + " cursor position " + lRRIndex);

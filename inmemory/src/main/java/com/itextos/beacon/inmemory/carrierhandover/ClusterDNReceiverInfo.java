@@ -48,7 +48,7 @@ public class ClusterDNReceiverInfo
                 if (!dnReceiverIds.isEmpty())
                 {
                     final int index = RoundRobin.getInstance().getCurrentIndex(aCluster, dnReceiverIds.size());
-                    dnReceiverId = dnReceiverIds.get(index - 1);
+                    dnReceiverId = dnReceiverIds.get(index);
                     if (log.isInfoEnabled())
                         log.info("clusterwise===>" + aCluster + " dnReceiverId===>" + dnReceiverId);
                 }

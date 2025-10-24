@@ -105,7 +105,7 @@ public class DnBasedRetryRedisProcessor
         if (log.isDebugEnabled())
             log.debug("DLR Retry Wait redis index : " + lCurRedisIndex);
 
-        return RedisConnectionProvider.getInstance().getConnection(ClusterType.COMMON, Component.DLR_WAIT_RETRY, lCurRedisIndex);
+        return RedisConnectionProvider.getInstance().getConnection(ClusterType.COMMON, Component.DLR_WAIT_RETRY, lCurRedisIndex+1);
     }
 
     private static int getRedisCount()

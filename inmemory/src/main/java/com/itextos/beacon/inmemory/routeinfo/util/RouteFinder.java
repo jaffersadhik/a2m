@@ -66,7 +66,7 @@ public class RouteFinder
                         if ((lRouteInfoList != null) && !lRouteInfoList.isEmpty())
                         {
                             final int lIndex = RouteUtil.getRRPointer(lRouteGroup, lRouteInfoList.size());
-                            lRouteId = lRouteInfoList.get(lIndex - 1);
+                            lRouteId = lRouteInfoList.get(lIndex);
                         }
                     }
 
@@ -144,7 +144,7 @@ public class RouteFinder
                     if ((lRouteInfoList != null) && !lRouteInfoList.isEmpty())
                     {
                         final int lIndex = RouteUtil.getRRPointer(lMapKey, lRouteInfoList.size());
-                        lRouteId = lRouteInfoList.get(lIndex - 1);
+                        lRouteId = lRouteInfoList.get(lIndex );
                     }
                 }
 

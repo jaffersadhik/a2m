@@ -133,7 +133,7 @@ public class RFinder
                         return false;
 
                     final int lIndex = RouteUtil.getRRPointer(groupid, lRoutelist.size());
-                    lMobileRoute = lRoutelist.get(lIndex - 1);
+                    lMobileRoute = lRoutelist.get(lIndex );
                 }
                 mMessageRequest.setRouteId(lMobileRoute);
                 mMessageRequest.setRouteLogicId(CommonUtility.getInteger(RouteLogic.LOGICID.getKey()));
@@ -277,7 +277,7 @@ public class RFinder
                     return false;
 
                 final int lIndex = RouteUtil.getRRPointer(aKey, routelist.size());
-                lRouteId = routelist.get(lIndex - 1);
+                lRouteId = routelist.get(lIndex );
             }
         }else {
         
@@ -342,7 +342,7 @@ public class RFinder
                 if (!lMaskedHeaderPool.isEmpty())
                 {
                     final int index = RoundRobin.getInstance().getCurrentIndex("global_header_mask_rotaion_pool", lMaskedHeaderPool.size());
-                    lMaskedHeader = lMaskedHeaderPool.get(index - 1);
+                    lMaskedHeader = lMaskedHeaderPool.get(index );
                 }
             }
 
@@ -390,7 +390,7 @@ public class RFinder
                 if ((routelist != null) && !routelist.isEmpty())
                 {
                     final int lIndex = RouteUtil.getRRPointer(lGroupid, routelist.size());
-                    return routelist.get(lIndex - 1);
+                    return routelist.get(lIndex );
                 }
 
                 if (log.isDebugEnabled())

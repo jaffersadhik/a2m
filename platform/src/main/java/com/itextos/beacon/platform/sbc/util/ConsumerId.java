@@ -2,7 +2,6 @@ package com.itextos.beacon.platform.sbc.util;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import com.itextos.beacon.commonlib.utility.RoundRobin;
 
@@ -40,4 +39,13 @@ public class ConsumerId {
     	return CONSUMER_ID_LIST;
     }
   
+    
+    public static void main(String args[]) {
+    	
+    	for(int i=0;i<50;i++) {
+    	
+    		System.out.println(ConsumerId.getInstance().getConsumerId());
+    	}
+    	
+    }
 }

@@ -46,19 +46,19 @@ public class RoundRobin
             {
                 log.error("Error while getting the Roundrobin value.", e);
             }
-            return 1;
+            return 0;
         }
 
         if (aMaxValue == 1)
-            return 1;
+            return 0;
 
         final AtomicInteger currentCount = roundRobinPointerMap.computeIfAbsent(aKey, k -> new AtomicInteger(0));
 
         int                 nextCount    = currentCount.addAndGet(1);
 
-        if (nextCount > aMaxValue)
+        if (nextCount >= aMaxValue)
         {
-            nextCount = 1;
+            nextCount = 0;
             currentCount.set(nextCount);
         }
         return nextCount;
