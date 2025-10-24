@@ -4,13 +4,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import com.itextos.beacon.commonlib.utility.RoundRobin;
+
 public class ConsumerId {
 
     private static ConsumerId obj = new ConsumerId();
     
     final List<String> CONSUMER_ID_LIST = new ArrayList<String>();
-    
-    private final AtomicInteger index = new AtomicInteger(0);
     
     private void init() {
         for(int i = 1; i < 6; i++) {
@@ -28,12 +28,10 @@ public class ConsumerId {
     }
     
     public String getConsumerId() {
-        if (CONSUMER_ID_LIST.isEmpty()) {
-            throw new IllegalStateException("Consumer ID list is empty");
-        }
-        
-        int currentIndex = index.getAndUpdate(i -> (i + 1) % CONSUMER_ID_LIST.size());
-        return CONSUMER_ID_LIST.get(currentIndex);
+    	
+        final int index = RoundRobin.getInstance().getCurrentIndex("schedule_blockout_index", CONSUMER_ID_LIST.size());
+
+        return CONSUMER_ID_LIST.get(index);
     }
     
     
