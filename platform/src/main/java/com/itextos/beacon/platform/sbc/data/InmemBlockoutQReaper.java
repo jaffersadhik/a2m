@@ -15,6 +15,8 @@ public class InmemBlockoutQReaper
 {
 
     private static final Log log = LogFactory.getLog(InmemBlockoutQReaper.class);
+    
+    DBHandler obj=new DBHandler();
 
     private InmemBlockoutQReaper()
     {
@@ -64,7 +66,7 @@ public class InmemBlockoutQReaper
                     while (!isDone)
                         try
                         {
-                            DBHandler.insertRecords(lRecords, DBHandler.TABLE_NAME_BLOCKOUT);
+                        	obj.insertRecords(lRecords, DBHandler.TABLE_NAME_BLOCKOUT);
                             isDone = true;
                             if (log.isInfoEnabled())
                                 log.info("DB Inserted succesfully...." + lRecords.size());

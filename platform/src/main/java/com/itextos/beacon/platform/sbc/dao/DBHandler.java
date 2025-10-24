@@ -19,11 +19,10 @@ import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.sbc.util.ConsumerId;
 
-public abstract class DBHandler
+public  class DBHandler
 {
 
-    private DBHandler()
-    {}
+   
 
     private static final Log    log                 = LogFactory.getLog(DBHandler.class);
     private static final String INSERT_SQL          = "insert into {0} (instance_id, cli_id, date_time_to_process, message_payload) values (?,?,?,?)";
@@ -31,7 +30,7 @@ public abstract class DBHandler
     public static final String  TABLE_NAME_SCHEDULE = "schedule_data";
     public static final String  TABLE_NAME_BLOCKOUT = "blockout_data";
 
-    public static void insertRecords(
+    public void insertRecords(
             List<MessageRequest> aMessageRequestList,
             String aTableName)
             throws ItextosException
@@ -75,17 +74,16 @@ public abstract class DBHandler
         }
     }
 
-    private static void insertRecords(
+    private void insertRecords(
             PreparedStatement aPstmt,
             List<MessageRequest> aMessageRequestList)
             throws SQLException
     {
-        ConsumerId consumerId = ConsumerId.getInstance();
         
         for (int i = 0; i < aMessageRequestList.size(); i++)
         {
             final MessageRequest lMessageRequest = aMessageRequestList.get(i);
-            aPstmt.setString(1, consumerId.getConsumerId()); // This will round-robin within the batch
+            aPstmt.setString(1, ConsumerId.getInstance().getConsumerId()); // This will round-robin within the batch
             aPstmt.setString(2, lMessageRequest.getClientId());
 
             final Date processTime = getProcessTime(lMessageRequest);
@@ -104,7 +102,7 @@ public abstract class DBHandler
         aPstmt.executeBatch();
     }
 
-    private static Date getProcessTime(
+    private Date getProcessTime(
             MessageRequest aMessageRequest)
     {
         Date processTime = getBlockoutTime(aMessageRequest);
@@ -113,19 +111,19 @@ public abstract class DBHandler
         return processTime;
     }
 
-    private static Date getScheduleTime(
+    private Date getScheduleTime(
             MessageRequest aMessageRequest)
     {
         return getDateTimeFromMessage(aMessageRequest.getScheduleDateTime());
     }
 
-    private static Date getBlockoutTime(
+    private Date getBlockoutTime(
             MessageRequest aMessageRequest)
     {
         return getDateTimeFromMessage(aMessageRequest.getProcessBlockoutTime());
     }
 
-    private static Date getDateTimeFromMessage(
+    private Date getDateTimeFromMessage(
             Date aProcessedTime)
     {
         if (aProcessedTime != null)

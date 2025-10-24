@@ -25,6 +25,8 @@ public abstract class InmemoryQueueReaper
     private final TimedProcessor mTimedProcessor;
     private boolean              canContinue               = true;
 
+    DBHandler obj=new DBHandler();
+    
     private long starttime=System.currentTimeMillis();
     
     protected InmemoryQueueReaper(
@@ -62,7 +64,7 @@ public abstract class InmemoryQueueReaper
 
             try
             {
-                DBHandler.insertRecords(lRecords, mTableName);
+            	obj.insertRecords(lRecords, mTableName);
             }
             catch (final ItextosException e)
             {
