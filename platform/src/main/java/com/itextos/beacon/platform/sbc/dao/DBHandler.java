@@ -18,6 +18,7 @@ import com.itextos.beacon.commonlib.constants.exception.ItextosException;
 import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.sbc.util.ConsumerId;
+import com.itextos.beacon.smslog.ScheduleConsumerIdLog;
 
 public  class DBHandler
 {
@@ -83,7 +84,9 @@ public  class DBHandler
         for (int i = 0; i < aMessageRequestList.size(); i++)
         {
             final MessageRequest lMessageRequest = aMessageRequestList.get(i);
-            aPstmt.setString(1, ConsumerId.getInstance().getConsumerId()); // This will round-robin within the batch
+            String consumerID=ConsumerId.getInstance().getConsumerId();
+            ScheduleConsumerIdLog.log(consumerID);
+            aPstmt.setString(1, consumerID); // This will round-robin within the batch
             aPstmt.setString(2, lMessageRequest.getClientId());
 
             final Date processTime = getProcessTime(lMessageRequest);
