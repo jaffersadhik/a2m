@@ -11,7 +11,7 @@ import com.itextos.beacon.errorlog.FolderCreation;
 
 public class ScheduleConsumerIdLog {
 
-	private static ScheduleConsumerIdLog obj=new ScheduleConsumerIdLog();
+	private static ScheduleConsumerIdLog obj=null;
 
     private final  Logger logger = Logger.getLogger(ScheduleConsumerIdLog.class.getName());
     
@@ -73,10 +73,16 @@ public class ScheduleConsumerIdLog {
 
     
     private ScheduleConsumerIdLog() {
-    	init();
+    	
     }
     
     public static ScheduleConsumerIdLog getInstance() {
+    	
+    	if(obj==null) {
+    		
+    		obj=new ScheduleConsumerIdLog();
+    		obj.init();
+    	}
     	
     	return obj;
     }
