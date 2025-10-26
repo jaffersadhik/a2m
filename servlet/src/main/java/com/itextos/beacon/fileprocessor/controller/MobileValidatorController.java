@@ -12,8 +12,11 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -26,44 +29,47 @@ import com.winnovature.fileuploads.utils.Utility;
 import com.winnovature.utils.utils.JsonUtility;
 import com.winnovature.utils.utils.UserDetails;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("/FP-FileUpload-0.0.1/validatemobile")
 public class MobileValidatorController {
 
+    private static final Log log = LogFactory.getLog(Constants.FileUploadLogger);
+
     @PostMapping(consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    public Mono<Map<String, Object>> validateMobileNumbers(
+    public ResponseEntity<Map<String, Object>> validateMobileNumbers(
             @RequestParam("cli_id") String clientId,
             @RequestParam("mobile") String mobile) {
 
-        return Mono.fromCallable(() -> {
-            Instant startTime = Instant.now();
-            
+        Instant startTime = Instant.now();
+        
+        try {
             if (StringUtils.isBlank(clientId)) {
-                return createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
-                        Constants.INTERNAL_SERVER_ERROR, "Client ID is required", HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
+                                Constants.INTERNAL_SERVER_ERROR, "Client ID is required"));
             }
 
             if (StringUtils.isBlank(mobile)) {
-                return createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
-                        Constants.INTERNAL_SERVER_ERROR, "Mobile numbers are required", HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
+                                Constants.INTERNAL_SERVER_ERROR, "Mobile numbers are required"));
             }
 
             // Parse mobile numbers from input
             List<String> mobiList = parseMobileNumbers(mobile);
             
             if (mobiList.isEmpty()) {
-                return createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
-                        Constants.INTERNAL_SERVER_ERROR, "No valid mobile numbers found", HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
+                                Constants.INTERNAL_SERVER_ERROR, "No valid mobile numbers found"));
             }
 
             // Get user info and validation parameters
             UserInfo userInfo = UserDetails.getUserInfo(clientId);
             if (userInfo == null) {
-                return createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
-                        Constants.INTERNAL_SERVER_ERROR, "User not found for client ID: " + clientId, 
-                        HttpStatus.BAD_REQUEST);
+                return ResponseEntity.badRequest()
+                        .body(createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
+                                Constants.INTERNAL_SERVER_ERROR, "User not found for client ID: " + clientId));
             }
 
             Map<String, Object> info = com.winnovature.utils.utils.MobileValidator.getRequiredInfo(userInfo);
@@ -88,24 +94,22 @@ public class MobileValidatorController {
             finalResponse.put("statusCode", Constants.SUCCESS_STATUS_CODE);
 
             // Log response
-            if (org.apache.commons.logging.LogFactory.getLog(Constants.FileUploadLogger).isDebugEnabled()) {
+            if (log.isDebugEnabled()) {
                 String json = new JsonUtility().mapToJson(finalResponse);
-                org.apache.commons.logging.LogFactory.getLog(Constants.FileUploadLogger)
-                        .debug("[MobileValidator] [validateMobileNumbers] time taken to process request " + 
-                               mobile + " is " + Utility.getTimeDifference(startTime) + 
-                               " milliseconds. Response = " + json);
+                log.debug("[MobileValidator] [validateMobileNumbers] time taken to process request " + 
+                       mobile + " is " + Utility.getTimeDifference(startTime) + 
+                       " milliseconds. Response = " + json);
             }
 
-            return finalResponse;
-        })
-        .onErrorResume(throwable -> {
-            org.apache.commons.logging.LogFactory.getLog(Constants.FileUploadLogger)
-                    .error("[MobileValidator] [validateMobileNumbers] Exception", throwable);
+            return ResponseEntity.ok(finalResponse);
+
+        } catch (Exception e) {
+            log.error("[MobileValidator] [validateMobileNumbers] Exception", e);
             
-            return Mono.just(createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
-                    Constants.INTERNAL_SERVER_ERROR, Constants.GENERAL_ERROR_MESSAGE, 
-                    HttpStatus.INTERNAL_SERVER_ERROR));
-        });
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE,
+                            Constants.INTERNAL_SERVER_ERROR, Constants.GENERAL_ERROR_MESSAGE));
+        }
     }
 
     private List<String> parseMobileNumbers(String mobileInput) {
@@ -157,7 +161,7 @@ public class MobileValidatorController {
         return new ValidationResult(validList, invalidList, duplicateList);
     }
 
-    private Map<String, Object> createErrorResponse(int statusCode, String error, String message, HttpStatus httpStatus) {
+    private Map<String, Object> createErrorResponse(int statusCode, String error, String message) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("statusCode", statusCode);
         errorResponse.put("code", statusCode);

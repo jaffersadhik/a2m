@@ -1,18 +1,28 @@
 package com.itextos.beacon.fileprocessor.controller;
 
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.http.codec.multipart.FilePart;
-import org.springframework.http.codec.multipart.Part;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.reactive.function.server.ServerResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.winnovature.fileuploads.services.FileReadService;
 import com.winnovature.fileuploads.utils.Constants;
@@ -20,19 +30,6 @@ import com.winnovature.fileuploads.utils.Utility;
 import com.winnovature.fileuploads.utils.ZipHandler;
 import com.winnovature.utils.singletons.ConfigParamsTon;
 import com.winnovature.utils.utils.JsonUtility;
-
-import reactor.core.publisher.Flux;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.time.Instant;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicLong;
 
 @RestController
 @RequestMapping("/FP-FileUpload-0.0.1/dlttemplateplaceholders")
@@ -42,11 +39,11 @@ public class CampaignTemplateDltFilesSaverController {
     private Map<String, String> configMap = null;
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public Mono<Map<String, Object>> handleFileUpload(
+    public ResponseEntity<Map<String, Object>> handleFileUpload(
             @RequestPart("username") String username,
             @RequestPart("t_type") String ttype,
             @RequestPart("mobile") String mobileColumn,
-            @RequestPart Map<String, Part> parts) {
+            @RequestPart("files") MultipartFile[] files) {
 
         if (log.isDebugEnabled()) {
             log.debug("[CampaignTemplateDltFilesSaver] [handleFileUpload] request received.");
@@ -77,219 +74,230 @@ public class CampaignTemplateDltFilesSaverController {
         }
 
         String mobileColumnName = mobileColumn.trim().toLowerCase();
-        List<String> filesList = Collections.synchronizedList(new ArrayList<>());
-        AtomicLong totalRecords = new AtomicLong(0);
+        List<String> filesList = new ArrayList<>();
+        long totalRecords = 0;
 
-        return getFileStoreLocation(username)
-                .flatMap(fileStoreLocation -> {
-                    // Process all file parts
-                    return Flux.fromIterable(parts.entrySet())
-                            .filter(entry -> entry.getValue() instanceof FilePart)
-                            .flatMap(entry -> processFilePart((FilePart) entry.getValue(), fileStoreLocation, filesList))
-                            .collectList()
-                            .flatMap(response -> {
-                                // Process zip files and extract contents
-                                return processZipFiles(response, fileStoreLocation, filesList)
-                                        .then(Mono.just(response));
-                            })
-                            .flatMap(response -> {
-                                // Process files with FileReadService
-                                return processFilesWithService(response, fileStoreLocation, filesList, 
-                                        mobileColumnName, ttype, totalRecords, requestFrom, username);
-                            })
-                            .flatMap(processedResults -> {
-                                // Build final response
-                                return buildFinalResponse(processedResults, totalRecords.get());
-                            });
-                })
-                .onErrorResume(throwable -> {
-                    log.error("[CampaignTemplateDltFilesSaver] [handleFileUpload] Exception", throwable);
-                    // Ensure files are tracked for cleanup even on error
-                    if (!filesList.isEmpty()) {
-                        Utility.sendFilesToTrackingRedis(requestFrom, username, filesList);
+        try {
+            String fileStoreLocation = getFileStoreLocation(username);
+            List<Map<String, Object>> processedFiles = new ArrayList<>();
+
+            // Process all uploaded files
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    Map<String, Object> fileData = processFilePart(file, fileStoreLocation, filesList);
+                    if (!fileData.isEmpty()) {
+                        processedFiles.add(fileData);
                     }
-                    return createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE, 
-                            "Internal Server Error", "Server Error", HttpStatus.INTERNAL_SERVER_ERROR);
-                })
-                .doOnSuccess(response -> {
-                    if (log.isDebugEnabled()) {
-                        try {
-                            String json = new JsonUtility().mapToJson(response);
-                            log.debug("[CampaignTemplateDltFilesSaver] [handleFileUpload] time taken to process request is "
-                                    + Utility.getTimeDifference(startTime) + " milliseconds and response is " + json);
-                        } catch (Exception e) {
-                            log.debug("[CampaignTemplateDltFilesSaver] [handleFileUpload] time taken to process request is "
-                                    + Utility.getTimeDifference(startTime) + " milliseconds");
-                        }
-                    }
-                });
-    }
-
-    private Mono<String> getFileStoreLocation(String username) {
-        return Mono.fromCallable(() -> {
-            configMap = ConfigParamsTon.getInstance().getConfigurationFromconfigParams();
-            String fileStoreLocation = configMap.get(Constants.CAMPAIGNS_FILE_STORE_PATH);
-            fileStoreLocation = fileStoreLocation + username.toLowerCase() + "/";
-            Files.createDirectories(Paths.get(fileStoreLocation));
-            return fileStoreLocation;
-        }).subscribeOn(Schedulers.boundedElastic());
-    }
-
-    private Mono<Map<String, Object>> processFilePart(FilePart filePart, String fileStoreLocation, List<String> filesList) {
-        return Mono.fromCallable(() -> {
-            String originalFileName = filePart.filename();
-            if (originalFileName == null) {
-                return Collections.<String, Object>emptyMap();
+                }
             }
 
-            String extension = "." + FilenameUtils.getExtension(originalFileName);
-            UUID uuid = UUID.randomUUID();
-            String storedFileName = StringUtils.replace(originalFileName, extension, "")
-                    .concat("_" + uuid.toString()).concat(extension);
+            // Process zip files and extract contents
+            processedFiles = processZipFiles(processedFiles, fileStoreLocation, filesList);
 
-            Path tempFilePath = Paths.get(fileStoreLocation + storedFileName);
+            // Process files with FileReadService
+            ProcessedResults processedResults = processFilesWithService(
+                    processedFiles, fileStoreLocation, filesList, 
+                    mobileColumnName, ttype, requestFrom, username);
+
+            totalRecords = processedResults.getTotalRecords();
+
+            // Build final response
+            Map<String, Object> finalResponse = buildFinalResponse(processedResults, totalRecords);
+
+            if (log.isDebugEnabled()) {
+                try {
+                    String json = new JsonUtility().mapToJson(finalResponse);
+                    log.debug("[CampaignTemplateDltFilesSaver] [handleFileUpload] time taken to process request is "
+                            + Utility.getTimeDifference(startTime) + " milliseconds and response is " + json);
+                } catch (Exception e) {
+                    log.debug("[CampaignTemplateDltFilesSaver] [handleFileUpload] time taken to process request is "
+                            + Utility.getTimeDifference(startTime) + " milliseconds");
+                }
+            }
+
+            return ResponseEntity.ok(finalResponse);
+
+        } catch (Exception e) {
+            log.error("[CampaignTemplateDltFilesSaver] [handleFileUpload] Exception", e);
+            // Ensure files are tracked for cleanup even on error
+            if (!filesList.isEmpty()) {
+                Utility.sendFilesToTrackingRedis(requestFrom, username, filesList);
+            }
+            return createErrorResponse(Constants.INTERNAL_SERVER_ERROR_STATUS_CODE, 
+                    "Internal Server Error", "Server Error: " + e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+    private String getFileStoreLocation(String username) throws Exception {
+        configMap = ConfigParamsTon.getInstance().getConfigurationFromconfigParams();
+        String fileStoreLocation = configMap.get(Constants.CAMPAIGNS_FILE_STORE_PATH);
+        fileStoreLocation = fileStoreLocation + username.toLowerCase() + "/";
+        Files.createDirectories(Paths.get(fileStoreLocation));
+        return fileStoreLocation;
+    }
+
+    private Map<String, Object> processFilePart(MultipartFile file, String fileStoreLocation, List<String> filesList) throws Exception {
+        String originalFileName = file.getOriginalFilename();
+        if (originalFileName == null) {
+            return Collections.emptyMap();
+        }
+
+        String extension = "." + FilenameUtils.getExtension(originalFileName);
+        UUID uuid = UUID.randomUUID();
+        String storedFileName = StringUtils.replace(originalFileName, extension, "")
+                .concat("_" + uuid.toString()).concat(extension);
+
+        Path tempFilePath = Paths.get(fileStoreLocation + storedFileName);
+        
+        // For CSV files, create a temporary file first
+        if (extension.equalsIgnoreCase(".csv")) {
+            String tempFileName = StringUtils.replace(originalFileName, extension, "")
+                    .concat("_" + uuid.toString())
+                    .concat("_" + com.winnovature.utils.utils.Utility.getCustomDateAsString("yyyy-MM-dd_HHmmssSSS"))
+                    .concat(extension);
+            Path csvTempPath = Paths.get(fileStoreLocation + tempFileName);
             
-            // For CSV files, create a temporary file first
-            if (extension.equalsIgnoreCase(".csv")) {
-                String tempFileName = StringUtils.replace(originalFileName, extension, "")
-                        .concat("_" + uuid.toString())
-                        .concat("_" + com.winnovature.utils.utils.Utility.getCustomDateAsString("yyyy-MM-dd_HHmmssSSS"))
-                        .concat(extension);
-                Path csvTempPath = Paths.get(fileStoreLocation + tempFileName);
-                
-                // Transfer file content
-                filePart.transferTo(csvTempPath).block();
-                
-                // Process CSV file
-                com.winnovature.utils.utils.Utility.storeCSVFile(
-                    fileStoreLocation + tempFileName, 
-                    fileStoreLocation + storedFileName
-                );
-                filesList.add(fileStoreLocation + tempFileName);
-            } else {
-                // Transfer regular files directly
-                filePart.transferTo(tempFilePath).block();
-            }
+            // Transfer file content
+            file.transferTo(csvTempPath.toFile());
+            
+            // Process CSV file
+            com.winnovature.utils.utils.Utility.storeCSVFile(
+                fileStoreLocation + tempFileName, 
+                fileStoreLocation + storedFileName
+            );
+            filesList.add(fileStoreLocation + tempFileName);
+        } else {
+            // Transfer regular files directly
+            file.transferTo(tempFilePath.toFile());
+        }
 
-            Map<String, Object> fileData = new HashMap<>();
-            fileData.put("filename", originalFileName);
-            fileData.put("r_filename", storedFileName);
-            fileData.put("extension", extension.toLowerCase());
+        Map<String, Object> fileData = new HashMap<>();
+        fileData.put("filename", originalFileName);
+        fileData.put("r_filename", storedFileName);
+        fileData.put("extension", extension.toLowerCase());
 
-            return fileData;
-        }).subscribeOn(Schedulers.boundedElastic());
+        return fileData;
     }
 
-    private Mono<Void> processZipFiles(List<Map<String, Object>> response, String fileStoreLocation, List<String> filesList) {
-        return Flux.fromIterable(response)
-                .filter(fileData -> ".zip".equalsIgnoreCase((String) fileData.get("extension")))
-                .flatMap(fileData -> {
-                    String storedFileName = (String) fileData.get("r_filename");
-                    String originalFileName = (String) fileData.get("filename");
+    private List<Map<String, Object>> processZipFiles(List<Map<String, Object>> response, String fileStoreLocation, List<String> filesList) {
+        List<Map<String, Object>> updatedResponse = new ArrayList<>(response);
+        
+        for (Map<String, Object> fileData : response) {
+            if (".zip".equalsIgnoreCase((String) fileData.get("extension"))) {
+                String storedFileName = (String) fileData.get("r_filename");
+                String originalFileName = (String) fileData.get("filename");
+                
+                try {
+                    Instant zipExtractStartTime = Instant.now();
+                    List<Map<String, Object>> zipContent = new ZipHandler()
+                            .extractZipFileContent(fileStoreLocation + storedFileName, fileStoreLocation);
                     
-                    return Mono.fromCallable(() -> {
-                        Instant zipExtractStartTime = Instant.now();
-                        List<Map<String, Object>> zipContent = new ZipHandler()
-                                .extractZipFileContent(fileStoreLocation + storedFileName, fileStoreLocation);
-                        
-                        if (log.isDebugEnabled()) {
-                            log.debug("[CampaignTemplateDltFilesSaver] [processZipFiles] time taken to extract "
-                                    + originalFileName + " is " + Utility.getTimeDifference(zipExtractStartTime)
-                                    + " milliseconds.");
-                        }
-                        
-                        // Add zip file to cleanup list
-                        if (StringUtils.isNotBlank(storedFileName)) {
-                            filesList.add(fileStoreLocation + storedFileName);
-                        }
-                        
-                        // Add extracted files to response
-                        response.addAll(zipContent);
-                        return zipContent;
-                    }).subscribeOn(Schedulers.boundedElastic());
-                })
-                .then();
+                    if (log.isDebugEnabled()) {
+                        log.debug("[CampaignTemplateDltFilesSaver] [processZipFiles] time taken to extract "
+                                + originalFileName + " is " + Utility.getTimeDifference(zipExtractStartTime)
+                                + " milliseconds.");
+                    }
+                    
+                    // Add zip file to cleanup list
+                    if (StringUtils.isNotBlank(storedFileName)) {
+                        filesList.add(fileStoreLocation + storedFileName);
+                    }
+                    
+                    // Add extracted files to response
+                    updatedResponse.addAll(zipContent);
+                    
+                } catch (Exception e) {
+                    log.error("Error processing zip file: " + originalFileName, e);
+                }
+            }
+        }
+        
+        return updatedResponse;
     }
 
-    private Mono<ProcessedResults> processFilesWithService(
+    private ProcessedResults processFilesWithService(
             List<Map<String, Object>> response, 
             String fileStoreLocation, 
             List<String> filesList,
             String mobileColumnName,
             String ttype,
-            AtomicLong totalRecords,
             String requestFrom,
-            String username) {
+            String username) throws Exception {
 
         // Add all files to tracking list
-        response.stream()
-                .filter(map -> map != null && map.get("r_filename") != null)
-                .map(map -> fileStoreLocation + map.get("r_filename").toString().trim())
-                .forEach(filesList::add);
+        for (Map<String, Object> map : response) {
+            if (map != null && map.get("r_filename") != null) {
+                filesList.add(fileStoreLocation + map.get("r_filename").toString().trim());
+            }
+        }
 
         // Send files to tracking Redis
         boolean sentToTrackingRedis = Utility.sendFilesToTrackingRedis(requestFrom, username, filesList);
 
-        // Process files using FileReadService
-        return Flux.fromIterable(response)
-                .flatMap(fileData -> processSingleFile(fileData, fileStoreLocation))
-                .collectList()
-                .map(fileResults -> {
-                    List<Map<String, Object>> successFiles = new ArrayList<>();
-                    List<Map<String, Object>> failedFiles = new ArrayList<>();
+        List<Map<String, Object>> successFiles = new ArrayList<>();
+        List<Map<String, Object>> failedFiles = new ArrayList<>();
+        long totalRecords = 0;
 
-                    // Process file results
-                    for (Map<String, Object> result : fileResults) {
-                        if (result.containsKey("error")) {
+        // Process files using FileReadService
+        for (Map<String, Object> fileData : response) {
+            try {
+                Map<String, Object> result = processSingleFile(fileData, fileStoreLocation);
+                
+                if (result.containsKey("error")) {
+                    failedFiles.add(result);
+                } else {
+                    long fileCount = Long.parseLong(result.get("count").toString());
+                    if (fileCount < 1) {
+                        // Remove files with 0 rows
+                        Map<String, Object> errorResult = new HashMap<>();
+                        errorResult.put("error", "Invalid File");
+                        errorResult.put("message", "File is empty");
+                        errorResult.put("filename", result.get("filename"));
+                        failedFiles.add(errorResult);
+                    } else {
+                        // Process placeholders and validate mobile column
+                        boolean mobileColumnFound = processPlaceholdersAndValidateMobile(result, mobileColumnName, ttype);
+                        if (!mobileColumnFound) {
+                            result.put("error", "Invalid File");
+                            result.put("message", "Missing Mobile " + 
+                                    ("index".equalsIgnoreCase(ttype) ? "Index " : "Column ") + mobileColumnName);
                             failedFiles.add(result);
                         } else {
-                            long fileCount = Long.parseLong(result.get("count").toString());
-                            if (fileCount < 1) {
-                                // Remove files with 0 rows
-                                Map<String, Object> errorResult = new HashMap<>();
-                                errorResult.put("error", "Invalid File");
-                                errorResult.put("message", "File is empty");
-                                errorResult.put("filename", result.get("filename"));
-                                failedFiles.add(errorResult);
-                            } else {
-                                // Process placeholders and validate mobile column
-                                boolean mobileColumnFound = processPlaceholdersAndValidateMobile(result, mobileColumnName, ttype);
-                                if (!mobileColumnFound) {
-                                    result.put("error", "Invalid File");
-                                    result.put("message", "Missing Mobile " + 
-                                            ("index".equalsIgnoreCase(ttype) ? "Index " : "Column ") + mobileColumnName);
-                                    failedFiles.add(result);
-                                } else {
-                                    successFiles.add(result);
-                                    totalRecords.addAndGet(fileCount);
-                                }
-                            }
+                            successFiles.add(result);
+                            totalRecords += fileCount;
                         }
                     }
+                }
+            } catch (Exception e) {
+                log.error("Error processing file: " + fileData.get("filename"), e);
+                Map<String, Object> errorResult = new HashMap<>();
+                errorResult.put("error", "Processing Error");
+                errorResult.put("message", e.getMessage());
+                errorResult.put("filename", fileData.get("filename"));
+                failedFiles.add(errorResult);
+            }
+        }
 
-                    return new ProcessedResults(successFiles, failedFiles, sentToTrackingRedis);
-                });
+        return new ProcessedResults(successFiles, failedFiles, sentToTrackingRedis, totalRecords);
     }
 
-    private Mono<Map<String, Object>> processSingleFile(Map<String, Object> fileData, String fileStoreLocation) {
-        return Mono.fromCallable(() -> {
-            try {
-                FileReadService fileReadService = new FileReadService(fileData, fileStoreLocation, true);
-                return fileReadService.call();
-            } catch (Exception e) {
+    private Map<String, Object> processSingleFile(Map<String, Object> fileData, String fileStoreLocation) throws Exception {
+        try {
+            FileReadService fileReadService = new FileReadService(fileData, fileStoreLocation, true);
+            return fileReadService.call();
+        } catch (Exception e) {
+            if (e.getMessage().contains(Constants.UNSUPPORTED_FILE_TYPE)) {
                 Map<String, Object> errorResult = new HashMap<>();
-                if (e.getMessage().contains(Constants.UNSUPPORTED_FILE_TYPE)) {
-                    errorResult.put("error", Constants.UNSUPPORTED_FILE_TYPE);
-                    errorResult.put("message", Constants.UNSUPPORTED_FILE_TYPE);
-                    if (StringUtils.split(e.getMessage(), "~").length > 1) {
-                        errorResult.put("filename", StringUtils.split(e.getMessage(), "~")[1].trim());
-                    }
-                } else {
-                    throw e;
+                errorResult.put("error", Constants.UNSUPPORTED_FILE_TYPE);
+                errorResult.put("message", Constants.UNSUPPORTED_FILE_TYPE);
+                if (StringUtils.split(e.getMessage(), "~").length > 1) {
+                    errorResult.put("filename", StringUtils.split(e.getMessage(), "~")[1].trim());
                 }
                 return errorResult;
+            } else {
+                throw e;
             }
-        }).subscribeOn(Schedulers.boundedElastic());
+        }
     }
 
     private boolean processPlaceholdersAndValidateMobile(Map<String, Object> result, String mobileColumnName, String ttype) {
@@ -340,27 +348,27 @@ public class CampaignTemplateDltFilesSaverController {
         return mobileColumnFound;
     }
 
-    private Mono<Map<String, Object>> buildFinalResponse(ProcessedResults processedResults, long total) {
+    private Map<String, Object> buildFinalResponse(ProcessedResults processedResults, long total) {
         Map<String, Object> finalResponse = new HashMap<>();
         Map<String, Object> nestedResponse = new HashMap<>();
         
-        nestedResponse.put("success", processedResults.successFiles);
-        nestedResponse.put("failed", processedResults.failedFiles);
+        nestedResponse.put("success", processedResults.getSuccessFiles());
+        nestedResponse.put("failed", processedResults.getFailedFiles());
 
         finalResponse.put("total", total);
         finalResponse.put("total_human", Utility.humanReadableNumberFormat(total));
         finalResponse.put("uploaded_files", nestedResponse);
         finalResponse.put("statusCode", Constants.SUCCESS_STATUS_CODE);
 
-        return Mono.just(finalResponse);
+        return finalResponse;
     }
 
-    private Mono<Map<String, Object>> createErrorResponse(int statusCode, String error, String message, HttpStatus httpStatus) {
+    private ResponseEntity<Map<String, Object>> createErrorResponse(int statusCode, String error, String message, HttpStatus httpStatus) {
         Map<String, Object> errorResponse = new HashMap<>();
         errorResponse.put("statusCode", statusCode);
         errorResponse.put("error", error);
         errorResponse.put("message", message);
-        return Mono.just(errorResponse);
+        return new ResponseEntity<>(errorResponse, httpStatus);
     }
 
     private boolean isInputInvalid(String ctype, String input) {
@@ -377,14 +385,22 @@ public class CampaignTemplateDltFilesSaverController {
 
     // Helper class to hold processing results
     private static class ProcessedResults {
-        final List<Map<String, Object>> successFiles;
-        final List<Map<String, Object>> failedFiles;
-        final boolean sentToTrackingRedis;
+        private final List<Map<String, Object>> successFiles;
+        private final List<Map<String, Object>> failedFiles;
+        private final boolean sentToTrackingRedis;
+        private final long totalRecords;
 
-        ProcessedResults(List<Map<String, Object>> successFiles, List<Map<String, Object>> failedFiles, boolean sentToTrackingRedis) {
+        public ProcessedResults(List<Map<String, Object>> successFiles, List<Map<String, Object>> failedFiles, 
+                               boolean sentToTrackingRedis, long totalRecords) {
             this.successFiles = successFiles;
             this.failedFiles = failedFiles;
             this.sentToTrackingRedis = sentToTrackingRedis;
+            this.totalRecords = totalRecords;
         }
+
+        public List<Map<String, Object>> getSuccessFiles() { return successFiles; }
+        public List<Map<String, Object>> getFailedFiles() { return failedFiles; }
+        public boolean isSentToTrackingRedis() { return sentToTrackingRedis; }
+        public long getTotalRecords() { return totalRecords; }
     }
 }

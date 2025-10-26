@@ -7,21 +7,17 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ServerWebExchange;
 
 import com.itextos.beacon.queryprocessor.commonutils.CommonVariables;
 import com.itextos.beacon.queryprocessor.commonutils.Utility;
 import com.itextos.beacon.queryprocessor.databaseconnector.ConnectionPoolSingleton;
 import com.itextos.beacon.queryprocessor.databaseconnector.SQLStatementExecutor;
 import com.itextos.beacon.queryprocessor.requestreceiver.QueryEngine;
-
-import reactor.core.publisher.Mono;
-import reactor.core.publisher.Flux;
-import reactor.core.scheduler.Schedulers;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -71,23 +67,46 @@ public class GetDataController {
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<JSONObject> getData(@RequestBody String requestBody, ServerWebExchange exchange) {
-        return parseAndValidateRequest(requestBody, exchange)
-                .flatMap(context -> validateDates(context, exchange))
-                .flatMap(context -> validateColumns(context, exchange))
-                .flatMap(context -> processDataRetrieval(context, exchange))
-                .onErrorResume(e -> {
-                    log.error("Unexpected error occurred", e);
-                    return createErrorResponse("Unable to retrieve the data", HttpStatus.INTERNAL_SERVER_ERROR, exchange);
-                });
-    }
-
-    private Mono<RequestContext> parseAndValidateRequest(String requestBody, ServerWebExchange exchange) {
-        return Mono.fromCallable(() -> {
+    public ResponseEntity<JSONObject> getData(@RequestBody String requestBody) {
+        try {
+            // Initialize connection pool if needed
             if (connPool == null) {
                 connPool = ConnectionPoolSingleton.getInstance();
             }
 
+            // Parse and validate request
+            RequestContext context = parseAndValidateRequest(requestBody);
+            if (context.hasError()) {
+                return ResponseEntity.status(context.statusCode).body(createErrorResponse(context.errorMessage));
+            }
+
+            // Validate dates
+            context = validateDates(context);
+            if (context.hasError()) {
+                return ResponseEntity.status(context.statusCode).body(createErrorResponse(context.errorMessage));
+            }
+
+            // Validate columns
+            context = validateColumns(context);
+            if (context.hasError()) {
+                return ResponseEntity.status(context.statusCode).body(createErrorResponse(context.errorMessage));
+            }
+
+            // Process data retrieval
+            JSONObject result = processDataRetrieval(context);
+            return ResponseEntity.ok(result);
+
+        } catch (Exception e) {
+            log.error("Unexpected error occurred", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(createErrorResponse("Unable to retrieve the data"));
+        }
+    }
+
+    private RequestContext parseAndValidateRequest(String requestBody) {
+        RequestContext context = new RequestContext();
+        
+        try {
             final JSONParser parser = new JSONParser();
             JSONObject reqJson = (JSONObject) parser.parse(requestBody);
             JSONObject paramJson = (JSONObject) parser.parse(reqJson.get(CommonVariables.R_PARAM).toString());
@@ -95,16 +114,24 @@ public class GetDataController {
             log.info("Parameter list");
             log.info(paramJson.toJSONString());
 
-            return new RequestContext(reqJson, paramJson);
-        })
-        .onErrorResume(e -> {
+            context.reqJson = reqJson;
+            context.paramJson = paramJson;
+            
+        } catch (Exception e) {
             log.error("JSON Parsing Error", e);
-            return createErrorContext("Invalid JSON", HttpStatus.BAD_REQUEST, exchange);
-        });
+            context.errorMessage = "Invalid JSON";
+            context.statusCode = HttpStatus.BAD_REQUEST;
+        }
+        
+        return context;
     }
 
-    private Mono<RequestContext> validateDates(RequestContext context, ServerWebExchange exchange) {
-        return Mono.fromCallable(() -> {
+    private RequestContext validateDates(RequestContext context) {
+        if (context.hasError()) {
+            return context;
+        }
+
+        try {
             final String DATE_FORMAT_S = "yyyy-M-dd HH:mm:ss";
             final DateTimeFormatter formatWithS = DateTimeFormatter.ofPattern(DATE_FORMAT_S);
             final LocalDateTime paramStartTime = LocalDateTime
@@ -138,15 +165,20 @@ public class GetDataController {
             context.paramStartTime = paramStartTime;
             context.paramEndTime = paramEndTime;
             return context;
-        });
+        } catch (Exception e) {
+            log.error("Error validating dates", e);
+            context.errorMessage = "Error processing date parameters";
+            context.statusCode = HttpStatus.BAD_REQUEST;
+            return context;
+        }
     }
 
-    private Mono<RequestContext> validateColumns(RequestContext context, ServerWebExchange exchange) {
+    private RequestContext validateColumns(RequestContext context) {
         if (context.hasError()) {
-            return Mono.just(context);
+            return context;
         }
 
-        return Mono.fromCallable(() -> {
+        try {
             final String paramColumns = Utility.nullCheck(context.paramJson.get("columns"), true);
 
             if ("".equals(paramColumns)) {
@@ -179,15 +211,20 @@ public class GetDataController {
             context.lstJSONCols = lstJSONCols;
             context.lstParamColumns = lstParamColumns;
             return context;
-        });
+        } catch (Exception e) {
+            log.error("Error validating columns", e);
+            context.errorMessage = "Error validating columns";
+            context.statusCode = HttpStatus.BAD_REQUEST;
+            return context;
+        }
     }
 
-    private Mono<JSONObject> processDataRetrieval(RequestContext context, ServerWebExchange exchange) {
+    private JSONObject processDataRetrieval(RequestContext context) {
         if (context.hasError()) {
-            return createErrorResponse(context.errorMessage, context.statusCode, exchange);
+            return createErrorResponse(context.errorMessage);
         }
 
-        return Mono.fromCallable(() -> {
+        try {
             int maxlimit = Utility.getInteger(QueryEngine.mySQL_cfg_val.getProperty("recordLimit"));
             @SuppressWarnings("unchecked")
             final List<Long> client_ids = (List<Long>) context.paramJson.get(CommonVariables.R_CLI_ID);
@@ -220,78 +257,58 @@ public class GetDataController {
             context.listOfDates = listOfDates;
             context.startDate = startDate;
             context.endDate = endDate;
-            return context;
-        })
-        .flatMap(ctx -> retrieveDataForAllDates(ctx, exchange));
+
+            // Retrieve data for all dates
+            return retrieveDataForAllDates(context);
+            
+        } catch (Exception e) {
+            log.error("Error during data retrieval", e);
+            return createErrorResponse("Unable to retrieve the data");
+        }
     }
 
-    private Mono<JSONObject> retrieveDataForAllDates(RequestContext context, ServerWebExchange exchange) {
-        return Flux.fromIterable(context.listOfDates)
-                .concatMap(date -> retrieveDataForDate(context, date)
-                        .map(dataResult -> new DateDataResult(date, dataResult)))
-                .takeWhile(dateDataResult -> {
-                    DateDataResult result = dateDataResult;
-                    if (result.dataResult.hasError) {
-                        return false; // Stop on error
-                    }
-                    
-                    // Continue if we haven't reached the limit
-                    // The actual record count check will be done in the final accumulation
-                    return true;
-                })
-                .collectList()
-                .flatMap(dateDataResults -> {
-                    JSONArray finalDataList = new JSONArray();
-                    int recordCount = 0;
-                    boolean hasError = false;
+    private JSONObject retrieveDataForAllDates(RequestContext context) {
+        JSONArray finalDataList = new JSONArray();
+        int recordCount = 0;
 
-                    for (DateDataResult dateDataResult : dateDataResults) {
-                        if (dateDataResult.dataResult.hasError) {
-                            hasError = true;
-                            break;
-                        }
-                        
-                        if (dateDataResult.dataResult.dataList != null) {
-                            finalDataList.addAll(dateDataResult.dataResult.dataList);
-                            recordCount = finalDataList.size();
-                            
-                            if (dateDataResult.dataResult.dataList.size() > 0) {
-                                log.info(String.format("Retrieved %d records for date: %s", 
-                                    dateDataResult.dataResult.dataList.size(), 
-                                    Utility.formatDateTime(dateDataResult.date.toLocalDate())));
-                            } else {
-                                log.info(String.format("No Data available for the Date: %s", 
-                                    Utility.formatDateTime(dateDataResult.date.toLocalDate())));
-                            }
-                        }
-                        
-                        // Stop if we've reached the limit
-                        if (recordCount >= context.maxlimit) {
-                            break;
-                        }
-                    }
+        for (LocalDateTime date : context.listOfDates) {
+            // Stop if we've reached the limit
+            if (recordCount >= context.maxlimit) {
+                break;
+            }
 
-                    if (hasError) {
-                        return createErrorResponse("Unable to retrieve the data", HttpStatus.INTERNAL_SERVER_ERROR, exchange);
-                    }
+            DataResult dataResult = retrieveDataForDate(context, date);
+            if (dataResult.hasError) {
+                log.error("Error retrieving data for date: " + Utility.formatDateTime(date.toLocalDate()));
+                return createErrorResponse("Unable to retrieve the data");
+            }
+            
+            if (dataResult.dataList != null) {
+                finalDataList.addAll(dataResult.dataList);
+                recordCount = finalDataList.size();
+                
+                if (dataResult.dataList.size() > 0) {
+                    log.info(String.format("Retrieved %d records for date: %s", 
+                        dataResult.dataList.size(), 
+                        Utility.formatDateTime(date.toLocalDate())));
+                } else {
+                    log.info(String.format("No Data available for the Date: %s", 
+                        Utility.formatDateTime(date.toLocalDate())));
+                }
+            }
+        }
 
-                    log.info(String.format("Get data completed, Record Count: %d", recordCount));
+        log.info(String.format("Get data completed, Record Count: %d", recordCount));
 
-                    JSONObject resJson = new JSONObject();
-                    resJson.put(CommonVariables.SERVER_TIMESTAMP, System.currentTimeMillis());
-                    resJson.put("record-count", recordCount);
-                    resJson.put("records", finalDataList);
-                    exchange.getResponse().setStatusCode(HttpStatus.OK);
-                    return Mono.just(resJson);
-                })
-                .onErrorResume(e -> {
-                    log.error("Error during data retrieval", e);
-                    return createErrorResponse("Unable to retrieve the data", HttpStatus.INTERNAL_SERVER_ERROR, exchange);
-                });
+        JSONObject resJson = new JSONObject();
+        resJson.put(CommonVariables.SERVER_TIMESTAMP, System.currentTimeMillis());
+        resJson.put("record-count", recordCount);
+        resJson.put("records", finalDataList);
+        return resJson;
     }
 
-    private Mono<DataResult> retrieveDataForDate(RequestContext context, LocalDateTime date) {
-        return Mono.fromCallable(() -> {
+    private DataResult retrieveDataForDate(RequestContext context, LocalDateTime date) {
+        try {
             LocalDateTime qStartDate;
             LocalDateTime qEndDate;
 
@@ -330,33 +347,22 @@ public class GetDataController {
             }
 
             return new DataResult(dataList, false);
-        })
-        .subscribeOn(Schedulers.boundedElastic()); // Move blocking DB calls to separate thread pool
+        } catch (Exception e) {
+            log.error("Error retrieving data for date: " + Utility.formatDateTime(date.toLocalDate()), e);
+            return new DataResult(null, true);
+        }
     }
 
-    private Mono<RequestContext> createErrorContext(String message, HttpStatus status, ServerWebExchange exchange) {
-        return Mono.fromCallable(() -> {
-            RequestContext context = new RequestContext(null, null);
-            context.errorMessage = message;
-            context.statusCode = status;
-            exchange.getResponse().setStatusCode(status);
-            return context;
-        });
-    }
-
-    private Mono<JSONObject> createErrorResponse(String message, HttpStatus status, ServerWebExchange exchange) {
-        return Mono.fromCallable(() -> {
-            JSONObject errorResponse = new JSONObject();
-            errorResponse.put(CommonVariables.STATUS_MESSAGE, message);
-            exchange.getResponse().setStatusCode(status);
-            return errorResponse;
-        });
+    private JSONObject createErrorResponse(String message) {
+        JSONObject errorResponse = new JSONObject();
+        errorResponse.put(CommonVariables.STATUS_MESSAGE, message);
+        return errorResponse;
     }
 
     // Helper classes for context management
     private static class RequestContext {
-        final JSONObject reqJson;
-        final JSONObject paramJson;
+        JSONObject reqJson;
+        JSONObject paramJson;
         LocalDateTime paramStartTime;
         LocalDateTime paramEndTime;
         List<String> lstJSONCols;
@@ -370,11 +376,6 @@ public class GetDataController {
         String errorMessage;
         HttpStatus statusCode;
 
-        RequestContext(JSONObject reqJson, JSONObject paramJson) {
-            this.reqJson = reqJson;
-            this.paramJson = paramJson;
-        }
-
         boolean hasError() {
             return errorMessage != null;
         }
@@ -387,16 +388,6 @@ public class GetDataController {
         DataResult(JSONArray dataList, boolean hasError) {
             this.dataList = dataList;
             this.hasError = hasError;
-        }
-    }
-
-    private static class DateDataResult {
-        final LocalDateTime date;
-        final DataResult dataResult;
-
-        DateDataResult(LocalDateTime date, DataResult dataResult) {
-            this.date = date;
-            this.dataResult = dataResult;
         }
     }
 }

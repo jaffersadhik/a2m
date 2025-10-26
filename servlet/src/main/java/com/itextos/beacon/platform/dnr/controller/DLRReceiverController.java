@@ -3,24 +3,17 @@ package com.itextos.beacon.platform.dnr.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
 
-import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
-import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
-import com.itextos.beacon.http.interfaceparameters.InterfaceParameter;
 import com.itextos.beacon.http.interfaceutil.MessageSource;
 import com.itextos.beacon.smslog.QSReceiverLog;
 import com.itextos.beacon.smslog.TimeTakenInterfaceLog;
-import com.mysql.cj.protocol.x.MessageConstants;
 
 import java.time.Instant;
-import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicReference;
 
 @RestController
 @RequestMapping("/dnr/dlrreceiver")
@@ -29,74 +22,76 @@ public class DLRReceiverController {
     private static final Log log = LogFactory.getLog(DLRReceiverController.class);
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> handleQSGetRequest(
+    public ResponseEntity<String> handleQSGetRequest(
             @RequestParam java.util.Map<String, String> allParams,
-            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
         
-        return processQSRequest("GET", allParams, clientIp,authorization);
+        return processQSRequest("GET", allParams, clientIp, authorization, null);
     }
 
     @PostMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> handleQSPostRequest(
-            @RequestBody(required = false) Mono<String> requestBody,
+    public ResponseEntity<String> handleQSPostRequest(
+            @RequestBody(required = false) String requestBody,
             @RequestParam java.util.Map<String, String> allParams,
-            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,@RequestHeader(value = "Authorization", required = false) String authorization) {
+            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,
+            @RequestHeader(value = "Authorization", required = false) String authorization) {
         
-        return requestBody.defaultIfEmpty("")
-            .flatMap(body -> processQSRequest("POST", allParams, clientIp,authorization));
+        return processQSRequest("POST", allParams, clientIp, authorization, requestBody);
     }
 
-    private Mono<String> processQSRequest(String method, java.util.Map<String, String> params, String clientIp,String authorization) {
+    private ResponseEntity<String> processQSRequest(String method, java.util.Map<String, String> params, 
+                                                   String clientIp, String authorization, String requestBody) {
         final Instant processStart = Instant.now();
-        final AtomicReference<StringBuffer> logBuffer = new AtomicReference<>(new StringBuffer());
+        final StringBuffer logBuffer = new StringBuffer();
         
         if (log.isDebugEnabled()) {
             log.debug("QS request received via " + method);
         }
 
         params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), clientIp);
-        
         params.put(InterfaceInputParameters.AUTHORIZATION, authorization);
 
         // Initialize log buffer
-        StringBuffer sb = new StringBuffer();
-        sb.append("\n##########################################\n");
-        sb.append("QS request received in ").append(method).append("\n");
-        logBuffer.set(sb);
+        logBuffer.append("\n##########################################\n");
+        logBuffer.append("QS request received in ").append(method).append("\n");
 
-        // Track metrics
-        
-
-        // Process request reactively
-        return Mono.fromCallable(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                try {
-                    // Adapt your existing QSRequestReader to reactive context
-                    ReactiveQSRequestReader reactiveReader = new ReactiveQSRequestReader(
-                        params, method, MessageSource.GENERIC_QS, logBuffer.get()
-                    );
-                    return reactiveReader.processRequest();
-                } catch (Exception e) {
-                    log.error("Error processing QS request", e);
-                    return "{\"status\": \"error\", \"message\": \"Processing failed\"}";
-                }
-            }
-        })
-        .subscribeOn(Schedulers.boundedElastic())
-        .doOnSuccess(response -> {
+        try {
+            // Process request synchronously
+            String response = processRequestSync(params, method, logBuffer, requestBody);
+            
             final Instant processEnd = Instant.now();
             final long processTaken = java.time.Duration.between(processStart, processEnd).toMillis();
             
-            // Log processing time
-            logProcessingTime(processStart, processEnd, processTaken, logBuffer.get());
-        })
-        .doOnError(error -> {
-            log.error("Exception processing QS request", error);
+            // Log processing time for success case
+            logProcessingTime(processStart, processEnd, processTaken, logBuffer);
+            
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+                    
+        } catch (Exception e) {
+            log.error("Exception processing QS request", e);
             final Instant processEnd = Instant.now();
             final long processTaken = java.time.Duration.between(processStart, processEnd).toMillis();
-            logProcessingTime(processStart, processEnd, processTaken, logBuffer.get());
-        });
+            
+            // Log processing time for error case
+            logProcessingTime(processStart, processEnd, processTaken, logBuffer);
+            
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"status\": \"error\", \"message\": \"Processing failed: " + e.getMessage() + "\"}");
+        }
+    }
+
+    private String processRequestSync(java.util.Map<String, String> params, String method, 
+                                     StringBuffer logBuffer, String requestBody) throws Exception {
+        // Use your existing synchronous QSRequestReader
+        // Replace ReactiveQSRequestReader with your original synchronous implementation
+        QSRequestReader requestReader = new QSRequestReader(
+            params, method, MessageSource.GENERIC_QS, logBuffer
+        );
+        return requestReader.processRequest();
     }
 
     private void logProcessingTime(Instant start, Instant end, long duration, StringBuffer sb) {
@@ -118,4 +113,6 @@ public class DLRReceiverController {
 
         QSReceiverLog.log(sb.toString());
     }
+
+    
 }

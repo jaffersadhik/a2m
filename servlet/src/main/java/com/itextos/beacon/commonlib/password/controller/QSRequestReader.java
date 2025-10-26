@@ -5,12 +5,10 @@ import java.util.Map;
 import com.itextos.beacon.commonlib.pwdencryption.EncryptedObject;
 import com.itextos.beacon.commonlib.pwdencryption.Encryptor;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
-import com.itextos.beacon.interfaces.generichttpapi.processor.reader.QSRequestReader;
-import com.itextos.beacon.interfaces.generichttpapi.processor.reader.RequestReader;
 
 import jakarta.servlet.http.HttpServletResponse;
 
-public class ReactiveQSRequestReader {
+public class QSRequestReader {
 
 	
 	private static final String PARAM_CLIENT_ID  = "cli_id";
@@ -20,7 +18,7 @@ public class ReactiveQSRequestReader {
 	String method=null;
 	String requestType=null;
 	StringBuffer stringBuffer=null;
-	public ReactiveQSRequestReader(Map<String, String> params, String method, String requestType,
+	public QSRequestReader(Map<String, String> params, String method, String requestType,
 			StringBuffer stringBuffer) {
 		
 		this.method=method;
@@ -32,7 +30,6 @@ public class ReactiveQSRequestReader {
 
 	public String processRequest() throws Exception {
 
-		 final RequestReader reader = new QSRequestReader( params,  method,  requestType,stringBuffer);
 	        
 	       return doGet(params);
 

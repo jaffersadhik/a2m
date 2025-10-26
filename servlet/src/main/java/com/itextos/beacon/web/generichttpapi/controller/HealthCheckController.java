@@ -9,8 +9,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("/genericapi/health")
 public class HealthCheckController {
@@ -18,27 +16,27 @@ public class HealthCheckController {
     private static final Log log = LogFactory.getLog(HealthCheckController.class);
 
     @GetMapping(produces = MediaType.TEXT_PLAIN_VALUE)
-    public Mono<String> healthCheckGet() {
+    public String healthCheckGet() {
         if (log.isDebugEnabled()) {
             log.debug("Health check request received via GET");
         }
         
-        return Mono.just("ok");
+        return "ok";
     }
 
     @PostMapping(produces = MediaType.TEXT_PLAIN_VALUE)
-    public Mono<String> healthCheckPost() {
+    public String healthCheckPost() {
         if (log.isDebugEnabled()) {
             log.debug("Health check request received via POST");
         }
         
-        return Mono.just("ok");
+        return "ok";
     }
 
     // Additional HTTP methods if needed
     @RequestMapping(method = {RequestMethod.PUT, RequestMethod.HEAD, RequestMethod.OPTIONS}, 
                     produces = MediaType.TEXT_PLAIN_VALUE)
-    public Mono<String> healthCheckOtherMethods() {
-        return Mono.just("ok");
+    public String healthCheckOtherMethods() {
+        return "ok";
     }
 }

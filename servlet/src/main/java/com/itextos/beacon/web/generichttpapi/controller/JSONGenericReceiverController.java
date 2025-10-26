@@ -3,12 +3,11 @@ package com.itextos.beacon.web.generichttpapi.controller;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
-import org.springframework.http.server.reactive.ServerHttpRequest;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -16,10 +15,8 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.utility.ClientIP;
-import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.InterfaceInputParameters;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
 import com.itextos.beacon.http.interfaceutil.MessageSource;
@@ -28,8 +25,7 @@ import com.itextos.beacon.interfaces.generichttpapi.processor.reader.RequestRead
 import com.itextos.beacon.smslog.JSONReceiverLog;
 import com.itextos.beacon.smslog.TimeTakenInterfaceLog;
 
-import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+import javax.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/genericapi/JSONGenericReceiver")
@@ -38,26 +34,26 @@ public class JSONGenericReceiverController {
     private static final Log log = LogFactory.getLog(JSONGenericReceiverController.class);
 
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> handleJsonGetRequest(
-            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp
-            ,@RequestHeader(value = "Authorization", required = false) String authorization,
-            ServerHttpRequest request) {
+    public ResponseEntity<String> handleJsonGetRequest(
+            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            HttpServletRequest request) {
         
-        return processJsonRequest("GET", "", clientIp,authorization,request);
+        return processJsonRequest("GET", "", clientIp, authorization, request);
     }
 
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public Mono<String> handleJsonPostRequest(
-            @RequestBody Mono<String> requestBody,
-            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp
-            ,@RequestHeader(value = "Authorization", required = false) String authorization,
-            ServerHttpRequest request) {
+    public ResponseEntity<String> handleJsonPostRequest(
+            @RequestBody String requestBody,
+            @RequestHeader(value = "X-Forwarded-For", required = false) String clientIp,
+            @RequestHeader(value = "Authorization", required = false) String authorization,
+            HttpServletRequest request) {
         
-        return requestBody.flatMap(body -> processJsonRequest("POST", body, clientIp,authorization,request));
+        return processJsonRequest("POST", requestBody, clientIp, authorization, request);
     }
 
-    private Mono<String> processJsonRequest(String method, String requestBody, String clientIp,String authorization,
-            ServerHttpRequest request) {
+    private ResponseEntity<String> processJsonRequest(String method, String requestBody, String clientIp, 
+                                                     String authorization, HttpServletRequest request) {
         final Instant startTime = Instant.now();
         final StringBuffer logBuffer = new StringBuffer();
         
@@ -68,49 +64,39 @@ public class JSONGenericReceiverController {
             log.debug("JSON request received via " + method);
         }
 
-        Map<String, String> params=new HashMap<String,String>();
-        
-        params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), ClientIP.getClientIpAddress(clientIp, request));
-        
-        params.put(InterfaceInputParameters.AUTHORIZATION, authorization);
-        
-        params.put("http_request_body", requestBody);
-        
-      
-        // Process request reactively
-        return Mono.fromCallable(new Callable<String>() {
-            @Override
-            public String call() throws Exception {
-                try {
-                   
-                    final RequestReader reader = new JSONRequestReader(params, method, MessageSource.GENERIC_JSON, new StringBuffer());
+        try {
+            Map<String, String> params = new HashMap<>();
+            
+            params.put(MiddlewareConstant.MW_CLIENT_SOURCE_IP.getKey(), ClientIP.getClientIpAddress(clientIp, request));
+            params.put(InterfaceInputParameters.AUTHORIZATION, authorization);
+            params.put("http_request_body", requestBody);
 
-                    
-                    if ("GET".equalsIgnoreCase(method)) {
-                        return reader.processGetRequest();
-                    } else {
-                        return reader.processPostRequest();
-                    }
-                    
-                } catch (Exception e) {
-                    log.error("Error processing JSON request", e);
-                    throw new RuntimeException("JSON processing failed", e);
-                }
+            // Process request synchronously
+            final RequestReader reader = new JSONRequestReader(params, method, MessageSource.GENERIC_JSON, new StringBuffer());
+
+            String response;
+            if ("GET".equalsIgnoreCase(method)) {
+                response = reader.processGetRequest();
+            } else {
+                response = reader.processPostRequest();
             }
-        })
-        .subscribeOn(Schedulers.boundedElastic())
-        .doOnSuccess(response -> {
+
             final Instant endTime = Instant.now();
             completeProcessing(startTime, endTime, logBuffer, method, true);
-        })
-        .doOnError(error -> {
-            log.error("Exception processing JSON request via " + method, error);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+                    
+        } catch (Exception e) {
+            log.error("Exception processing JSON request via " + method, e);
             final Instant endTime = Instant.now();
             completeProcessing(startTime, endTime, logBuffer, method, false);
-        })
-        .onErrorResume(error -> {
-            return Mono.just("{\"status\": \"error\", \"message\": \"" + error.getMessage() + "\"}");
-        });
+
+            return ResponseEntity.badRequest()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body("{\"status\": \"error\", \"message\": \"" + e.getMessage() + "\"}");
+        }
     }
 
     private void completeProcessing(Instant start, Instant end, StringBuffer logBuffer, String method, boolean success) {

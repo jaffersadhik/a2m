@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Bean;
 import com.itextos.beacon.commonlib.messageidentifier.RedisDataPopulator;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.StartupTimeLog;
-import com.itextos.beacon.web.generichttpapi.controller.ReactiveQSRequestReader;
+import com.itextos.beacon.web.generichttpapi.controller.QSRequestReader;
 
 @SpringBootApplication(exclude = {
 	    DataSourceAutoConfiguration.class,
@@ -33,11 +33,9 @@ import com.itextos.beacon.web.generichttpapi.controller.ReactiveQSRequestReader;
 	    DataSourceTransactionManagerAutoConfiguration.class,
 	    SqlInitializationAutoConfiguration.class,
 	    SecurityAutoConfiguration.class,
-	    ReactiveSecurityAutoConfiguration.class,
 	    UserDetailsServiceAutoConfiguration.class,
 	    SecurityFilterAutoConfiguration.class,
 	    ManagementWebSecurityAutoConfiguration.class,
-	    WebMvcAutoConfiguration.class// Add this line
 	})
 public class App {
 
@@ -205,7 +203,7 @@ public class App {
             throttleStartup("japi-init", 2000); // 2-second delay before init
             try {
                 init();
-                ReactiveQSRequestReader.initSMS();
+                QSRequestReader.initSMS();
             } catch (Exception e) {
                 System.err.println("JAPI initialization failed: " + e.getMessage());
                 e.printStackTrace();

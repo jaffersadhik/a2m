@@ -12,8 +12,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.winnovature.utils.singletons.ConfigParamsTon;
 
-import reactor.core.publisher.Mono;
-
 @RestController
 @RequestMapping("/fileprocessor/memoryrefresh")
 public class InMemoryRefreshController {
@@ -22,7 +20,7 @@ public class InMemoryRefreshController {
     private static final String className = "InMemoryRefreshController";
 
     @GetMapping(produces = MediaType.TEXT_HTML_VALUE)
-    public Mono<String> handleGet(@RequestParam(value = "reqtype", required = false) String reqtype) {
+    public String handleGet(@RequestParam(value = "reqtype", required = false) String reqtype) {
         String logName = className + " [handleGet] ";
 
         if (log.isDebugEnabled()) {
@@ -37,10 +35,10 @@ public class InMemoryRefreshController {
         if (reqtype.equalsIgnoreCase("CP")) {
             try {
                 ConfigParamsTon.getInstance().reload();
-                return Mono.just("<font color='green'>Config params reloaded</font>");
+                return "<font color='green'>Config params reloaded</font>";
             } catch (Exception e) {
                 log.error(logName + "Exception: ", e);
-                return Mono.just("<font color='red'>Exception while reloading Config Params table.</font>");
+                return "<font color='red'>Exception while reloading Config Params table.</font>";
             }
         } else {
             return displayMenu();
@@ -48,17 +46,17 @@ public class InMemoryRefreshController {
     }
 
     @PostMapping(path = "/memoryrefresh", produces = MediaType.TEXT_HTML_VALUE)
-    public Mono<String> handlePost(@RequestParam(value = "reqtype", required = false) String reqtype) {
+    public String handlePost(@RequestParam(value = "reqtype", required = false) String reqtype) {
         return handleGet(reqtype);
     }
 
-    private Mono<String> displayMenu() {
+    private String displayMenu() {
         StringBuilder menu = new StringBuilder();
         menu.append("<B>http://IP:PORT/FP-InMemoryRefresh-0.0.1/memoryrefresh?reqtype={here use any one of below keys....}</B>");
         menu.append("<br><ul>");
         menu.append("<li>CP - Config Param &nbsp;&nbsp;(TABLE NAME = CONFIG_PARAMS)</li></ul>");
         menu.append("</ul>");
         
-        return Mono.just(menu.toString());
+        return menu.toString();
     }
 }

@@ -5,7 +5,7 @@ import java.util.Map;
 import com.itextos.beacon.interfaces.generichttpapi.processor.reader.QSRequestReader;
 import com.itextos.beacon.interfaces.generichttpapi.processor.reader.RequestReader;
 
-public class ReactiveCustomQSReader {
+public class CustomQSReader {
 
 	
 	Map<String, String> params=null;
@@ -13,7 +13,7 @@ public class ReactiveCustomQSReader {
 	String requestType=null;
 	StringBuffer stringBuffer=null;
 	
-	public ReactiveCustomQSReader(Map<String, String> params, String method, String requestType,
+	public CustomQSReader(Map<String, String> params, String method, String requestType,
 			StringBuffer stringBuffer) {
 		this.method=method;
 		this.params=params;
