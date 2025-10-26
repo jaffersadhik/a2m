@@ -107,8 +107,13 @@ public class Consumer
                 final int                               pollCount = records.count();
                 final long                              endTime   = System.currentTimeMillis();
 
-                ConsumerDataLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
+                if(pollCount>0) {
+                
+                	
+                	ConsumerDataLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
 
+                }
+                
                 if (pollCount != 0)
                 {
                     if (log.isDebugEnabled())
