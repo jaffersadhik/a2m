@@ -22,7 +22,7 @@ import com.itextos.beacon.inmemory.loader.process.InmemoryProcessor;
 import com.itextos.beacon.smslog.QSReceiverLog;
 import com.itextos.beacon.smslog.TimeTakenInterfaceLog;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/inmemory/tablesummary")

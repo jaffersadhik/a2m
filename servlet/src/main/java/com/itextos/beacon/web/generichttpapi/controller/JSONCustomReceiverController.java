@@ -25,7 +25,7 @@ import com.itextos.beacon.interfaces.generichttpapi.processor.reader.RequestRead
 import com.itextos.beacon.smslog.JSONReceiverLog;
 import com.itextos.beacon.smslog.TimeTakenInterfaceLog;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/genericapi/JSONCustomReceiver")

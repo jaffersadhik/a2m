@@ -1,10 +1,18 @@
 package com.itextos.beacon.web.migration.controller;
 
+import java.time.Instant;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.utility.ClientIP;
@@ -14,10 +22,7 @@ import com.itextos.beacon.http.interfaceutil.MessageSource;
 import com.itextos.beacon.smslog.QSReceiverLog;
 import com.itextos.beacon.smslog.TimeTakenInterfaceLog;
 
-import java.time.Instant;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 @RestController
 @RequestMapping("/migrationapi/MQSRequestReceiver")

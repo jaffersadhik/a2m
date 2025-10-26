@@ -2,7 +2,7 @@ package com.itextos.beacon.commonlib.utility;
 
 import org.springframework.util.StringUtils;
 
-import javax.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletRequest;
 
 public class ClientIP {
 
