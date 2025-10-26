@@ -42,13 +42,7 @@ public class App {
     private static boolean IS_START_PROMETHEUS=false;
     
     
- // Prevent Tomcat from starting
-    @Bean
-    public ServletWebServerFactory servletWebServerFactory() {
-        return new org.springframework.boot.web.embedded.tomcat.TomcatServletWebServerFactory(0) {
-            // This will create a factory that doesn't actually start a server
-        };
-    }
+ 
     
     public static void foldercreaton(String folderPath) {
         
