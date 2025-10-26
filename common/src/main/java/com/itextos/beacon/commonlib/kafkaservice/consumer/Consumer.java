@@ -107,10 +107,8 @@ public class Consumer
                 final int                               pollCount = records.count();
                 final long                              endTime   = System.currentTimeMillis();
 
-                if (log.isDebugEnabled()) {
-                    log.debug("Started consuming messages from '" + mTopicName + "' pollCount : "+pollCount);
-                }
-                
+                ConsumerDataLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
+
                 if (pollCount != 0)
                 {
                     if (log.isDebugEnabled())
