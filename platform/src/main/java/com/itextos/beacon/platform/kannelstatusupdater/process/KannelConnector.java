@@ -3,37 +3,32 @@ package com.itextos.beacon.platform.kannelstatusupdater.process;
 import java.io.StringReader;
 import java.net.URL;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Unmarshaller;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.constants.ErrorMessage;
 import com.itextos.beacon.commonlib.httpclient.BasicHttpConnector;
 import com.itextos.beacon.commonlib.httpclient.HttpResult;
-import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.platform.kannelstatusupdater.beans.KannelStatusInfo;
 import com.itextos.beacon.platform.kannelstatusupdater.xmlparser.Gateway;
 import com.itextos.beacon.smslog.KannelStatusLog;
 
-public class KannelConnector
-{
+import jakarta.xml.bind.JAXBContext;
+import jakarta.xml.bind.Unmarshaller;
+
+public class KannelConnector {
 
     private static Log log = LogFactory.getLog(KannelConnector.class);
 
-    private KannelConnector()
-    {}
+    private KannelConnector() {}
 
     public static String getKannelStatus(
             String aKannelID,
-            String aKannelURL)
-    {
+            String aKannelURL) {
         final KannelStatusInfo kannelStatusInfo = new KannelStatusInfo(aKannelID);
 
-        try
-        {
+        try {
             final URL url = new URL(aKannelURL);
             kannelStatusInfo.setKannelIp(url.getHost());
             kannelStatusInfo.setKannelPort(url.getPort());
@@ -42,21 +37,15 @@ public class KannelConnector
             if (log.isDebugEnabled())
                 log.debug("Kannel Http Result : " + httpResult);
 
-            if (httpResult.isSuccess())
-            {
+            if (httpResult.isSuccess()) {
                 final String xml = httpResult.getResponseString();
-
-                
-
                 return xml;
-
             }
            
-        }
-        catch (final Exception e)
-        {
+        } catch (final Exception e) {
             log.error("Error while getting the Kannel Status", e);
-            KannelStatusLog.log("Kannel Status for Url:'" + aKannelURL + "', " +ErrorMessage.getStackTraceAsString(e));
+            KannelStatusLog.log("Kannel Status for Url:'" + aKannelURL + "', " + 
+                ErrorMessage.getStackTraceAsString(e));
 
             kannelStatusInfo.setKannelAvailable(false);
         }
@@ -65,20 +54,18 @@ public class KannelConnector
 
     public static void setKannelStatus(
             String xml,
-            KannelStatusInfo kannelStatusInfo)
-    {
+            KannelStatusInfo kannelStatusInfo) {
 
         KannelStatusLog.log("setKannelStatus entered");
 
-        try
-        {
-            final JAXBContext  context = JAXBContext.newInstance(Gateway.class);
-            final Unmarshaller um      = context.createUnmarshaller();
-            KannelStatusLog.log("setKannelStatus get  Unmarshaller um");
+        try {
+            final JAXBContext context = JAXBContext.newInstance(Gateway.class);
+            final Unmarshaller um = context.createUnmarshaller();
+            KannelStatusLog.log("setKannelStatus get Unmarshaller um");
 
-            final Gateway      gateway = (Gateway) um.unmarshal(new StringReader(xml));
+            final Gateway gateway = (Gateway) um.unmarshal(new StringReader(xml));
 
-            KannelStatusLog.log("setKannelStatus get  Gateway ");
+            KannelStatusLog.log("setKannelStatus get Gateway ");
 
             if (log.isDebugEnabled())
                 log.debug("Parsed the XML successfully");
@@ -91,24 +78,19 @@ public class KannelConnector
 
             final long queueSize = gateway.getSMSBoxQueued();
 
-            if (queueSize == -1)
-            {
+            if (queueSize == -1) {
                 kannelStatusInfo.setKannelAvailable(false);
                 kannelStatusInfo.setSmsBoxQueue(0);
-            }
-            else
-            {
+            } else {
                 kannelStatusInfo.setKannelAvailable(true);
                 kannelStatusInfo.setSmsBoxQueue(queueSize);
             }
-        }
-        catch (final Exception e)
-        {
-            ErrorLog.log("Exception while parsing and getting the details from XML \n"+ErrorMessage.getStackTraceAsString(e));
+        } catch (final Exception e) {
+            ErrorLog.log("Exception while parsing and getting the details from XML \n" + 
+                ErrorMessage.getStackTraceAsString(e));
             kannelStatusInfo.setKannelAvailable(false);
         }
         
         KannelStatusLog.log("setKannelStatus complete");
     }
-
 }
