@@ -11,7 +11,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.constants.exception.ItextosException;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.dnpayloadutil.dao.PayloadInsertInDB;
 
 public class PayloadUpdateTask
@@ -31,8 +31,7 @@ public class PayloadUpdateTask
         start();
 
         mTimedProcessor = new TimedProcessor("PayloadUpdateTask", this, TimerIntervalConstant.PAYLOAD_UPDATE_TASK_RELOAD);
-   
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "PayloadUpdateTask");
+        VirtualThreadStartup.addTask(mTimedProcessor, "PayloadUpdateTask");
      }
 
     public static PayloadUpdateTask getInstance()

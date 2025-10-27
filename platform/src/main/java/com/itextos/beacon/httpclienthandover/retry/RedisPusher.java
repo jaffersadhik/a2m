@@ -23,7 +23,7 @@ import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.httpclienthandover.data.ClientHandoverData;
 import com.itextos.beacon.httpclienthandover.utils.ClientHandoverUtils;
 
@@ -63,7 +63,7 @@ public class RedisPusher
     private RedisPusher()
     {
         mTimedProcessor = new TimedProcessor("TimerThread-Redis-Pusher", this, TimerIntervalConstant.DLR_HTTP_HANDOVER_REDIS_PUSH_INTERVAL);
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor,"TimerThread-Redis-Pusher" );
+        VirtualThreadStartup.addTask(mTimedProcessor,"TimerThread-Redis-Pusher" );
         mCanContinue = true;
     }
 

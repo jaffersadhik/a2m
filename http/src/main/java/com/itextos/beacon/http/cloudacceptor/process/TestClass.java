@@ -8,7 +8,7 @@ import java.net.URL;
 import java.text.DecimalFormat;
 import java.util.Date;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class TestClass
 {
@@ -27,11 +27,12 @@ public class TestClass
         {
             final Thread t = new Thread(new Hitter(url, "T-" + dc.format((index + 1)), noOfHitsPerThread, isResponseRequired));
             
-            ExecutorSheduler2.getInstance().addTask(t,  "T-" + dc.format((index + 1)));
+            VirtualThreadStartup.addTask(t,  "T-" + dc.format((index + 1)));
+        }
         }
     }
 
-}
+
 
 class Hitter
         implements

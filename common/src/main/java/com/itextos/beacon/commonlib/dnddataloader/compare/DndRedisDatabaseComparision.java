@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.dnddataloader.common.CountHolder;
 import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvider;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class DndRedisDatabaseComparision
 {
@@ -95,7 +95,7 @@ public class DndRedisDatabaseComparision
 
             log.fatal("Starting the thread ..." + withRange);
 
-            ExecutorSheduler2.getInstance().addTask(withRange, threadName);
+            VirtualThreadStartup.addTask(withRange, threadName);
           
         }
     }

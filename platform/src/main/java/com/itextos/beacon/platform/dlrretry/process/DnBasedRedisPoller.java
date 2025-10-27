@@ -16,7 +16,7 @@ import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvider;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.dlrretry.util.DlrWaitRetryUtil;
 import com.itextos.beacon.platform.dlrretry.util.DnBasedRetryRedisProcessor;
 
@@ -159,8 +159,7 @@ public class DnBasedRedisPoller
             }
 
         }, "");
-        
-        ExecutorSheduler2.getInstance().addTask(lThread, ClusterType.COMMON+" : "+Component.DLR_WAIT_RETRY+" : "+mRedisIndex);
+        VirtualThreadStartup.addTask(lThread, ClusterType.COMMON+" : "+Component.DLR_WAIT_RETRY+" : "+mRedisIndex);
     }
 
     private static void processRecords(

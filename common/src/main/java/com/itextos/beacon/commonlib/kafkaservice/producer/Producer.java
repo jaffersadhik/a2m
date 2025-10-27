@@ -23,7 +23,7 @@ import com.itextos.beacon.commonlib.message.MessagePart;
 import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaProducer;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.smslog.ProducerFlushDataLog;
 import com.itextos.beacon.smslog.ProducerFlushLog;
 import com.itextos.beacon.smslog.ProducerTPLog;
@@ -64,8 +64,7 @@ public class Producer
         createProducer();
 
       
-        
-        ExecutorKafkaProducer.getInstance().addTask(new FlushMonitor(this), aTopicName);
+        VirtualThreadStartup.addTask(new FlushMonitor(this), aTopicName);
   
     }
 

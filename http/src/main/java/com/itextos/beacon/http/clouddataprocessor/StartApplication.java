@@ -8,7 +8,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.constants.Component;
 import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvider;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.http.clouddataprocessor.process.RequestProcess;
 import com.itextos.beacon.http.clouddatautil.common.CloudDataConfig;
 import com.itextos.beacon.http.clouddatautil.common.CloudDataConfigInfo;
@@ -48,7 +48,8 @@ public class StartApplication
             {
                 final RequestProcess requestProcess = new RequestProcess(((index % maxRedisCount) + 1), key);
                 final Thread         t              = new Thread(requestProcess, "RequestProcess:" + (index));
-                ExecutorSheduler2.getInstance().addTask(t, "RequestProcess:" + (index));
+                VirtualThreadStartup.addTask(t, "RequestProcess:" + (index));
+            
             }
         }
     }

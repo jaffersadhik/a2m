@@ -3,7 +3,7 @@ package com.winnovature.scheduleProcessor.servlets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.scheduleProcessor.pollers.ScheduleCampaignPoller;
 import com.winnovature.scheduleProcessor.utils.Constants;
 
@@ -28,7 +28,7 @@ public class InitializeScheduleCampaignPoller  {
 
 				CSAPoller = new ScheduleCampaignPoller("CSAPoller");
 				CSAPoller.setName("CSAPoller");
-				ExecutorFilePoller.getInstance().addTask(CSAPoller, "CSAPoller");
+				VirtualThreadStartup.addTask(CSAPoller, "CSAPoller");
 	//			CSAPoller.start();
 	//			ExecutorSheduler.addTask(CSAPoller);
 

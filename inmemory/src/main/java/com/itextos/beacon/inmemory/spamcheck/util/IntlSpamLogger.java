@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class IntlSpamLogger
 {
@@ -30,7 +30,7 @@ public class IntlSpamLogger
     {
         for (int i = 0; i < REAPER_COUNT; i++) {
            ;
-            ExecutorSheduler2.getInstance().addTask( new IntlSpamLoggerReaper(), "IntlSpamLoggerReaper : "+i);
+           VirtualThreadStartup.addTask( new IntlSpamLoggerReaper(), "IntlSpamLoggerReaper : "+i); 
         }
     }
 

@@ -28,7 +28,7 @@ import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.dlrpayloadgen.util.DlrPayloadGenUtil;
 import com.itextos.beacon.platform.dlrpayloadgen.util.PushToDlrProcessor;
 import com.itextos.beacon.smslog.DNgenerationFromPayloadLog;
@@ -60,8 +60,7 @@ public class GenerateDnsFromPayloadStore
    
         this.mPayloadId = aPayloadId;
         this.mCluster   = aCluster;
-        
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "GenerateDnsFromPayloadStore-" + aPayloadId);
+        VirtualThreadStartup.addTask(mTimedProcessor, "GenerateDnsFromPayloadStore-" + aPayloadId);
     }
 
     private void doProcess()

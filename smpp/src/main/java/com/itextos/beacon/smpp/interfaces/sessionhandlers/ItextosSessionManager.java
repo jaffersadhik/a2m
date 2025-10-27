@@ -18,7 +18,7 @@ import org.apache.commons.logging.LogFactory;
 import com.cloudhopper.smpp.SmppBindType;
 import com.cloudhopper.smpp.SmppServerSession;
 import com.itextos.beacon.commonlib.constants.exception.ItextosException;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSMPPDNRedisPoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.inmemdata.account.UserInfo;
 import com.itextos.beacon.smpp.interfaces.event.handlers.ItextosSmppSessionHandler;
 import com.itextos.beacon.smpp.interfaces.sessionhandlers.objects.SessionRoundRobin;
@@ -201,7 +201,7 @@ public class ItextosSessionManager
         {
             final SessionRedisQWorker sworker = new SessionRedisQWorker(aSessionHandler.getClientId(), systemId, aSessionHandler);
 
-            ExecutorSMPPDNRedisPoller.getInstance().addTask(sworker, sworker.getThreadName());
+            VirtualThreadStartup.addTask(sworker, sworker.getThreadName());
             final LinkedList<Runnable> list = dnWorkerMap.computeIfAbsent(systemId, k -> new LinkedList<>());
             list.add(sworker);
         }
@@ -219,7 +219,7 @@ public class ItextosSessionManager
         {
             final CustomerRedisQWorker worker = new CustomerRedisQWorker(aSessionHandler.getClientId(), aSessionHandler.getSystemId());
             
-            ExecutorSMPPDNRedisPoller.getInstance().addTask(worker, worker.getThreadName());
+            VirtualThreadStartup.addTask(worker, worker.getThreadName());
 
             final LinkedList<Runnable> list = dnWorkerMap.computeIfAbsent(aSessionHandler.getSystemId(), k -> new LinkedList<>());
             list.add(worker);

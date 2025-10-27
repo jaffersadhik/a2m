@@ -5,7 +5,7 @@ import java.util.List;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public abstract class AbstractJobLogging
         implements
@@ -21,7 +21,7 @@ public abstract class AbstractJobLogging
     	
         mTimedProcessor = new TimedProcessor("ScheduleJobLogging", this, TimerIntervalConstant.DATA_REFRESHER_RELOAD_INTERVAL);
    
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "ScheduleJobLogging");
+        VirtualThreadStartup.addTask(mTimedProcessor, "ScheduleJobLogging");
     }
 
     @Override

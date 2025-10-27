@@ -5,14 +5,13 @@ import java.util.UUID;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.jetty.util.thread.ScheduledExecutorScheduler;
 
 import com.itextos.beacon.commonlib.constants.MiddlewareConstant;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.httpclienthandover.utils.LogStatusEnum;
 import com.itextos.beacon.httpclienthandover.utils.TopicSenderUtility;
 
@@ -36,7 +35,7 @@ public class ExpiredMessageLogger
         isCustomerSpecific = aIsCustSpecific;
         clientId           = aCustID;
         timeProcessor      = new TimedProcessor("Expired Message Logger - " + (aIsCustSpecific ? aCustID : "Default"), this, TimerIntervalConstant.DLR_HTTP_HANDOVER_EXPIRED_MESSAGE_LOG_INTERVAL);
-        ExecutorSheduler.getInstance().addTask(timeProcessor, "Expired Message Logger - " + (aIsCustSpecific ? aCustID : "Default"));
+        VirtualThreadStartup.addTask(timeProcessor, "Expired Message Logger - " + (aIsCustSpecific ? aCustID : "Default"));
     }
 
     @Override

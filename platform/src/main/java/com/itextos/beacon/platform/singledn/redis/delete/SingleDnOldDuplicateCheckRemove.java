@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.inmemory.customfeatures.pojo.DlrTypeInfo;
 import com.itextos.beacon.platform.singledn.process.RedisOperation;
 import com.itextos.beacon.platform.singledn.process.SingleDNUtil;
@@ -41,7 +41,7 @@ public class SingleDnOldDuplicateCheckRemove
     public SingleDnOldDuplicateCheckRemove()
     {
         mTimedProcessor = new TimedProcessor("SingleDnOldDuplicateCheckRemove", this, TimerIntervalConstant.SINGLE_DN_DUPCHECK_PROCESS);
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "SingleDnOldDuplicateCheckRemove");
+        VirtualThreadStartup.addTask(mTimedProcessor, "SingleDnOldDuplicateCheckRemove");
         log.info("SingleDnDuplicateCheckRemove Processor started ........");
     }
 

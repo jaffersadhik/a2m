@@ -14,7 +14,7 @@ import com.itextos.beacon.commonlib.constants.ClusterType;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.smpp.objects.request.SmppMessageRequest;
 
 class DbOperationInMemory
@@ -36,7 +36,7 @@ class DbOperationInMemory
         
         mTimedProcessor = new TimedProcessor("SmppConcateDbInserter-" + aClusterType, this, TimerIntervalConstant.SMPP_DLR_FALLBACK_TABLE_READER);
  
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "SmppConcateDbInserter-" + aClusterType);
+        VirtualThreadStartup.addTask(mTimedProcessor, "SmppConcateDbInserter-" + aClusterType);
     }
 
     void addMessage(

@@ -20,7 +20,7 @@ import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.elasticsearchutil.EsProcess;
 import com.itextos.beacon.platform.elasticsearchutil.utility.ESBulkAsyncListener;
 import com.itextos.beacon.platform.elasticsearchutil.utility.Kafka2ESConstants;
@@ -61,8 +61,7 @@ public class K2ETableWrapper
         mComponent     = aComponent;
 
         timedProcessor = new TimedProcessor("T2DbTableWrapper : "+mComponent.getKey(), this, mSleepTimeSecs);
- 
-        ExecutorSheduler.getInstance().addTask(timedProcessor, "T2DbTableWrapper : "+ mComponent.getKey());
+        VirtualThreadStartup.addTask(timedProcessor, "T2DbTableWrapper : "+ mComponent.getKey());
         
     }
 

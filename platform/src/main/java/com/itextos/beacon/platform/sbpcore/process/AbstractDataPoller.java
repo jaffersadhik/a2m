@@ -21,7 +21,7 @@ import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.Name;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorShedulePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.errorlog.SMSLog;
 import com.itextos.beacon.inmemdata.account.ClientAccountDetails;
 import com.itextos.beacon.inmemdata.account.UserInfo;
@@ -50,8 +50,7 @@ public abstract class AbstractDataPoller
         mTableName      = aTableName;
   
         mTimedProcessor = new TimedProcessor("TimerThread-ScheduleBlockoutPoller-" + aTableName, this, TimerIntervalConstant.SCHEDULE_MESSAGE_TABLE_READER);
-   
-        ExecutorShedulePoller.getInstance().addTask(mTimedProcessor, "TimerThread-ScheduleBlockoutPoller-" + aTableName);
+        VirtualThreadStartup.addTask(mTimedProcessor, "TimerThread-ScheduleBlockoutPoller-" + aTableName);
     }
 
     @Override

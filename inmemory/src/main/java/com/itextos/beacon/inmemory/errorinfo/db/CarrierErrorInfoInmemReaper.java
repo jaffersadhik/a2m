@@ -17,7 +17,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.inmemory.errorinfo.data.CarrierErrorInfo;
 
 public class CarrierErrorInfoInmemReaper
@@ -52,7 +52,7 @@ public class CarrierErrorInfoInmemReaper
     	
         mTimedProcessor = new TimedProcessor("CarrierErrorInfoInmemReaper", this, TimerIntervalConstant.CARRIER_ERROR_INFO_REFRESH);
        
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "CarrierErrorInfoInmemReaper");
+        VirtualThreadStartup.addTask(mTimedProcessor, "CarrierErrorInfoInmemReaper");
     }
 
     public void addErrorInfo(

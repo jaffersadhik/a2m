@@ -8,7 +8,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.smppsimulator.util.ISmppInfo;
 import com.itextos.beacon.smppsimulator.objects.SmppObjectType;
 import com.itextos.beacon.smppsimulator.objects.inmem.InfoCollection;
@@ -36,7 +36,7 @@ abstract class AbstractInmemDrainer
         
         mTimedProcessor = new TimedProcessor(aSmppObjectType + "-InMemDrainer", this, aIntervalConstant);
     
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, aSmppObjectType + "-InMemDrainer");
+        VirtualThreadStartup.addTask(mTimedProcessor, aSmppObjectType + "-InMemDrainer");
     }
 
     @Override

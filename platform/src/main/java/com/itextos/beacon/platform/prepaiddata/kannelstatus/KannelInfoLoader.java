@@ -25,7 +25,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvider;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
@@ -70,8 +70,7 @@ public class KannelInfoLoader
             log.debug("Starting the Kannel Info Loader : '");
 
         mTimedProcessor = new TimedProcessor("KannelInfoLoader", this, TimerIntervalConstant.DATA_REFRESHER_RELOAD_INTERVAL);
-          
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "KannelInfoLoader");
+        VirtualThreadStartup.addTask(mTimedProcessor, "KannelInfoLoader");
         
         if (log.isDebugEnabled())
             log.debug("Kannel Info Loader started '");

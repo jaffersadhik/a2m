@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.kannelstatusupdater.utility.KannelRedisConstants;
 import com.itextos.beacon.platform.kannelstatusupdater.utility.Utility;
 
@@ -45,8 +45,7 @@ public class KannelAvailability
     {
     	
         mTimedProcessor = new TimedProcessor("KannelAvailability", this, TimerIntervalConstant.KANNEL_AVALIABILITY_REFRESH);
-      
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "KannelAvailability");
+        VirtualThreadStartup.addTask(mTimedProcessor, "KannelAvailability");
     }
 
     /** Request from - 0-CarrierHandover, 1-RetryCarrierHandover */

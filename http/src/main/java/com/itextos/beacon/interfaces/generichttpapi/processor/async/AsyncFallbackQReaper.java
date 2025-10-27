@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.message.AsyncRequestObject;
 import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.http.generichttpapi.common.data.QueueObject;
 import com.itextos.beacon.http.generichttpapi.common.utils.FileGenUtil;
 
@@ -43,8 +43,7 @@ public class AsyncFallbackQReaper
     	
     	
         mTimedProcessor = new TimedProcessor("AsyncFallbackInserter", this, TimerIntervalConstant.INTERFACE_FALLBACK_TABLE_INSERTER);
-     
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "AsyncFallbackInserter");
+        VirtualThreadStartup.addTask(mTimedProcessor, "AsyncFallbackInserter");
     }
 
     private static boolean process()

@@ -23,7 +23,7 @@ import com.itextos.beacon.commonlib.datarefresher.dataobjects.IDataRefresher;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class DataRefresher
         implements
@@ -62,7 +62,7 @@ public class DataRefresher
     	
         mTimedProcessor = new TimedProcessor("DataRefresherMasterData", this, TimerIntervalConstant.DATA_REFRESHER_RELOAD_INTERVAL);
    
-    	ExecutorSheduler.getInstance().addTask(mTimedProcessor, ALL_TABLES);
+        VirtualThreadStartup.addTask(mTimedProcessor, ALL_TABLES);
     }
 
     @Override

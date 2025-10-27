@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class KannelStatusRefresher
         implements
@@ -36,8 +36,7 @@ public class KannelStatusRefresher
     	
         final int timeInterval = 10;
         mTimedProcessor = new TimedProcessor("KannelStatusRefresher", this, TimerIntervalConstant.KANNEL_STATUS_REFRESH);
-     
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "KannelStatusRefresher");
+        VirtualThreadStartup.addTask(mTimedProcessor, "KannelStatusRefresher");
         
         if (log.isInfoEnabled())
             log.info("Kannel Status Refresher started with " + timeInterval + " time interval.");

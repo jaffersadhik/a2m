@@ -5,7 +5,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.campaignfinisher.consumers.DQRedisCleaner;
 import com.winnovature.campaignfinisher.consumers.PollerCampaignFilesCompleted;
 import com.winnovature.campaignfinisher.consumers.PollerCampaignMasterCompleted;
@@ -44,7 +44,7 @@ public class ServletInitializer  {
 						queryExecutionConsumer = new QueryExecutor(bean);
 						queryExecutionConsumer.setName("QueryExecutionConsumer" + i);
 					//	queryExecutionConsumer.start();
-						ExecutorFilePoller.getInstance().addTask(queryExecutionConsumer, "QueryExecutionConsumer" + i);
+						VirtualThreadStartup.addTask(queryExecutionConsumer, "QueryExecutionConsumer" + i);
 						///ExecutorSheduler.addTask(queryExecutionConsumer);
 						
 						if (log.isDebugEnabled())
@@ -55,20 +55,20 @@ public class ServletInitializer  {
 				pollerCampaignFilesCompleted = new PollerCampaignFilesCompleted();
 				pollerCampaignFilesCompleted.setName("PollerCampaignFilesCompleted");
 				
-				ExecutorFilePoller.getInstance().addTask(pollerCampaignFilesCompleted, "PollerCampaignFilesCompleted");
+				VirtualThreadStartup.addTask(pollerCampaignFilesCompleted, "PollerCampaignFilesCompleted");
 			//	pollerCampaignFilesCompleted.start();
 			//	ExecutorSheduler.addTask(pollerCampaignFilesCompleted);
 				
 				pollerCampaignMasterCompleted = new PollerCampaignMasterCompleted();
 				pollerCampaignMasterCompleted.setName("PollerCampaignMasterCompleted");
-				ExecutorFilePoller.getInstance().addTask(pollerCampaignMasterCompleted, "PollerCampaignMasterCompleted");
+				VirtualThreadStartup.addTask(pollerCampaignMasterCompleted, "PollerCampaignMasterCompleted");
 
 			//	pollerCampaignMasterCompleted.start();
 			//	ExecutorSheduler.addTask(pollerCampaignMasterCompleted);
 
 				dqRedisCleaner = new DQRedisCleaner();
 				dqRedisCleaner.setName("DQRedisCleaner");
-				ExecutorFilePoller.getInstance().addTask(dqRedisCleaner, "DQRedisCleaner");
+				VirtualThreadStartup.addTask(dqRedisCleaner, "DQRedisCleaner");
 
 			//	dqRedisCleaner.start();
 			//	ExecutorSheduler.addTask(dqRedisCleaner);

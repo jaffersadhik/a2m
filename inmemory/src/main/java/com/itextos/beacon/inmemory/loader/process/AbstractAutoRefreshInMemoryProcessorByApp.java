@@ -5,7 +5,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public abstract class AbstractAutoRefreshInMemoryProcessorByApp
         extends
@@ -27,7 +27,7 @@ public abstract class AbstractAutoRefreshInMemoryProcessorByApp
         mTimedProcessor = new TimedProcessor("TimerThread-" + mInmemoryInput.getInmemoryId(), this, mInmemoryInput.getSleepSec());
        
         mCanContinue = mInmemoryInput.isAutoRefreshRequired();
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor,  ""+mInmemoryInput.getInmemoryId());
+        VirtualThreadStartup.addTask(mTimedProcessor,  ""+mInmemoryInput.getInmemoryId());
     }
 
     @Override

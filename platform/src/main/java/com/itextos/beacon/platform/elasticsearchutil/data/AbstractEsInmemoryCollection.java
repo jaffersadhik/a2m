@@ -17,7 +17,7 @@ import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.elasticsearchutil.types.EsOperation;
 import com.itextos.beacon.platform.elasticsearchutil.utility.EsBulkProcessor;
 import com.itextos.beacon.platform.elasticsearchutil.utility.EsUtility;
@@ -41,8 +41,7 @@ abstract class AbstractEsInmemoryCollection
         mEsTypeInsert   = aEsType;
        
         mTimedProcessor = new TimedProcessor("ESInMemCollection-" + aEsType, this, TimerIntervalConstant.ELASTIC_SEARCH_INMEMORY_PUSH);
-      
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "ESInMemCollection-" + aEsType);
+        VirtualThreadStartup.addTask(mTimedProcessor, "ESInMemCollection-" + aEsType);
     }
 
     @Override

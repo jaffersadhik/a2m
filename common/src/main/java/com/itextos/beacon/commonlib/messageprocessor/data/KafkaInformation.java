@@ -29,8 +29,7 @@ import com.itextos.beacon.commonlib.messageprocessor.data.db.KafkaClusterInfo;
 import com.itextos.beacon.commonlib.messageprocessor.request.ProducerKafkaRequest;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.RoundRobin;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaConsumer;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaICConsumer;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.KILog;
 import com.itextos.beacon.smslog.ProducerTopicLog;
@@ -483,12 +482,15 @@ public class KafkaInformation
                     componentConsumersList.add(consumer);
 
                     mTotalConsumersCount++;
-                    
+                    /*
                     if(aComponent==Component.IC) {
                     	ExecutorKafkaICConsumer.getInstance().addTask(consumer,  topicName + "-" + consumerClientIndex);
                     }else {
                     	ExecutorKafkaConsumer.getInstance().addTask(consumer,  topicName + "-" + consumerClientIndex);
                     }
+                    */
+                    VirtualThreadStartup.addTask(consumer,topicName + "-" + consumerClientIndex);
+                    
                     StartupFlowLog.log("createConsumerClients : "+clientId+"  topicName : "+topicName);
                     
                     if (log.isDebugEnabled())

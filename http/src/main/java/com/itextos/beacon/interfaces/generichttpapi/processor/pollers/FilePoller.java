@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.http.generichttpapi.common.utils.APIConstants;
 import com.itextos.beacon.http.generichttpapi.common.utils.FileGenUtil;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;
@@ -32,7 +32,7 @@ public class FilePoller
     
         mTimedProcessor = new TimedProcessor(threadName, this, TimerIntervalConstant.INTERFACE_FILE_POLLER_LOOKUP_INTERVAL);
      
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, threadName);
+        VirtualThreadStartup.addTask(mTimedProcessor, threadName);
         
         if (log.isDebugEnabled())
             log.debug("Started File Poller with name " + threadName);

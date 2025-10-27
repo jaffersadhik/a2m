@@ -9,7 +9,7 @@ import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.exclude.consumers.ExcludeConsumer;
 import com.winnovature.exclude.singletons.ExcludeProcessorPropertiesTon;
 import com.winnovature.exclude.singletons.RedisConnectionFactory;
@@ -58,7 +58,7 @@ public class InitializeExcludeConsumer {
 						for (int i = 0; i < Integer.parseInt(noofconsumer); i++) {
 							consumer = new ExcludeConsumer(queueName, bean, instanceId);
 							consumer.setName("Thread" + i + "-" + queueName);
-							ExecutorFilePoller.getInstance().addTask(consumer, "Thread" + i + "-" + queueName);
+							VirtualThreadStartup.addTask(consumer, "Thread" + i + "-" + queueName);
 						//	consumer.start();
 						//	ExecutorSheduler.addTask(consumer);
 

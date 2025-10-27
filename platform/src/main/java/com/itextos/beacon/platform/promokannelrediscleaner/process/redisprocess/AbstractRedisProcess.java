@@ -13,7 +13,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvider;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 import redis.clients.jedis.Jedis;
 
@@ -44,8 +44,7 @@ abstract class AbstractRedisProcess
 
        
         mTimedProcessor = new TimedProcessor("PromoRedisDataCleaner-" + mRedisIndex, this, TimerIntervalConstant.PROMO_KANNEL_REDIS_CLEANER_INTERVAL);
-  
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "PromoRedisDataCleaner-" + mRedisIndex);
+        VirtualThreadStartup.addTask(mTimedProcessor, "PromoRedisDataCleaner-" + mRedisIndex);
         
     }
 

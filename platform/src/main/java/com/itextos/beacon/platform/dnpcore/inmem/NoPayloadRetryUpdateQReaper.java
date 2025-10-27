@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.dnpcore.dao.NoPayloadRetryDao;
 
 public class NoPayloadRetryUpdateQReaper
@@ -39,7 +39,7 @@ public class NoPayloadRetryUpdateQReaper
     private NoPayloadRetryUpdateQReaper()
     {
         mTimedProcessor = new TimedProcessor("NoPayloadRetryUpdateQReaper", this, TimerIntervalConstant.INTERFACE_FALLBACK_TABLE_INSERTER);
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "NoPayloadRetryQReaper");
+        VirtualThreadStartup.addTask(mTimedProcessor, "NoPayloadRetryQReaper");
     }
 
     private static boolean process()

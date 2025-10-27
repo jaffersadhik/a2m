@@ -11,7 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class TemporaryStorage
         implements
@@ -36,7 +36,7 @@ public class TemporaryStorage
       
         reaper = new TimedProcessor("Temporary storage", this, TimerIntervalConstant.DLR_HTTP_HANDOVER_HANDOVER_RETRY_REAPER);
   
-        ExecutorSheduler.getInstance().addTask(reaper, "Temporary storage");
+        VirtualThreadStartup.addTask(reaper, "Temporary storage");
         
     }
 

@@ -18,7 +18,7 @@ import com.itextos.beacon.commonlib.constants.exception.ItextosException;
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.message.MessageRequest;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaProducer;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class TestKafkaProducerConsumer
 {
@@ -85,8 +85,7 @@ public class TestKafkaProducerConsumer
     private static void startConsumMessages(
             TestKafkaConsumer aConsumer)
     {
-      
-    	ExecutorKafkaProducer.getInstance().addTask(aConsumer,"startConsumMessages");
+    	VirtualThreadStartup.addTask(aConsumer, "startConsumMessages");
     	
     }
 
@@ -152,7 +151,7 @@ public class TestKafkaProducerConsumer
             System.out.println("Thread " + aIndex + " Time taken " + (endTime - startTime) + " counts " + count + " Total Size " + totalLength);
         });
        
-        ExecutorKafkaProducer.getInstance().addTask(t, "sstartMessagings");
+        VirtualThreadStartup.addTask(t, "sstartMessagings");
         // t.join();
         // aProducer.closeProducer();
         return t;

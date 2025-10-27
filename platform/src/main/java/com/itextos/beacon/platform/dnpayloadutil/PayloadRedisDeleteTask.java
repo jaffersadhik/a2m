@@ -12,7 +12,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.message.SubmissionObject;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class PayloadRedisDeleteTask
         implements
@@ -32,8 +32,7 @@ public class PayloadRedisDeleteTask
         start();
 
         mTimedProcessor = new TimedProcessor("PayloadRedisDeleteTask", this, TimerIntervalConstant.PAYLOAD_DELETE_TASK_RELOAD);
- 
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "PayloadRedisDeleteTask");
+        VirtualThreadStartup.addTask(mTimedProcessor, "PayloadRedisDeleteTask");
      }
 
     public static PayloadRedisDeleteTask getInstance()

@@ -18,7 +18,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class MessageRemovePropertyReader
         implements
@@ -61,7 +61,7 @@ public class MessageRemovePropertyReader
        
         mTimedProcessor = new TimedProcessor("MessageRemovePropertyReader", this, TimerIntervalConstant.MESSAGE_REMOVE_PROPERTY_UPDATER);
  
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "MessageRemovePropertyReader");
+        VirtualThreadStartup.addTask(mTimedProcessor, "MessageRemovePropertyReader");
     }
 
     @Override

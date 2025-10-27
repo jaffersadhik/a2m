@@ -15,7 +15,7 @@ import com.itextos.beacon.commonlib.messageprocessor.process.MessageProcessor;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.http.interfacefallback.dao.FallBackDao;
 import com.itextos.beacon.smslog.FallbackPollerLog;
 
@@ -36,8 +36,7 @@ public abstract class AbstractDataPoller
         
         mTimedProcessor = new TimedProcessor("FallbackTableReader", this, TimerIntervalConstant.INTERFACE_FALLBACK_TABLE_READER);
         
-		
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "FallbackTableReader");
+        VirtualThreadStartup.addTask(mTimedProcessor, "FallbackTableReader");
         
   
     }

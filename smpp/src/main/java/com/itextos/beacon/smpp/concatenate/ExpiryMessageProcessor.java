@@ -19,7 +19,7 @@ import com.itextos.beacon.commonlib.message.MessagePart;
 import com.itextos.beacon.commonlib.message.MessageRequest;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.http.interfaceutil.InterfaceUtil;
 import com.itextos.beacon.smpp.objects.SmppUserInfo;
 import com.itextos.beacon.smpp.objects.request.SmppMessageRequest;
@@ -47,7 +47,7 @@ class ExpiryMessageProcessor
         
         mTimedProcessor = new TimedProcessor("ExpiryMessageProcessor:" + mClusterType + "~" + mRedisPoolIndex, this, TimerIntervalConstant.SMPP_CONCAT_MESSAGE_EXPIRY_INTERVAL);
    
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "ExpiryMessageProcessor:" + mClusterType + "~" + mRedisPoolIndex);
+        VirtualThreadStartup.addTask(mTimedProcessor, "ExpiryMessageProcessor:" + mClusterType + "~" + mRedisPoolIndex);
     }
 
     @Override

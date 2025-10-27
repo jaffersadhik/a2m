@@ -37,8 +37,7 @@ import com.itextos.beacon.commonlib.messageprocessor.data.db.KafkaClusterCompone
 import com.itextos.beacon.commonlib.messageprocessor.data.db.KafkaComponentInfo;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorTopic;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorkannelSubmit;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.errorlog.ErrorLog;
 import com.itextos.beacon.smslog.DebugLog;
 import com.itextos.beacon.smslog.StartupFlowLog;
@@ -276,11 +275,9 @@ public class ProcessorInfo
             allProcessors.add(currentComponentProcessor);
 
             TopicLog.getInstance(aTopicName+"_initiated").log(aTopicName+" : "+new Date());
-            if(mComponent==Component.IC) {
-            ExecutorkannelSubmit.getInstance().addTask(currentComponentProcessor, threadName);
-            }else {
-            ExecutorTopic.getInstance().addTask(currentComponentProcessor, threadName);
-            }
+           
+            
+            VirtualThreadStartup.addTask(currentComponentProcessor, threadName);
             StartupFlowLog.log("Thread '" + threadName + "'started for Component '" + mComponent + "' Cluster '" + aClusterName + "' Actual Cluster '" + aPlatformCluster + "' Topic name '" + aTopicName
                     + "' Thread index '" + aThreadIndex + "' with sleep time millis '" + aSleepInMillis + "'");
             

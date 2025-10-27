@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class MessageIdentifier
 {
@@ -141,8 +141,7 @@ public class MessageIdentifier
     {
         mInstanceStatusUpdater = new MessageIdentifierUpdater(mAppInstanceRedis);
    
-        
-        ExecutorSheduler2.getInstance().addTask(mInstanceStatusUpdater,"MessageIdentifier-" + mInterfaceType + "-" + mAppInstanceRedis.getCurrentAppInstanceID());
+        VirtualThreadStartup.addTask(mInstanceStatusUpdater, "MessageIdentifier-" + mInterfaceType + "-" + mAppInstanceRedis.getCurrentAppInstanceID());
    
         if (log.isDebugEnabled())
             log.debug("Message Identifier Status updater thread started for the interface type :'" + mInterfaceType + "' and Instance ID : '" + mAppInstanceRedis.getCurrentAppInstanceID() + "'");

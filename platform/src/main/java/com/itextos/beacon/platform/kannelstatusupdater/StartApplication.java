@@ -19,7 +19,7 @@ import com.itextos.beacon.commonlib.commondbpool.DBDataSourceFactory;
 import com.itextos.beacon.commonlib.constants.ErrorMessage;
 import com.itextos.beacon.commonlib.constants.Table2DBInserterId;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.inmemory.loader.InmemoryLoaderCollection;
 import com.itextos.beacon.inmemory.loader.process.InmemoryId;
 import com.itextos.beacon.platform.kannelstatusupdater.process.KannelStatusRefresher;
@@ -44,8 +44,7 @@ public class StartApplication
         try
         {
             KannelStatusRefresher.getInstance();
-            
-            ExecutorSheduler.getInstance().addTask(new TableCreation(), "TableCreation");
+            VirtualThreadStartup.addTask(new TableCreation(), "TableCreation");
 
         }
         catch (final Exception e)

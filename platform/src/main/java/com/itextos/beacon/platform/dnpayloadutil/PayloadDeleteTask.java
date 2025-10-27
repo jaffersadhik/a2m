@@ -6,7 +6,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.dnpayloadutil.dao.PayloadInsertInDB;
 
 public class PayloadDeleteTask
@@ -25,8 +25,7 @@ public class PayloadDeleteTask
 
      
         mTimedProcessor = new TimedProcessor("PayloadDeleteTask", this, TimerIntervalConstant.PAYLOAD_DELETE_TASK_RELOAD);
-       
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "PayloadDeleteTask");
+        VirtualThreadStartup.addTask(mTimedProcessor, "PayloadDeleteTask");
     }
 
     public static PayloadDeleteTask getInstance()

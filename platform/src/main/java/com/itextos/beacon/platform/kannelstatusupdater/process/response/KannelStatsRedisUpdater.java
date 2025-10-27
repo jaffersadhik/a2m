@@ -3,7 +3,7 @@ package com.itextos.beacon.platform.kannelstatusupdater.process.response;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.kannelstatusupdater.utility.Utility;
 
 public class KannelStatsRedisUpdater
@@ -31,7 +31,8 @@ public class KannelStatsRedisUpdater
     {
     	
         mTimedProcessor = new TimedProcessor("KannelStatsUpdateReaper", this, TimerIntervalConstant.KANNEL_RESPONSE_REFRESH);
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "KannelStatsUpdateReaper");
+      
+        VirtualThreadStartup.addTask(mTimedProcessor, "KannelStatsUpdateReaper");
     }
 
     @Override

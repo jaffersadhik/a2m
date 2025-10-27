@@ -8,15 +8,9 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
-import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorShedulePoller;
 import com.itextos.beacon.platform.sbc.util.ConsumerId;
-import com.itextos.beacon.platform.sbpcore.dao.DBPoller;
-import com.itextos.beacon.smslog.DebugLog;
-import com.itextos.beacon.smslog.SchedulePollerLog;
 
 public class ScheduleBlockoutPollarHolder
         implements

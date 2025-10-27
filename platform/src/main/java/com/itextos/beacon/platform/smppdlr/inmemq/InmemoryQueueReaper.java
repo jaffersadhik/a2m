@@ -9,7 +9,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.smppdlrutil.util.SmppDlrUtil;
 
 public class InmemoryQueueReaper
@@ -27,8 +27,7 @@ public class InmemoryQueueReaper
     {
         
         mTimedProcessor = new TimedProcessor("TimerThread-InmemoryReaper", this, TimerIntervalConstant.SMPP_DLR_INMEM_PROCESS_INTERVAL);
-
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "TimerThread-InmemoryReaper-smppdlr");
+        VirtualThreadStartup.addTask(mTimedProcessor, "TimerThread-InmemoryReaper-smppdlr");
     }
 
     @Override

@@ -13,7 +13,7 @@ import com.itextos.beacon.commonlib.constants.Table2DBInserterId;
 import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.inmemory.loader.InmemoryLoaderCollection;
 import com.itextos.beacon.inmemory.loader.process.InmemoryId;
 import com.itextos.beacon.platform.topic2table.dbinfo.TableInserterInfo;
@@ -73,8 +73,7 @@ public class T2DbTableWrapper
        // 	k2es=new DeliveriesK2ES();
         }
         timedProcessor = new TimedProcessor("T2DbTableWrapper : "+mComponent.getKey(), this, mSleepTimeSecs);
- 
-        ExecutorSheduler.getInstance().addTask(timedProcessor, "T2DbTableWrapper : "+ mComponent.getKey());
+        VirtualThreadStartup.addTask(timedProcessor, "T2DbTableWrapper : "+ mComponent.getKey());
         
     }
 

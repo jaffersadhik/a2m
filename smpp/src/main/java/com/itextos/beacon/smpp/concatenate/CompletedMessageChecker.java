@@ -14,7 +14,7 @@ import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.smpp.utils.AccountDetails;
 
 public class CompletedMessageChecker
@@ -46,7 +46,7 @@ public class CompletedMessageChecker
         mTimedProcessor = new TimedProcessor("CompletedMessageChecker:" + mClusterType + "~" + mRedisPoolIndex, this, TimerIntervalConstant.SMPP_CONCAT_MESSAGE_CHECKER_INTERVAL);
     
         
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "CompletedMessageChecker:" + mClusterType + "~" + mRedisPoolIndex);
+        VirtualThreadStartup.addTask(mTimedProcessor, "CompletedMessageChecker:" + mClusterType + "~" + mRedisPoolIndex);
 		
     }
 

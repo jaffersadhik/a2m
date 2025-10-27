@@ -16,8 +16,7 @@ import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 import redis.clients.jedis.Jedis;
 
@@ -40,8 +39,7 @@ public class TimeBoundMessageReaper
         this.mRedisIndex = aRedisIndex;
 
         mTimedProcessor  = new TimedProcessor("TimeBoundMessageReaper-RedisIndex:" + mRedisIndex, this, TimerIntervalConstant.TIMEBOUND_MESSAGE_REAPER);
-  
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "TimeBoundMessageReaper-RedisIndex:" + mRedisIndex);
+        VirtualThreadStartup.addTask(mTimedProcessor, "TimeBoundMessageReaper-RedisIndex:" + mRedisIndex);
        
         checkForPreviousDate(mRedisIndex);
     }
@@ -145,9 +143,8 @@ public class TimeBoundMessageReaper
             if ((lKeys != null) && !lKeys.isEmpty())
             {
                 final RemoveRedisEntries lRemoveEntries = new RemoveRedisEntries(aRedisId, lKeys, lCompareTime);
-              
+                VirtualThreadStartup.addTask(lRemoveEntries, "RemoveEntries-" + lPattern);
 
-                ExecutorSheduler2.getInstance().addTask(lRemoveEntries, "RemoveEntries-" + lPattern);
             }
         }
         catch (final Exception e)
@@ -189,8 +186,7 @@ public class TimeBoundMessageReaper
                     {
                         lTotRecords = lTotRecords + lKeys.size();
                         final RemoveRedisEntries lRemoveEntries = new RemoveRedisEntries(aRedisIndex, lKeys, lFromTime.getTimeInMillis());
-                    
-                        ExecutorSheduler2.getInstance().addTask(lRemoveEntries,  "MissedRemovedEntries-" + lPattern);
+                        VirtualThreadStartup.addTask(lRemoveEntries,  "MissedRemovedEntries-" + lPattern);
                     }
                 }
                 catch (final Exception e)

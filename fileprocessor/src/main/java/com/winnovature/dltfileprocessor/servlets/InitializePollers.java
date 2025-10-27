@@ -6,7 +6,7 @@ import java.util.List;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.dltfileprocessor.consumers.DltFileQConsumer;
 import com.winnovature.dltfileprocessor.pollers.DltTemplateRequestCompletionPoller;
 import com.winnovature.dltfileprocessor.pollers.DltTemplateRequestPoller;
@@ -48,7 +48,7 @@ public class InitializePollers{
 				if (runDltTemplateRequestPoller) {
 					dltTemplateRequestPoller = new DltTemplateRequestPoller("dltTemplateRequestPoller");
 					dltTemplateRequestPoller.setName("dltTemplateRequestPoller");
-					ExecutorFilePoller.getInstance().addTask(dltTemplateRequestPoller, "dltTemplateRequestPoller");
+					VirtualThreadStartup.addTask(dltTemplateRequestPoller, "dltTemplateRequestPoller");
 			//		dltTemplateRequestPoller.start();
 				//	ExecutorSheduler.addTask(dltTemplateRequestPoller);
 
@@ -58,7 +58,7 @@ public class InitializePollers{
 					
 					dltTemplateRequestCompletionPoller = new DltTemplateRequestCompletionPoller();
 					dltTemplateRequestCompletionPoller.setName("DltTemplateRequestCompletionPoller");
-					ExecutorFilePoller.getInstance().addTask(dltTemplateRequestCompletionPoller, "DltTemplateRequestCompletionPoller");
+					VirtualThreadStartup.addTask(dltTemplateRequestCompletionPoller, "DltTemplateRequestCompletionPoller");
 					
 			//		dltTemplateRequestCompletionPoller.start();
 			//		ExecutorSheduler.addTask(dltTemplateRequestCompletionPoller);
@@ -89,7 +89,7 @@ public class InitializePollers{
 						for (int i = 0; i < dltFileConsumersPerRedisServer; i++) {
 							dltFileQConsumer = new DltFileQConsumer(bean, instanceId);
 							dltFileQConsumer.setName("Thread" + (i+1) + "-" + "DltFileQConsumer");
-							ExecutorFilePoller.getInstance().addTask(dltFileQConsumer, "Thread" + (i+1) + "-" + "DltFileQConsumer");
+							VirtualThreadStartup.addTask(dltFileQConsumer, "Thread" + (i+1) + "-" + "DltFileQConsumer");
 						//	dltFileQConsumer.start();
 						//	ExecutorSheduler.addTask(dltFileQConsumer);
 

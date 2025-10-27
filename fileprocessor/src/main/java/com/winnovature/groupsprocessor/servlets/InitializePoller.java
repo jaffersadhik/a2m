@@ -1,20 +1,12 @@
 package com.winnovature.groupsprocessor.servlets;
 
-import java.io.IOException;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.servlet.GenericServlet;
-import javax.servlet.Servlet;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.annotation.WebServlet;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.groupsprocessor.consumers.GroupsCampaignQConsumer;
 import com.winnovature.groupsprocessor.consumers.GroupsFileSplitQConsumer;
 import com.winnovature.groupsprocessor.consumers.GroupsQConsumer;
@@ -27,7 +19,6 @@ import com.winnovature.groupsprocessor.singletons.RedisConnectionTon;
 import com.winnovature.groupsprocessor.utils.Constants;
 import com.winnovature.logger.GroupProcessorLog;
 import com.winnovature.utils.dtos.RedisServerDetailsBean;
-import com.winnovature.utils.utils.ExecutorSheduler;
 
 public class InitializePoller  {
 
@@ -65,7 +56,7 @@ public class InitializePoller  {
 				if (runGroupsPoller) {
 					groupsMasterPoller = new GroupsMasterPoller("GroupsMasterPoller");
 					groupsMasterPoller.setName("GroupsMasterPoller");
-					ExecutorFilePoller.getInstance().addTask(groupsMasterPoller, "GroupsMasterPoller");
+					VirtualThreadStartup.addTask(groupsMasterPoller, "GroupsMasterPoller");
 				//	groupsMasterPoller.start();
 				//	ExecutorSheduler.addTask(groupsMasterPoller);
 
@@ -86,7 +77,7 @@ public class InitializePoller  {
 					for (int i = 0; i < groupFileConsumersPerRedisServer; i++) {
 						groupsQConsumer = new GroupsQConsumer(bean, instanceId);
 						groupsQConsumer.setName("Thread" + (i + 1) + "-" + "GroupsQConsumer");
-						ExecutorFilePoller.getInstance().addTask(groupsQConsumer, "Thread" + (i + 1) + "-" + "GroupsQConsumer");
+						VirtualThreadStartup.addTask(groupsQConsumer, "Thread" + (i + 1) + "-" + "GroupsQConsumer");
 					//	groupsQConsumer.start();
 					//	ExecutorSheduler.addTask(groupsQConsumer);
 
@@ -106,7 +97,7 @@ public class InitializePoller  {
 					for (int i = 0; i < groupSplitFileConsumersPerRedisServer; i++) {
 						groupsFileSplitQConsumer = new GroupsFileSplitQConsumer(bean, instanceId, batchSize);
 						groupsFileSplitQConsumer.setName("Thread" + (i + 1) + "-" + "GroupsFileSplitQConsumer");
-						ExecutorFilePoller.getInstance().addTask(groupsFileSplitQConsumer, "Thread" + (i + 1) + "-" + "GroupsFileSplitQConsumer");
+						VirtualThreadStartup.addTask(groupsFileSplitQConsumer, "Thread" + (i + 1) + "-" + "GroupsFileSplitQConsumer");
 				//		groupsFileSplitQConsumer.start();
 					//	ExecutorSheduler.addTask(groupsFileSplitQConsumer);
 
@@ -120,7 +111,7 @@ public class InitializePoller  {
 				if (runGroupsPoller) {
 					pollerGroupFilesCompleted = new PollerGroupFilesCompleted();
 					pollerGroupFilesCompleted.setName("PollerGroupFilesCompleted");
-					ExecutorFilePoller.getInstance().addTask(pollerGroupFilesCompleted, "PollerGroupFilesCompleted");
+					VirtualThreadStartup.addTask(pollerGroupFilesCompleted, "PollerGroupFilesCompleted");
 			//		pollerGroupFilesCompleted.start();
 				//	ExecutorSheduler.addTask(pollerGroupFilesCompleted);
 
@@ -130,7 +121,7 @@ public class InitializePoller  {
 					
 					pollerGroupMasterCompleted = new PollerGroupMasterCompleted();
 					pollerGroupMasterCompleted.setName("PollerGroupMasterCompleted");
-					ExecutorFilePoller.getInstance().addTask(pollerGroupMasterCompleted, "PollerGroupMasterCompleted");
+					VirtualThreadStartup.addTask(pollerGroupMasterCompleted, "PollerGroupMasterCompleted");
 				//	pollerGroupMasterCompleted.start();
 				//	ExecutorSheduler.addTask(pollerGroupMasterCompleted);
 
@@ -140,7 +131,7 @@ public class InitializePoller  {
 					
 					pollerCampaignMasterCompleted = new PollerCampaignMasterCompleted();
 					pollerCampaignMasterCompleted.setName("PollerCampaignMasterCompleted");
-					ExecutorFilePoller.getInstance().addTask(pollerCampaignMasterCompleted, "PollerCampaignMasterCompleted");
+					VirtualThreadStartup.addTask(pollerCampaignMasterCompleted, "PollerCampaignMasterCompleted");
 				//	pollerCampaignMasterCompleted.start();
 				//	ExecutorSheduler.addTask(pollerCampaignMasterCompleted);
 
@@ -159,7 +150,7 @@ public class InitializePoller  {
 					for (int i = 0; i < groupsCampaignQConsumersPerRedisServer; i++) {
 						groupsCampaignQConsumer = new GroupsCampaignQConsumer(bean, instanceId);
 						groupsCampaignQConsumer.setName("Thread" + (i+1) + "-" + "GroupsCampaignQConsumer");
-						ExecutorFilePoller.getInstance().addTask(groupsCampaignQConsumer, "Thread" + (i+1) + "-" + "GroupsCampaignQConsumer");
+						VirtualThreadStartup.addTask(groupsCampaignQConsumer, "Thread" + (i+1) + "-" + "GroupsCampaignQConsumer");
 					//	groupsCampaignQConsumer.start();
 					//	ExecutorSheduler.addTask(groupsCampaignQConsumer);
 

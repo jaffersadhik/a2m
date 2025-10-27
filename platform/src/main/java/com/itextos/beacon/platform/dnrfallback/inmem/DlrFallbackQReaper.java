@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.message.IMessage;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.dnrfallback.dao.DlrFallBackDao;
 
 public class DlrFallbackQReaper
@@ -40,8 +40,7 @@ public class DlrFallbackQReaper
     {
     	
         mTimedProcessor = new TimedProcessor("DlrFallbackTableInserter", this, TimerIntervalConstant.INTERFACE_FALLBACK_TABLE_INSERTER);
-
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "DlrFallbackTableInserter");
+        VirtualThreadStartup.addTask(mTimedProcessor, "DlrFallbackTableInserter");
     
     }
 

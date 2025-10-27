@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class AbstractAgingDlrGen
         implements
@@ -30,8 +30,7 @@ public class AbstractAgingDlrGen
         super();
        
         mTimedProcessor = new TimedProcessor("TimerThread-AgingDlrGenrator", this, TimerIntervalConstant.SCHEDULE_MESSAGE_TABLE_READER);
-     
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "TimerThread-AgingDlrGenrator");
+        VirtualThreadStartup.addTask(mTimedProcessor, "TimerThread-AgingDlrGenrator");
     }
 
     @Override

@@ -3,7 +3,7 @@ package com.itextos.beacon.r3r.process;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class DataProcessor
 {
@@ -35,8 +35,7 @@ public class DataProcessor
     private void initDBProcessor()
     {
     	
-    	
-    	ExecutorSheduler2.getInstance().addTask(dbProcessorThread, "DB Process Thread");
+    	VirtualThreadStartup.addTask(dbProcessorThread, "DB Process Thread");
 
     	if (log.isDebugEnabled())
             log.debug("DB Processor Thread Started ");
@@ -46,7 +45,7 @@ public class DataProcessor
     {
     
     	
-    	ExecutorSheduler2.getInstance().addTask(urlRequestDetailsProcessor, "URL Request Processor");
+    	VirtualThreadStartup.addTask(urlRequestDetailsProcessor, "URL Request Processor");
          
         if (log.isDebugEnabled())
             log.debug("URL Request Details Processor Started ");

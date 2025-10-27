@@ -10,7 +10,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.httpclienthandover.common.DLRProcessor;
 import com.itextos.beacon.httpclienthandover.common.IHandoverProcessor;
 
@@ -33,7 +33,9 @@ public class HandoverRetryReaper
         isClientSpecific = aIsCustSpecific;
         mClientId        = aCustID;
         timedProcessor   = new TimedProcessor("Client Handover Retry Reaper - " + (aIsCustSpecific ? aCustID : "Default"), this, TimerIntervalConstant.DLR_HTTP_HANDOVER_HANDOVER_RETRY_REAPER);
-        ExecutorSheduler.getInstance().addTask(timedProcessor, "Client Handover Retry Reaper - " + (aIsCustSpecific ? aCustID : "Default"));
+   
+        VirtualThreadStartup.addTask(timedProcessor, "Client Handover Retry Reaper - " + (aIsCustSpecific ? aCustID : "Default"));
+        
     }
 
     @Override

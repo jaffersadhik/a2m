@@ -3,7 +3,7 @@ package com.winnovature.initialstate.servlets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.initialstate.pollers.CampaignGroupsPoller;
 import com.winnovature.initialstate.pollers.CampaignMasterPoller;
 import com.winnovature.initialstate.utils.Constants;
@@ -33,7 +33,7 @@ public class InitializePoller {
 
 				campaignMasterPoller = new CampaignMasterPoller("CampaignMasterPoller");
 				campaignMasterPoller.setName("CampaignMasterPoller");
-				ExecutorFilePoller.getInstance().addTask(campaignMasterPoller, "CampaignMasterPoller");
+				VirtualThreadStartup.addTask(campaignMasterPoller, "CampaignMasterPoller");
 		//		campaignMasterPoller.start();
 		//		ExecutorSheduler.addTask(campaignMasterPoller);
 
@@ -45,7 +45,7 @@ public class InitializePoller {
 				
 				campaignGroupsPoller = new CampaignGroupsPoller("CampaignGroupsPoller");
 				campaignGroupsPoller.setName("CampaignGroupsPoller");
-				ExecutorFilePoller.getInstance().addTask(campaignGroupsPoller, "CampaignGroupsPoller");
+				VirtualThreadStartup.addTask(campaignGroupsPoller, "CampaignGroupsPoller");
 			//	campaignGroupsPoller.start();
 			//	ExecutorSheduler.addTask(campaignGroupsPoller);
 

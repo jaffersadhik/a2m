@@ -11,8 +11,7 @@ import org.apache.commons.logging.LogFactory;
 
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.messageidentifier.MessageIdentifier;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
-import com.itextos.beacon.http.interfacefallback.inmem.FallbackQReaper;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.handoverstage.consumers.SplitFileConsumer;
 import com.winnovature.handoverstage.singletons.HandoverStagePropertiesTon;
 import com.winnovature.handoverstage.singletons.RedisConnectionFactory;
@@ -69,7 +68,7 @@ public class InitializeConsumersServlet {
 
 							consumer = new SplitFileConsumer(queueName, bean, instanceId);
 							consumer.setName("Thread" + i + "-" + queueName);
-							ExecutorFilePoller.getInstance().addTask(consumer, "Thread" + i + "-" + queueName);
+							VirtualThreadStartup.addTask(consumer, "Thread" + i + "-" + queueName);
 					//		consumer.start();
 					//		ExecutorSheduler.addTask(consumer);
 

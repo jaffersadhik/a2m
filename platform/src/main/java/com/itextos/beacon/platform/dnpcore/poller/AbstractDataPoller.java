@@ -17,7 +17,7 @@ import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.errorlog.SMSLog;
 import com.itextos.beacon.platform.dnpayloadutil.PayloadProcessor;
 import com.itextos.beacon.platform.dnpcore.dao.NoPayloadRetryDao;
@@ -44,8 +44,7 @@ public abstract class AbstractDataPoller
         mClusterType    = aClusterType;
       
         mTimedProcessor = new TimedProcessor("NoPayloadRetryTableReader-" + mClusterType, this, TimerIntervalConstant.NO_PAYLOAD_RETRY_TABLE_READER);
-        
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "NoPayloadRetryTableReader-" + mClusterType);
+        VirtualThreadStartup.addTask(mTimedProcessor, "NoPayloadRetryTableReader-" + mClusterType);
     }
 
     @Override

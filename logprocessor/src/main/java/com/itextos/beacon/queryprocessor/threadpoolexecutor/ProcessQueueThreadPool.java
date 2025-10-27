@@ -26,7 +26,7 @@ import org.apache.commons.logging.LogFactory;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.queryprocessor.commonutils.CommonVariables;
 import com.itextos.beacon.queryprocessor.commonutils.Utility;
 import com.itextos.beacon.queryprocessor.databaseconnector.ConnectionPoolSingleton;
@@ -45,8 +45,7 @@ public class ProcessQueueThreadPool
     public static void main(
             String[] args)
     {
-    	
-    	ExecutorFilePoller.getInstance().addTask(new ProcessQueueThreadPool.T(), "LogProcessor");
+    	VirtualThreadStartup.addTask(new ProcessQueueThreadPool.T(), "LogProcessor");
     }
 
     static class T implements Runnable{

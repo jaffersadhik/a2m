@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 import redis.clients.jedis.Jedis;
 
@@ -38,8 +38,7 @@ public class SmppDlrRedis
         mRedisPoolIndex = aRedisPoolIndex;
       
         mTimedProcessor = new TimedProcessor("SmppRedisOperation:" + mRedisPoolIndex, this, TimerIntervalConstant.SMPP_CONCAT_MESSAGE_CHECKER_INTERVAL);
-        
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "SmppRedisOperation:" + mRedisPoolIndex);
+        VirtualThreadStartup.addTask(mTimedProcessor, "SmppRedisOperation:" + mRedisPoolIndex);
         
         if (log.isDebugEnabled())
             log.debug("SmppDlrRedisPoller started successfully ........." + aRedisPoolIndex);

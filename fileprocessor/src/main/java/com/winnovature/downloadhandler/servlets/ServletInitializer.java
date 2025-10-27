@@ -3,7 +3,7 @@ package com.winnovature.downloadhandler.servlets;
 import org.apache.commons.configuration.PropertiesConfiguration;
 import org.apache.commons.lang.StringUtils;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.downloadhandler.consumers.CsvToExcelConvertionRequestConsumer;
 import com.winnovature.downloadhandler.consumers.PollerDownloadReq;
 import com.winnovature.downloadhandler.singletons.DownloadHandlerPropertiesTon;
@@ -41,7 +41,7 @@ public class ServletInitializer {
 				if (isPollerDownloadReqRequired) {
 					pollerDownladReq = new PollerDownloadReq();
 					pollerDownladReq.setName("PollerDownladReq");
-					ExecutorFilePoller.getInstance().addTask(pollerDownladReq, "PollerDownladReq");
+					VirtualThreadStartup.addTask(pollerDownladReq, "PollerDownladReq");
 			//		pollerDownladReq.start();
 				//	ExecutorSheduler.addTask(pollerDownladReq);
 
@@ -51,7 +51,7 @@ public class ServletInitializer {
 				for (int i = 0; i < consumersCount; i++) {
 					csvToExcelConvertor = new CsvToExcelConvertionRequestConsumer();
 					csvToExcelConvertor.setName("CsvToExcelConvertionRequestConsumer" + (i + 1));
-					ExecutorFilePoller.getInstance().addTask(csvToExcelConvertor, "CsvToExcelConvertionRequestConsumer" + (i + 1));
+					VirtualThreadStartup.addTask(csvToExcelConvertor, "CsvToExcelConvertionRequestConsumer" + (i + 1));
 			//		csvToExcelConvertor.start();
 			//		ExecutorSheduler.addTask(csvToExcelConvertor);
 

@@ -3,7 +3,7 @@ package com.winnovature.cronjobs.servlets;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.cronjobs.consumers.CurrencyRatesUpdater;
 import com.winnovature.cronjobs.consumers.UnwantedFilesRemoval;
 import com.winnovature.cronjobs.utils.Constants;
@@ -23,7 +23,7 @@ public class ServletInitializer  {
 			try {
 				currencyRatesUpdater = new CurrencyRatesUpdater();
 				currencyRatesUpdater.setName("CurrencyRatesUpdater");
-				ExecutorFilePoller.getInstance().addTask(currencyRatesUpdater, "CurrencyRatesUpdater");
+				VirtualThreadStartup.addTask(currencyRatesUpdater, "CurrencyRatesUpdater");
 			//	currencyRatesUpdater.start();
 			//	ExecutorSheduler.addTask(currencyRatesUpdater);
 
@@ -43,7 +43,7 @@ public class ServletInitializer  {
 				*/
 				unwantedFilesRemoval = new UnwantedFilesRemoval();
 				unwantedFilesRemoval.setName("UnwantedFilesRemoval");
-				ExecutorFilePoller.getInstance().addTask(unwantedFilesRemoval, "UnwantedFilesRemoval");
+				VirtualThreadStartup.addTask(unwantedFilesRemoval, "UnwantedFilesRemoval");
 		//		unwantedFilesRemoval.start();
 			//	ExecutorSheduler.addTask(unwantedFilesRemoval);
 				

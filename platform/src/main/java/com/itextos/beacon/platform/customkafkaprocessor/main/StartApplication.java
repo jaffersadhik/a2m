@@ -6,8 +6,7 @@ import java.util.Map.Entry;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorKafkaConsumer;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.customkafkaprocessor.CustomKafkaConsumer;
 import com.itextos.beacon.platform.customkafkaprocessor.process.FullMessageTableInserter;
 import com.itextos.beacon.platform.customkafkaprocessor.util.CustomKafkaProperties;
@@ -55,8 +54,7 @@ public class StartApplication
                     isConsumerCreated = isConsumerCreated || lConsumer.isConsumerCreated();
 
                     final String threadName = topicName + "-consumer-" + i;
-                   
-                    ExecutorKafkaConsumer.getInstance().addTask(lConsumer, threadName);
+                    VirtualThreadStartup.addTask(lConsumer, threadName);
                     
                     log.debug("Process Thread " + threadName + " started");
                 }
@@ -77,8 +75,8 @@ public class StartApplication
         {
             final FullMessageTableInserter lFullMessageTableInserter = new FullMessageTableInserter(3000);
             final String                   threadName                = "FullMsgInserter-" + i;
-          
-            ExecutorSheduler2.getInstance().addTask(lFullMessageTableInserter, threadName);
+            VirtualThreadStartup.addTask(lFullMessageTableInserter, threadName);
+
 
             log.debug("Process Thread " + threadName + " started");
         }

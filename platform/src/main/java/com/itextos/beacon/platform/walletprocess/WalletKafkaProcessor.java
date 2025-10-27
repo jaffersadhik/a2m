@@ -12,7 +12,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.walletbase.data.WalletInput;
 import com.itextos.beacon.platform.walletbase.database.DbInserter;
 import com.itextos.beacon.platform.walletbase.util.WalletHistoryKafkaProperties;
@@ -49,8 +49,7 @@ class WalletKafkaProcessor
         {
         	
             mTimedProcessor = new TimedProcessor("WalletHistoryProducer", this, TimerIntervalConstant.KANNEL_RESPONSE_REFRESH);
-       
-            ExecutorSheduler.getInstance().addTask(mTimedProcessor, "WalletHistoryProducer");
+            VirtualThreadStartup.addTask(mTimedProcessor, "WalletHistoryProducer");
         }
         catch (final Exception e)
         {

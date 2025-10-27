@@ -11,7 +11,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.platform.smppdlrutil.dao.SmppDlrFallBackDao;
 import com.itextos.beacon.platform.smppdlrutil.util.SmppDlrUtil;
 
@@ -30,8 +30,7 @@ public abstract class AbstractDataPoller
         super();
 
         mTimedProcessor = new TimedProcessor("SmppDlrFallbackTableReader", this, TimerIntervalConstant.SMPP_DLR_FALLBACK_TABLE_READER);
-  
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "SmppDlrFallbackTableReader");
+        VirtualThreadStartup.addTask(mTimedProcessor, "SmppDlrFallbackTableReader");
     }
 
     @Override

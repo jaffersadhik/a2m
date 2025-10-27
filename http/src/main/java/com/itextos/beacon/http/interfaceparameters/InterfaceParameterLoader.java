@@ -15,11 +15,10 @@ import com.itextos.beacon.commonlib.commondbpool.DBDataSourceFactory;
 import com.itextos.beacon.commonlib.commondbpool.JndiInfo;
 import com.itextos.beacon.commonlib.constants.InterfaceType;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
-import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class InterfaceParameterLoader
         implements
@@ -71,7 +70,7 @@ public class InterfaceParameterLoader
        
         mTimedProcessor = new TimedProcessor("InterfaceParameterLoader", this, TimerIntervalConstant.INTERFACE_PARAMETER_LOADER);
     
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "InterfaceParameterLoader");
+        VirtualThreadStartup.addTask(mTimedProcessor, "InterfaceParameterLoader");
         if (log.isDebugEnabled())
             log.debug("Timer Thread for loading the Interface Parameters started with sleep time of 30 seconds.");
     }

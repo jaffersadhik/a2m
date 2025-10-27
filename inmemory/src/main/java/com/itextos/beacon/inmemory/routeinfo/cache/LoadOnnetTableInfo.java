@@ -17,11 +17,10 @@ import com.itextos.beacon.commonlib.commondbpool.JndiInfoHolder;
 import com.itextos.beacon.commonlib.constants.Constants;
 import com.itextos.beacon.commonlib.constants.MessageType;
 import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
-import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.inmemory.routeinfo.util.RouteUtil;
 
 public class LoadOnnetTableInfo
@@ -56,8 +55,7 @@ public class LoadOnnetTableInfo
         {
         	
             mTimedProcessor = new TimedProcessor("TimerThread-LoadOnnetTableInfo", this, TimerIntervalConstant.ONNET_TABLE_INFO_REFRESH);
-        
-            ExecutorSheduler.getInstance().addTask(mTimedProcessor, "LoadOnnetTableInfo");
+            VirtualThreadStartup.addTask(mTimedProcessor, "LoadOnnetTableInfo");
             }
         catch (final Exception e)
         {

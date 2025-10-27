@@ -7,7 +7,7 @@ import java.util.Map;
 
 import org.apache.commons.configuration.PropertiesConfiguration;
 
-import com.itextos.beacon.commonlib.utility.tp.ExecutorFilePoller;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.logger.SplitStageLog;
 import com.winnovature.splitstage.consumers.FileSplitQConsumer;
 import com.winnovature.splitstage.singletons.RedisConnectionTon;
@@ -67,7 +67,7 @@ public class SplitStageServlet  {
 					for (int i = 0; i < splitConsumersPerRedisServer; i++) {
 						fileSplitQConsumer = new FileSplitQConsumer(bean, instanceId);
 						fileSplitQConsumer.setName("Thread" + (i+1) + "-" + "SplitQConsumer");
-						ExecutorFilePoller.getInstance().addTask(fileSplitQConsumer, "Thread" + (i+1) + "-" + "SplitQConsumer");
+						VirtualThreadStartup.addTask(fileSplitQConsumer, "Thread" + (i+1) + "-" + "SplitQConsumer");
 					//	fileSplitQConsumer.start();
 					//	ExecutorSheduler.addTask(fileSplitQConsumer);
 

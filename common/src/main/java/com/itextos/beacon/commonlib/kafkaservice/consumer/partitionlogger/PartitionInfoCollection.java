@@ -19,7 +19,7 @@ import com.itextos.beacon.commonlib.constants.TimerIntervalConstant;
 import com.itextos.beacon.commonlib.utility.DateTimeUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 public class PartitionInfoCollection
         implements
@@ -57,7 +57,7 @@ public class PartitionInfoCollection
     {
     	
         mTimedProcessor = new TimedProcessor("PartitionInfoCollection", this, TimerIntervalConstant.KAFKA_PARTITION_INFO_INSERT);
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "PartitionInfoCollection");
+        VirtualThreadStartup.addTask(mTimedProcessor, "PartitionInfoCollection");
     }
 
     public void addKafkaPartition(

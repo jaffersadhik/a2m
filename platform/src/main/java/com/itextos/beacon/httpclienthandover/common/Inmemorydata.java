@@ -13,7 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import com.itextos.beacon.commonlib.message.BaseMessage;
 import com.itextos.beacon.commonlib.message.DeliveryObject;
 import com.itextos.beacon.commonlib.utility.CommonUtility;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler2;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.itextos.beacon.httpclienthandover.data.ClientHandoverData;
 import com.itextos.beacon.httpclienthandover.retry.ExpiredMessageLogger;
 import com.itextos.beacon.httpclienthandover.retry.HandoverRetryReaper;
@@ -108,7 +108,7 @@ public class Inmemorydata
 
             final ProcessStarter processStarter = new ProcessStarter(aClientId);
            
-            ExecutorSheduler2.getInstance().addTask(processStarter, "Process Starter - " + aClientId + "-" + index);
+            VirtualThreadStartup.addTask(processStarter, "Process Starter - " + aClientId + "-" + index);
             processStartersList.add(processStarter);
         }
 

@@ -14,7 +14,7 @@ import com.itextos.beacon.commonlib.redisconnectionprovider.RedisConnectionProvi
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.commonlib.utility.timer.ITimedProcess;
 import com.itextos.beacon.commonlib.utility.timer.TimedProcessor;
-import com.itextos.beacon.commonlib.utility.tp.ExecutorSheduler;
+import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.Pipeline;
@@ -38,7 +38,7 @@ public class PayloadDataReader
     {
     	
         mTimedProcessor = new TimedProcessor("PayloadDataReader", this, REFRESH_MINUTES);
-        ExecutorSheduler.getInstance().addTask(mTimedProcessor, "PayloadDataReader");
+        VirtualThreadStartup.addTask(mTimedProcessor, "PayloadDataReader");
     }
 
     @Override
