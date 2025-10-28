@@ -20,22 +20,22 @@ import com.itextos.beacon.platform.kannelstatusupdater.utility.Utility;
 @XmlRootElement(name = "gateway")
 public class Gateway {
 
-    private static final Log log = LogFactory.getLog(Gateway.class);
+	public static final Log log = LogFactory.getLog(Gateway.class);
 
     @XmlElement(name = "status")
-    private String status;
+    public String status;
 
     @XmlElementRef
-    private Sms sms;
+    public Sms sms;
 
     @XmlElementRef
-    private Dn dn;
+    public Dn dn;
 
     @XmlElementRef
-    private Smscs smscs;
+    public Smscs smscs;
 
     @XmlElementRef
-    private Boxes boxes;
+    public Boxes boxes;
 
     public String getUptime() {
         String result = "";
