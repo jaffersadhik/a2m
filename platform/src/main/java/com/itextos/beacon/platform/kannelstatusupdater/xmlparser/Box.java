@@ -1,19 +1,14 @@
 package com.itextos.beacon.platform.kannelstatusupdater.xmlparser;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(
-        name = "box")
-public class Box
-{
+@XmlRootElement(name = "box")
+public class Box {
 
-    @XmlElement(
-            name = "queue")
+    @XmlElement(name = "queue")
     public String queue;
 
-    @XmlElement(
-            name = "type")
+    @XmlElement(name = "type")
     public String type;
-
 }

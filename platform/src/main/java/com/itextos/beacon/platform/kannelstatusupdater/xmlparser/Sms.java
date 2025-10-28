@@ -1,27 +1,21 @@
 package com.itextos.beacon.platform.kannelstatusupdater.xmlparser;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementRef;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(
-        name = "sms")
-public class Sms
-{
+@XmlRootElement(name = "sms")
+public class Sms {
 
-    @XmlElement(
-            name = "storesize")
+    @XmlElement(name = "storesize")
     public String storesize;
 
-    @XmlElement(
-            name = "inbound")
+    @XmlElement(name = "inbound")
     public String inbound;
 
-    @XmlElement(
-            name = "outbound")
+    @XmlElement(name = "outbound")
     public String outbound;
 
     @XmlElementRef
-    SmsSent       smssent;
-
+    public SmsSent smssent;
 }

@@ -1,23 +1,18 @@
 package com.itextos.beacon.platform.kannelstatusupdater.xmlparser;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementRef;
-import javax.xml.bind.annotation.XmlRootElement;
+import jakarta.xml.bind.annotation.XmlElement;
+import jakarta.xml.bind.annotation.XmlElementRef;
+import jakarta.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement(
-        name = "dlr")
-public class Dn
-{
+@XmlRootElement(name = "dlr")
+public class Dn {
 
     @XmlElementRef
-    DnReceived    dnreceived;
+    public DnReceived dnreceived;
 
-    @XmlElement(
-            name = "inbound")
+    @XmlElement(name = "inbound")
     public String inbound;
 
-    @XmlElement(
-            name = "queued")
+    @XmlElement(name = "queued")
     public String queued;
-
 }
