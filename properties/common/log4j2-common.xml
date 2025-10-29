@@ -145,6 +145,18 @@
                         </Policies>
                         <DefaultRolloverStrategy max="3" />
             </RollingFile>
+            
+                            <RollingFile name="kannelstatusupdater"
+                        fileName="${basePath}/kannelstatusupdater.log"
+                        filePattern="${basePath}/kannelstatusupdater-%i.log.gz">
+                        <PatternLayout>
+                                <pattern>${messagePattern}</pattern>
+                        </PatternLayout>
+                        <Policies>
+                                <SizeBasedTriggeringPolicy size="10MB" />
+                        </Policies>
+                        <DefaultRolloverStrategy max="3" />
+            </RollingFile>
 
             <RollingFile name="ic"
                         fileName="${basePath}/ic.log"
@@ -206,6 +218,11 @@
                 <logger name="com.itextos.beacon.commonlib.kafka.service.consumer" level="DEBUG">
                         <AppenderRef ref="kafkaconsumer" />
                 </logger>
+                
+                    <logger name="com.itextos.beacon.platform.kannelstatusupdater" level="DEBUG">
+                        <AppenderRef ref="kannelstatusupdater" />
+                </logger>
+                
 
         </Loggers>
 </Configuration>
