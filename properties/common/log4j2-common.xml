@@ -171,39 +171,39 @@
         <Loggers>
 
 
-          <logger name="com.itextos.beacon.splog" level="ERROR">
+          <logger name="com.itextos.beacon.splog" level="DEBUG">
                         <AppenderRef ref="sp" />
                 </logger>
 
-                <Root level="ERROR" additivity="true">
+                <Root level="DEBUG" additivity="true">
                         <appender-ref ref="mainLogger" />
                 </Root>
 
-                <logger name="com.itextos.beacon.commonlib" level="ERROR">
+                <logger name="com.itextos.beacon.commonlib" level="DEBUG">
                         <AppenderRef ref="commonlibLog" />
                 </logger>
 
-                <logger name="com.itextos.beacon.inmemory" level="ERROR">
+                <logger name="com.itextos.beacon.inmemory" level="DEBUG">
                         <AppenderRef ref="inmemoryLog" />
                 </logger>
 
-                <logger name="com.itextos.beacon.platform.dnprocess.common.TimeAdjustmentUtility" level="ERROR">
+                <logger name="com.itextos.beacon.platform.dnprocess.common.TimeAdjustmentUtility" level="DEBUG">
                         <AppenderRef ref="timeadjustlog" />
                 </logger>
 
-                <logger name="com.itextos.beacon.commonlib.prometheus" level="ERROR">
+                <logger name="com.itextos.beacon.commonlib.prometheus" level="DEBUG">
                         <AppenderRef ref="prometheusLog" />
                 </logger>
 
-                <logger name="com.itextos.beacon.commonlib.kafka.service" level="ERROR">
+                <logger name="com.itextos.beacon.commonlib.kafka.service" level="DEBUG">
                         <AppenderRef ref="kafkaservice" />
                 </logger>
 
-                <logger name="com.itextos.beacon.platform.templatefinder" level="ERROR">
+                <logger name="com.itextos.beacon.platform.templatefinder" level="DEBUG">
                         <AppenderRef ref="templatefinder" />
                 </logger>
 
-                <logger name="com.itextos.beacon.commonlib.kafka.service.consumer" level="ERROR">
+                <logger name="com.itextos.beacon.commonlib.kafka.service.consumer" level="DEBUG">
                         <AppenderRef ref="kafkaconsumer" />
                 </logger>
 
