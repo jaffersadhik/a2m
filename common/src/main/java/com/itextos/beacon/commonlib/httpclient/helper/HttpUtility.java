@@ -130,8 +130,6 @@ public class HttpUtility
         if ((aResult == null) || (aException == null))
             return;
 
-        log.error("Some Exception while doing the http process.", aException);
-
         aResult.setSuccess(false);
         aResult.setException(aException);
         aResult.setErrorString(aException.getMessage());

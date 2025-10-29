@@ -13,7 +13,6 @@ public class BasicHttpConnector
 
     private static final int DEFAULT_CONNECT_TIMEOUT_MILLIS = 2000;
     private static final int DEFAULT_READ_TIMEOUT_MILLIS    = 2000;
-    private static final Log log                            = LogFactory.getLog(BasicHttpConnector.class);
 
     private BasicHttpConnector()
     {}
@@ -127,9 +126,7 @@ public class BasicHttpConnector
             int aReadTimeout,
             boolean aReturnResponseErrorString)
     {
-        if (log.isDebugEnabled())
-            log.debug("URL to connect : '" + aCompleteUrl + "'");
-
+     
         final HttpResult  result     = new HttpResult();
         HttpURLConnection connection = null;
 
@@ -146,9 +143,7 @@ public class BasicHttpConnector
 
             final int statusCode = connection.getResponseCode();
 
-            if (log.isDebugEnabled())
-                log.debug("Status : '" + statusCode + "', URL [" + aCompleteUrl + "]");
-
+        
             result.setSuccess(true);
             result.setStatusCode(statusCode);
 
@@ -162,12 +157,10 @@ public class BasicHttpConnector
         }
         catch (final Exception e)
         {
-            log.error("Exception while connecting to URL '" + aCompleteUrl + "'", e);
             HttpUtility.handleException(e, result, connection);
         }
 
-        if (log.isDebugEnabled())
-            log.debug("Result : '" + result + "', URL [" + aCompleteUrl + "]");
+     
 
         return result;
     }
