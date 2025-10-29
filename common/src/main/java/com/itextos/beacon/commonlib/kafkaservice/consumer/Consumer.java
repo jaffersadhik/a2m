@@ -107,19 +107,12 @@ public class Consumer
                 final int                               pollCount = records.count();
                 final long                              endTime   = System.currentTimeMillis();
 
-                if(pollCount>0) {
-                
-                	
-                	ConsumerDataLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
-
-                }
+               
                 
                 if (pollCount != 0)
                 {
-                    if (log.isDebugEnabled())
-                        log.debug(mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
-
-                    ConsumerDataLog.log(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
+                 
+                    log.debug(threadName+" : "+mLogTopicName + " Time taken " + (endTime - startTime) + " records " + pollCount);
                     mAreRecordsInProcess = false;
 
 
@@ -216,15 +209,15 @@ public class Consumer
 
     private void waitForAllMessagesToProcess()
     {
-        log.fatal("Is All inmemory processed " + (mConsumerInMemCollection.getInMemSize() == 0));
+        log.fatal(" : "+mLogTopicName +" Is All inmemory processed " + (mConsumerInMemCollection.getInMemSize() == 0));
 
         while (mConsumerInMemCollection.getInMemSize() > 0)
         {
-            log.fatal("Waiting for the messages to be processed from in memory. Messages count " + mConsumerInMemCollection.getInMemSize());
+            log.fatal(" : "+mLogTopicName +" Waiting for the messages to be processed from in memory. Messages count " + mConsumerInMemCollection.getInMemSize());
             CommonUtility.sleepForAWhile(10);
         }
 
-        log.fatal("AFTER WHILE Is All inmemory processed " + (mConsumerInMemCollection.getInMemSize() == 0));
+        log.fatal(" : "+mLogTopicName + " AFTER WHILE Is All inmemory processed " + (mConsumerInMemCollection.getInMemSize() == 0));
     }
 
     private void processRecords(
@@ -234,14 +227,11 @@ public class Consumer
 
         for (final ConsumerRecord<String, IMessage> messageFromKafka : aRecords)
         {
-            if (log.isDebugEnabled())
-                log.debug("Consumed \t" + mTopicName + "\t" + messageFromKafka.partition() + "\t" + messageFromKafka.offset());
 
             final IMessage message = messageFromKafka.value();
 
-            KafkaReceiver.getInstance(message.getNextComponent()).log(message.getNextComponent(),"Consumed \t" + mTopicName + "\t" + messageFromKafka.partition() + "\t" + messageFromKafka.offset());
+            log.debug("Consumed \t" + mTopicName + "\t" + messageFromKafka.partition() + "\t" + messageFromKafka.offset()+" \t sent to InmemoryQueue");
 
-            KafkaReceiver.getInstance(message.getNextComponent()).log(message.getNextComponent(),message.getJsonString());
             
             mConsumerInMemCollection.addMessage(message);
 
