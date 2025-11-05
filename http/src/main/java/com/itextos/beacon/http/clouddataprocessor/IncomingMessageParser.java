@@ -1,6 +1,6 @@
 package com.itextos.beacon.http.clouddataprocessor;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.itextos.beacon.commonlib.constants.exception.ItextosRuntimeException;
 import com.itextos.beacon.http.clouddatautil.common.RequestType;

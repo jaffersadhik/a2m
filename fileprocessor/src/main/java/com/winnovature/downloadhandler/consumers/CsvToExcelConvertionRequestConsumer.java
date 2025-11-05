@@ -3,7 +3,7 @@ package com.winnovature.downloadhandler.consumers;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 
 import com.winnovature.downloadhandler.singletons.DownloadHandlerPropertiesTon;
 import com.winnovature.downloadhandler.singletons.RedisConnectionTon;

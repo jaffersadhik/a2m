@@ -3,7 +3,7 @@ package com.itextos.beacon.platform.promokannelrediscleaner.process.redisprocess
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.google.gson.Gson;
 

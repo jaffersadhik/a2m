@@ -20,13 +20,16 @@ import org.apache.kafka.clients.consumer.ConsumerRecords;
 import org.apache.kafka.clients.consumer.KafkaConsumer;
 import org.apache.kafka.common.TopicPartition;
 import org.apache.kafka.common.errors.WakeupException;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.update.UpdateRequest;
-import org.elasticsearch.client.RequestOptions;
+import co.elastic.clients.elasticsearch.ElasticsearchClient;
+import co.elastic.clients.elasticsearch.core.BulkRequest;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.UpdateAction;
+import co.elastic.clients.json.jackson.JacksonJsonpMapper;
+import co.elastic.clients.transport.ElasticsearchTransport;
+import co.elastic.clients.transport.rest_client.RestClientTransport;
 import org.elasticsearch.client.RestClient;
 import org.elasticsearch.client.RestClientBuilder;
-import org.elasticsearch.client.RestHighLevelClient;
-import org.elasticsearch.common.xcontent.XContentType;
 import org.json.simple.JSONObject;
 
 import com.itextos.beacon.commonlib.message.IMessage;
@@ -43,91 +46,92 @@ public class Kafka2ESConsumerThread
         ConsumerRebalanceListener
 {
 
-    private static final K2ESLog                              log                     = K2ESLog.getInstance();
-    private static final K2ESDataLog                              logdata                     = K2ESDataLog.getInstance();
+    private static final K2ESLog log = K2ESLog.getInstance();
+    private static final K2ESDataLog logdata = K2ESDataLog.getInstance();
 
-    private final AtomicBoolean             stopped         = new AtomicBoolean(false);
+    private final AtomicBoolean stopped = new AtomicBoolean(false);
 
-    private KafkaConsumer<String, IMessage> TopicConsumer   = null;
-    private final String                    KafkaTopicName;
-    private final String                    KafkaConsumerGroupId;
+    private KafkaConsumer<String, IMessage> TopicConsumer = null;
+    private final String KafkaTopicName;
+    private final String KafkaConsumerGroupId;
 
-    public String                           ConsumerThreadName;
-    private final String                    ConsumerMode;
-    private final String                    ConsumerClientID;
-    private final AppConfiguration          AppConfig;
-    private final String                    ESIndexName;
-    private final String                    ESIndexUniqueColumn;
-    public final String                     ESFmsgIndexName;
-    public final String                     ESFmsgIndexUniqueColumn;
+    public String ConsumerThreadName;
+    private final String ConsumerMode;
+    private final String ConsumerClientID;
+    private final AppConfiguration AppConfig;
+    private final String ESIndexName;
+    private final String ESIndexUniqueColumn;
+    public final String ESFmsgIndexName;
+    public final String ESFmsgIndexUniqueColumn;
 
-    private final int                       ESRetryConflictCount;
+    private final int ESRetryConflictCount;
 
-    private RestHighLevelClient             ESClient        = null;
-    private BulkRequest                     bulkRequest     = null;
-    private BulkRequest                     fmsgBulkRequest = null;
+    private ElasticsearchClient ESClient = null;
+    private RestClient restClient = null;
+    private List<BulkOperation> bulkOperations = null;
+    private List<BulkOperation> fmsgBulkOperations = null;
 
-    private final int                       IdleFlushTime;
-    private final int                       FlushLimit;
-    private final int                       LogProcLimit;
+    private final int IdleFlushTime;
+    private final int FlushLimit;
+    private final int LogProcLimit;
 
-    private long                            IdleTimeMS      = 0L;
-    private int                             BatchCount      = 0;
-    private int                             ProcCount       = 0;
-    private int                             LogProcCount    = 0;
+    private long IdleTimeMS = 0L;
+    private int BatchCount = 0;
+    private int ProcCount = 0;
+    private int LogProcCount = 0;
 
     public Kafka2ESConsumerThread(
-            String pThreadName,String tpoicgroupname,String topicname)
-    {
+            String pThreadName, String tpoicgroupname, String topicname) {
         this.setName(pThreadName);
-        ConsumerThreadName           = pThreadName;
-        this.ConsumerMode            = "deliveries";
-        this.AppConfig               = StartApplicationDelivery.AppConfig;
-        this.ESIndexName             = StartApplicationDelivery.ESIndexName;
-        this.ESIndexUniqueColumn     = StartApplicationDelivery.ESIndexUniqueColumn;
-        this.ESFmsgIndexName         = StartApplicationDelivery.ESFmsgIndexName;
+        ConsumerThreadName = pThreadName;
+        this.ConsumerMode = "deliveries";
+        this.AppConfig = StartApplicationDelivery.AppConfig;
+        this.ESIndexName = StartApplicationDelivery.ESIndexName;
+        this.ESIndexUniqueColumn = StartApplicationDelivery.ESIndexUniqueColumn;
+        this.ESFmsgIndexName = StartApplicationDelivery.ESFmsgIndexName;
         this.ESFmsgIndexUniqueColumn = StartApplicationDelivery.ESFmsgIndexUniqueColumn;
-        this.KafkaTopicName          = topicname;
-        this.KafkaConsumerGroupId    = tpoicgroupname;
-        this.ESRetryConflictCount    = this.AppConfig.getInt("es.update.retry.count");
-        this.FlushLimit              = this.AppConfig.getInt("es.index.flush.limit");
-        this.IdleFlushTime           = this.AppConfig.getInt("consumer.idle.flushtime.ms");
-        this.LogProcLimit            = this.AppConfig.getInt("consumer.log.proc.limit");
+        this.KafkaTopicName = topicname;
+        this.KafkaConsumerGroupId = tpoicgroupname;
+        this.ESRetryConflictCount = this.AppConfig.getInt("es.update.retry.count");
+        this.FlushLimit = this.AppConfig.getInt("es.index.flush.limit");
+        this.IdleFlushTime = this.AppConfig.getInt("consumer.idle.flushtime.ms");
+        this.LogProcLimit = this.AppConfig.getInt("consumer.log.proc.limit");
 
-        ConsumerClientID             = StartApplicationDelivery.HostIPAddr + ":"
+        ConsumerClientID = StartApplicationDelivery.HostIPAddr + ":"
                 + StartApplicationDelivery.AppProcID + ":"
                 + pThreadName;
     }
 
-    RestHighLevelClient esConnect()
-    {
-        final String         ESHosts         = this.AppConfig.getString("es.servers");
-        final String[]       ESHSplit        = ESHosts.split("[,]");
-        final int            ESConnecTimeOut = this.AppConfig.getInt("es.connection.timeout");
-        final int            ESSocketTimeout = this.AppConfig.getInt("es.socket.timeout");
+    ElasticsearchClient esConnect() {
+        final String ESHosts = this.AppConfig.getString("es.servers");
+        final String[] ESHSplit = ESHosts.split("[,]");
+        final int ESConnecTimeOut = this.AppConfig.getInt("es.connection.timeout");
+        final int ESSocketTimeout = this.AppConfig.getInt("es.socket.timeout");
 
-        final List<HttpHost> httpHosts       = Arrays.stream(ESHSplit)
+        final List<HttpHost> httpHosts = Arrays.stream(ESHSplit)
                 .map(s -> s.split("[:]"))
                 .map(strings -> new HttpHost(strings[0], Integer.valueOf(strings[1])))
                 .collect(Collectors.toList());
 
         log.info("Connecting to ElasticSearch Nodes: " + httpHosts.toString());
 
-        final RestClientBuilder   builder    = RestClient.builder(
+        final RestClientBuilder builder = RestClient.builder(
                 httpHosts.toArray(new HttpHost[httpHosts.size()]))
                 .setRequestConfigCallback(
                         requestConfigBuilder -> requestConfigBuilder
                                 .setConnectTimeout(ESConnecTimeOut)
                                 .setSocketTimeout(ESSocketTimeout));
-        final RestHighLevelClient restClient = new RestHighLevelClient(builder);
+        
+        this.restClient = builder.build();
+        ElasticsearchTransport transport = new RestClientTransport(restClient, new JacksonJsonpMapper());
+        ElasticsearchClient esClient = new ElasticsearchClient(transport);
 
-        return restClient;
+        return esClient;
     }
 
-    KafkaConsumer<String, IMessage> kafkaConnect()
-    {
+    KafkaConsumer<String, IMessage> kafkaConnect() {
         final Properties ConsumerProps = new Properties();
-        final String     KafkaServers  = this.AppConfig.getString("kafka.bootstrap.servers");
+        final String KafkaServers = this.AppConfig.getString("kafka.bootstrap.servers");
         ConsumerProps.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, KafkaServers);
         ConsumerProps.put(ConsumerConfig.GROUP_ID_CONFIG, this.KafkaConsumerGroupId);
         ConsumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, this.AppConfig.getString("kafka.key.deserializer"));
@@ -145,32 +149,28 @@ public class Kafka2ESConsumerThread
 
     private void processData(
             ConsumerRecords<String, IMessage> pDataList)
-            throws Exception
-    {
+            throws Exception {
 
-        for (final ConsumerRecord<String, IMessage> data : pDataList)
-        {
-            final IMessage iMsg     = data.value();
-            JSONObject     dataJSON = null;
+        for (final ConsumerRecord<String, IMessage> data : pDataList) {
+            final IMessage iMsg = data.value();
+            final JSONObject dataJSON; // Declare as final
 
-            try
-            {
+            try {
                 if (this.ConsumerMode.equals(Kafka2ESConstants.subMode))
                     dataJSON = Kafka2ESJSONUtil.buildSubJSON(iMsg);
+                else if (this.ConsumerMode.equals(Kafka2ESConstants.delMode))
+                    dataJSON = Kafka2ESJSONUtil.buildDelJSON(iMsg);
                 else
-                    if (this.ConsumerMode.equals(Kafka2ESConstants.delMode))
-                        dataJSON = Kafka2ESJSONUtil.buildDelJSON(iMsg);
-            }
-            catch (final Exception ex)
-            {
+                    dataJSON = null; // Initialize in all paths
+            } catch (final Exception ex) {
                 log.error("Error while processing Message Object", ex);
                 ex.printStackTrace(System.err);
                 if (log.isDebugEnabled())
                     log.debug(iMsg.toString());
+                continue; // Skip to next iteration if exception occurs
             }
 
-            if (dataJSON == null)
-            {
+            if (dataJSON == null) {
                 log.error("Unable to build JSON Object from Message Object");
 
                 if (log.isDebugEnabled())
@@ -179,38 +179,54 @@ public class Kafka2ESConsumerThread
                 continue;
             }
 
-            final String        msgId         = CommonUtility.nullCheck(dataJSON.get(this.ESIndexUniqueColumn), true);
-            final UpdateRequest updateRequest = new UpdateRequest(this.ESIndexName, msgId)
-                    .doc(dataJSON.toJSONString(), XContentType.JSON)
-                    .docAsUpsert(true);
-            updateRequest.retryOnConflict(ESRetryConflictCount);
-            bulkRequest.add(updateRequest);
+            final String msgId = CommonUtility.nullCheck(dataJSON.get(this.ESIndexUniqueColumn), true);
+            
+            // Create update operation for main index
+            // dataJSON is now effectively final and can be used in lambda
+            BulkOperation updateOp = BulkOperation.of(b -> b
+                .update(u -> u
+                    .index(this.ESIndexName)
+                    .id(msgId)
+                    .action(a -> a
+                        .docAsUpsert(true)
+                        .doc(convertJSONObjectToMap(dataJSON)) // dataJSON is effectively final
+                    )
+                    .retryOnConflict(ESRetryConflictCount)
+                )
+            );
+            bulkOperations.add(updateOp);
 
             final String baseMsgId = CommonUtility.nullCheck(dataJSON.get(this.ESFmsgIndexUniqueColumn), true);
 
-            if (!"".equals(baseMsgId))
-            {
-                JSONObject fmsgJSON = null;
+            if (!"".equals(baseMsgId)) {
+                final JSONObject fmsgJSON; // Declare as final
                 if (this.ConsumerMode.equals(Kafka2ESConstants.subMode))
                     fmsgJSON = Kafka2ESJSONUtil.buildSubFMSGJSON(dataJSON, baseMsgId);
+                else if (this.ConsumerMode.equals(Kafka2ESConstants.delMode))
+                    fmsgJSON = Kafka2ESJSONUtil.buildDelFMSGJSON(dataJSON, baseMsgId);
                 else
-                    if (this.ConsumerMode.equals(Kafka2ESConstants.delMode))
-                        fmsgJSON = Kafka2ESJSONUtil.buildDelFMSGJSON(dataJSON, baseMsgId);
+                    fmsgJSON = null;
 
-                if (fmsgJSON != null)
-                {
-                    final UpdateRequest fmsgupdateRequest = new UpdateRequest(this.ESFmsgIndexName, baseMsgId)
-                            .doc(fmsgJSON.toJSONString(), XContentType.JSON)
-                            .docAsUpsert(true);
-                    fmsgupdateRequest.retryOnConflict(ESRetryConflictCount);
-                    fmsgBulkRequest.add(fmsgupdateRequest);
+                if (fmsgJSON != null) {
+                    // Create update operation for full message index
+                    BulkOperation fmsgUpdateOp = BulkOperation.of(b -> b
+                        .update(u -> u
+                            .index(this.ESFmsgIndexName)
+                            .id(baseMsgId)
+                            .action(a -> a
+                                .docAsUpsert(true)
+                                .doc(convertJSONObjectToMap(fmsgJSON)) // fmsgJSON is effectively final
+                            )
+                            .retryOnConflict(ESRetryConflictCount)
+                        )
+                    );
+                    fmsgBulkOperations.add(fmsgUpdateOp);
                 }
             }
 
             BatchCount++;
 
-            if (BatchCount == FlushLimit)
-            {
+            if (BatchCount == FlushLimit) {
                 if (log.isDebugEnabled())
                     log.debug("Batch Count: " + BatchCount + ", Flusing Data...");
 
@@ -219,12 +235,18 @@ public class Kafka2ESConsumerThread
         }
     }
 
-    private void writeData()
-            throws Exception
-    {
+    /**
+     * Convert JSONObject to Map for Elasticsearch client compatibility
+     */
+    @SuppressWarnings("unchecked")
+    private java.util.Map<String, Object> convertJSONObjectToMap(JSONObject jsonObject) {
+        return new java.util.HashMap<String, Object>(jsonObject);
+    }
 
-        if (BatchCount == 0)
-        {
+    private void writeData()
+            throws Exception {
+
+        if (BatchCount == 0) {
             if (log.isDebugEnabled())
                 log.debug("BulkRequest is empty");
             return;
@@ -233,19 +255,16 @@ public class Kafka2ESConsumerThread
         if (log.isDebugEnabled())
             log.debug("Executing ES BulkAsync ...");
 
-        // ESClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-        final ESBulkAsyncListener bal = new ESBulkAsyncListener(bulkRequest, false);
-        ESClient.bulkAsync(bulkRequest, RequestOptions.DEFAULT, bal);
-        bulkRequest = new BulkRequest();
+        // Execute bulk operations for main index
+        if (!bulkOperations.isEmpty()) {
+            BulkRequest bulkRequest = BulkRequest.of(b -> b.operations(bulkOperations));
+            ESClient.bulk(bulkRequest);
+        }
 
-        if (fmsgBulkRequest.requests().size() > 0)
-        {
-            if (log.isDebugEnabled())
-                log.debug("Executing ES BulkAsync for Full Message Info...");
-            // ESClient.bulk(bulkRequest, RequestOptions.DEFAULT);
-            final ESBulkAsyncListener balFmsg = new ESBulkAsyncListener(fmsgBulkRequest, true);
-            ESClient.bulkAsync(fmsgBulkRequest, RequestOptions.DEFAULT, balFmsg);
-            fmsgBulkRequest = new BulkRequest();
+        // Execute bulk operations for full message index
+        if (!fmsgBulkOperations.isEmpty()) {
+            BulkRequest fmsgBulkRequest = BulkRequest.of(b -> b.operations(fmsgBulkOperations));
+            ESClient.bulk(fmsgBulkRequest);
         }
 
         if (log.isDebugEnabled())
@@ -258,26 +277,25 @@ public class Kafka2ESConsumerThread
 
         if (log.isDebugEnabled())
             log.debug(ProcCount + " records procesed");
-        else
-        {
+        else {
             LogProcCount += BatchCount;
 
-            if (LogProcCount >= LogProcLimit)
-            {
+            if (LogProcCount >= LogProcLimit) {
                 log.info(ProcCount + " records procesed");
                 LogProcCount = 0;
             }
         }
 
+        // Reset bulk operations
+        bulkOperations.clear();
+        fmsgBulkOperations.clear();
         BatchCount = 0;
     }
 
     @Override
-    public void run()
-    {
+    public void run() {
 
-        try
-        {
+        try {
             log.info("Consumer Thread started");
             log.info("Connecting to ElaticSearch...");
             ESClient = esConnect();
@@ -286,22 +304,20 @@ public class Kafka2ESConsumerThread
             log.info("subscribing topic: " + this.KafkaTopicName);
             TopicConsumer.subscribe(Collections.singleton(this.KafkaTopicName), this);
 
-            final int PollMS    = this.AppConfig.getInt("consumer.poll.ms");
+            final int PollMS = this.AppConfig.getInt("consumer.poll.ms");
             final int PollDelay = this.AppConfig.getInt("consumer.poll.delay.ms");
 
             log.info("polling topic");
 
-            bulkRequest     = new BulkRequest();
-            fmsgBulkRequest = new BulkRequest();
+            bulkOperations = new java.util.ArrayList<>();
+            fmsgBulkOperations = new java.util.ArrayList<>();
 
-            IdleTimeMS      = DateTimeUtility.getCurrentTimeInMillis();
+            IdleTimeMS = DateTimeUtility.getCurrentTimeInMillis();
 
-            while (!stopped.get())
-            {
+            while (!stopped.get()) {
 
                 if ((BatchCount > 0) &&
-                        ((DateTimeUtility.getCurrentTimeInMillis() - IdleTimeMS) >= IdleFlushTime))
-                {
+                        ((DateTimeUtility.getCurrentTimeInMillis() - IdleTimeMS) >= IdleFlushTime)) {
                     if (log.isDebugEnabled())
                         log.debug("Idle Time threshold has exceeded, Flushing data, Batch Count: " + BatchCount);
 
@@ -312,16 +328,14 @@ public class Kafka2ESConsumerThread
                 final ConsumerRecords<String, IMessage> pollRecords = TopicConsumer.poll(
                         Duration.of(PollMS, ChronoUnit.MILLIS));
 
-                final int                               pollCount   = pollRecords.count();
+                final int pollCount = pollRecords.count();
 
                 if(pollCount==0) {
                     log.debug(" KafkaTopicName : "+ KafkaTopicName +" : Poll Count: " + pollCount);
                 }else {
                     logdata.debug(" KafkaTopicName : "+ KafkaTopicName +" : Poll Count: " + pollCount);
-
                 }
-                if (pollCount == 0)
-                {
+                if (pollCount == 0) {
                     CommonUtility.sleepForAWhile(PollDelay);
                     continue;
                 }
@@ -329,36 +343,33 @@ public class Kafka2ESConsumerThread
                 processData(pollRecords);
                 IdleTimeMS = DateTimeUtility.getCurrentTimeInMillis();
             }
-        }
-        catch (final WakeupException we)
-        {
+        } catch (final WakeupException we) {
 
             // Ignore exception if closing
-            if (!this.stopped.get())
-            {
+            if (!this.stopped.get()) {
                 if (log.isDebugEnabled())
                     log.debug("Stop Flag is already set in the WakeupException");
                 throw we;
             }
-        }
-        catch (final Exception ex)
-        {
+        } catch (final Exception ex) {
             log.error(ex.getMessage(), ex);
             ex.printStackTrace(System.err);
-        }
-        finally
-        {
+        } finally {
 
-            try
-            {
+            try {
                 if (!this.stopped.get())
                     this.stopped.set(true);
 
                 if (BatchCount > 0)
                     writeData();
 
-                if (ESClient != null)
-                    ESClient.close();
+                if (ESClient != null) {
+                    try {
+                        restClient.close();
+                    } catch (Exception e) {
+                        log.error("Error closing Elasticsearch client", e);
+                    }
+                }
 
                 if (TopicConsumer != null)
                     TopicConsumer.close();
@@ -367,27 +378,22 @@ public class Kafka2ESConsumerThread
                 log.info("Consumer Thread stopped");
                 StartApplicationDelivery.logMsg("Total records processed: " + ProcCount);
                 StartApplicationDelivery.logMsg("Consumer Thread stopped");
-            }
-            catch (final Exception ex2)
-            {
+            } catch (final Exception ex2) {
                 log.error(ex2.getMessage(), ex2);
                 ex2.printStackTrace(System.err);
             }
         }
     }
 
-    public String getConsumerThreadName()
-    {
+    public String getConsumerThreadName() {
         return this.ConsumerThreadName;
     }
 
-    public boolean isConsumerStopped()
-    {
+    public boolean isConsumerStopped() {
         return stopped.get();
     }
 
-    public void stopConsumer()
-    {
+    public void stopConsumer() {
         if (stopped.get())
             return;
         stopped.set(true);
@@ -399,16 +405,13 @@ public class Kafka2ESConsumerThread
 
     @Override
     public void onPartitionsRevoked(
-            Collection<TopicPartition> partitions)
-    {
+            Collection<TopicPartition> partitions) {
         log.info("Partitions revoked: " + partitions);
     }
 
     @Override
     public void onPartitionsAssigned(
-            Collection<TopicPartition> partitions)
-    {
+            Collection<TopicPartition> partitions) {
         log.info("Partitions assigned: " + partitions);
     }
-
 }

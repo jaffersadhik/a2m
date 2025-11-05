@@ -1,8 +1,8 @@
 package com.winnovature.cronjobs.singletons;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -52,9 +52,9 @@ public class CronJobsPropertiesTon {
 			if (StringUtils.isNotBlank(propertyFilePath)) {
 				if (log.isDebugEnabled())
 					log.debug(className + methodName + " Properties file - " + propertyFilePath);
-				propConf = new PropertiesConfiguration(propertyFilePath);
-				propConf.setReloadingStrategy(new FileChangedReloadingStrategy());
-			} else {
+				Configurations configs = new Configurations();
+			    propConf = configs.properties(propertyFilePath);		
+			    } else {
 				throw new Exception("****** ERROR: EITHER IT COULD NOT FIND " + propertyFilePath
 						+ " PROPERTY OR HAVE NO VALUES ****");
 			}

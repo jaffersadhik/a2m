@@ -156,4 +156,4 @@ COPY ./target/profile/digitalocean3/req_receiver.properties_do3 /req_receiver.pr
 
 COPY ./target/mainmodule-1.0-executable.jar /mainmodule-1.0-executable.jar
 
-ENTRYPOINT ["java","-Dcommon.property.file.location=/global.properties","-Dkafka.2.elasticsearch.config.file=/kafka2es.properties","-Dlog4j.configurationFile=file:/log4j2-common.xml","-jar","/mainmodule-1.0-executable.jar"]
+ENTRYPOINT ["java","--enable-preview","-XX:ActiveProcessorCount=4","-Djava.util.concurrent.ForkJoinPool.common.parallelism=100","-Dspring.threads.virtual.enabled=true","-Djdk.virtualThreadScheduler.parallelism=200","-Djdk.virtualThreadScheduler.maxPoolSize=256","-Djdk.virtualThreadScheduler.minRunnable=1","-Djdk.tracePinnedThreads=true","-Dcommon.property.file.location=/global.properties","-Dkafka.2.elasticsearch.config.file=/kafka2es.properties","-Dlog4j.configurationFile=file:/log4j2-common.xml","-jar","/mainmodule-1.0-executable.jar"]

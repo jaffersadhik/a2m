@@ -4,7 +4,7 @@ import java.util.List;
 import java.util.StringJoiner;
 import java.util.regex.Pattern;
 
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang3.StringUtils;
 
 import com.itextos.beacon.commonlib.utility.CommonUtility;
 import com.itextos.beacon.platform.templatefinder.Result;

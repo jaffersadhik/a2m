@@ -1,5 +1,6 @@
 package com.itextos.beacon.commonlib.commonpropertyloader;
 
+import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.EnumMap;
@@ -8,9 +9,11 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.configuration2.reloading.PeriodicReloadingTrigger;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 
@@ -64,9 +67,11 @@ public class PropertyLoader
 
         try
         {
-            mCommonConfiguration = new PropertiesConfiguration(commonPropertiesLocation);
-            mCommonConfiguration.setReloadingStrategy(new FileChangedReloadingStrategy());
-
+        	Configurations configs = new Configurations();
+            mCommonConfiguration = configs.properties(commonPropertiesLocation);
+            
+            // Set up automatic reloading
+          
             if (log.isDebugEnabled())
                 log.debug("Loading Global Properties completed.");
         }
@@ -167,8 +172,10 @@ public class PropertyLoader
             	propertiesPath+="_"+System.getenv("profile");
             }
             
-            final PropertiesConfiguration propConfiguration = new PropertiesConfiguration(propertiesPath);
-            propConfiguration.setReloadingStrategy(new FileChangedReloadingStrategy());
+            final PropertiesConfiguration propConfiguration ;
+            
+            Configurations configs = new Configurations();
+            propConfiguration = configs.properties(propertiesPath);
             mPropertiesConfigMap.put(aPropertiesKey, propConfiguration);
 
             if (log.isDebugEnabled())

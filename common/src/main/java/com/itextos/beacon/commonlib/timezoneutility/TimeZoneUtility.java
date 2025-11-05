@@ -3,7 +3,7 @@ package com.itextos.beacon.commonlib.timezoneutility;
 import java.util.Date;
 import java.util.TimeZone;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 

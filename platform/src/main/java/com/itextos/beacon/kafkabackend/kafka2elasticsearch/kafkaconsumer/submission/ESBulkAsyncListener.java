@@ -1,71 +1,100 @@
 package com.itextos.beacon.kafkabackend.kafka2elasticsearch.kafkaconsumer.submission;
 
-import org.elasticsearch.action.ActionListener;
-import org.elasticsearch.action.DocWriteRequest;
-import org.elasticsearch.action.bulk.BulkItemResponse;
-import org.elasticsearch.action.bulk.BulkRequest;
-import org.elasticsearch.action.bulk.BulkResponse;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import co.elastic.clients.elasticsearch.core.BulkResponse;
+import co.elastic.clients.elasticsearch.core.bulk.BulkOperation;
+import co.elastic.clients.elasticsearch.core.bulk.BulkResponseItem;
 
 import com.itextos.beacon.errorlog.K2ESLog;
 
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.BiConsumer;
+
 public class ESBulkAsyncListener
         implements
-        ActionListener<BulkResponse>
+        BiConsumer<BulkResponse, Throwable>
 {
 
-    private static final K2ESLog                              log                     = K2ESLog.getInstance();
-    protected BulkRequest    bRequest;
-    protected boolean        isFullMsg = false;
+    private static final K2ESLog log = K2ESLog.getInstance();
+    protected List<BulkOperation> bulkOperations;
+    protected boolean isFullMsg = false;
 
     public ESBulkAsyncListener(
-            BulkRequest aRequest,
+            List<BulkOperation> operations,
             boolean aIsFullMsg)
     {
-        bRequest  = aRequest;
+        bulkOperations = operations;
         isFullMsg = aIsFullMsg;
     }
 
     @Override
-    public void onResponse(
-            BulkResponse aResponse)
-    {
+    public void accept(BulkResponse bulkResponse, Throwable throwable) {
+        if (throwable != null) {
+            // Handle overall failure
+            onFailure(throwable);
+            return;
+        }
+        
+        if (bulkResponse != null) {
+            onResponse(bulkResponse);
+        }
+    }
 
-        if (aResponse.hasFailures())
-        {
-            final BulkItemResponse biResponses[] = aResponse.getItems();
+    public void onResponse(BulkResponse aResponse) {
+        if (aResponse.errors()) {
+            final List<BulkResponseItem> items = aResponse.items();
 
-            for (int rIdx = 0; rIdx < biResponses.length; rIdx++)
-            {
-                final BulkItemResponse response = biResponses[rIdx];
+            for (int rIdx = 0; rIdx < items.size(); rIdx++) {
+                final BulkResponseItem response = items.get(rIdx);
 
-                if (response.isFailed())
-                {
-                    final BulkItemResponse.Failure failure = response.getFailure();
-                    final DocWriteRequest          req     = bRequest.requests().get(rIdx);
-                    final String                   reqId   = req.id();
+                if (response.error() != null) {
+                    final String errorType = response.error().type();
+                    final String errorReason = response.error().reason();
+                    final String operationId = response.id() != null ? response.id() : "unknown";
+                    final String indexName = response.index() != null ? response.index() : "unknown";
 
-                    if (isFullMsg)
-                    {
-                        log.error("FullMsg, Failed to Index[" + reqId + "]: " + req.toString());
-                        log.error("FullMsg, Failure Message[" + reqId + "]: " + failure.getMessage());
-                        log.error("FullMsg, Exception[" + reqId + "]: ", failure.getCause());
-                    }
-                    else
-                    {
-                        log.error("Failed to Index[" + reqId + "]: " + req.toString());
-                        log.error("Failure Message[" + reqId + "]: " + failure.getMessage());
-                        log.error("Exception[" + reqId + "]: ", failure.getCause());
+                    if (isFullMsg) {
+                        log.error("FullMsg, Failed to Index[" + operationId + "] in index[" + indexName + "]: " + 
+                                 "Type: " + errorType + ", Reason: " + errorReason);
+                        
+                        if (log.isDebugEnabled()) {
+                            final BulkOperation operation = rIdx < bulkOperations.size() ? bulkOperations.get(rIdx) : null;
+                            log.debug("FullMsg, Operation[" + operationId + "]: " + (operation != null ? operation.toString() : "unknown"));
+                        }
+                    } else {
+                        log.error("Failed to Index[" + operationId + "] in index[" + indexName + "]: " + 
+                                 "Type: " + errorType + ", Reason: " + errorReason);
+                        
+                        if (log.isDebugEnabled()) {
+                            final BulkOperation operation = rIdx < bulkOperations.size() ? bulkOperations.get(rIdx) : null;
+                            log.debug("Operation[" + operationId + "]: " + (operation != null ? operation.toString() : "unknown"));
+                        }
                     }
                 }
+            }
+        } else {
+            if (log.isDebugEnabled()) {
+                log.debug("Bulk operation completed successfully for " + 
+                         (isFullMsg ? "full message index" : "main index"));
             }
         }
     }
 
-    @Override
-    public void onFailure(
-            Exception aException)
-    {
-        log.error(aException.getMessage(), aException);
+    public void onFailure(Throwable aException) {
+        log.error("Bulk operation failed for " + 
+                 (isFullMsg ? "full message index: " : "main index: ") + 
+                 aException.getMessage(), aException);
     }
 
+    // Alternative method for use with CompletableFuture
+    public static CompletableFuture<BulkResponse> processAsync(
+            CompletableFuture<BulkResponse> future,
+            List<BulkOperation> operations,
+            boolean isFullMsg) {
+        
+        ESBulkAsyncListener listener = new ESBulkAsyncListener(operations, isFullMsg);
+        return future.whenComplete(listener);
+    }
 }

@@ -3,8 +3,8 @@ package com.winnovature.dltfileprocessor.servlets;
 import java.util.Iterator;
 import java.util.List;
 
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.lang3.StringUtils;
 
 import com.itextos.beacon.commonlib.utility.tp.VirtualThreadStartup;
 import com.winnovature.dltfileprocessor.consumers.DltFileQConsumer;

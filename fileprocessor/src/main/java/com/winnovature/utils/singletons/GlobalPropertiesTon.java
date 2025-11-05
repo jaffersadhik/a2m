@@ -1,13 +1,12 @@
 package com.winnovature.utils.singletons;
 
-import org.apache.commons.configuration.Configuration;
-import org.apache.commons.configuration.PropertiesConfiguration;
-import org.apache.commons.configuration.SystemConfiguration;
-import org.apache.commons.configuration.reloading.FileChangedReloadingStrategy;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.configuration2.Configuration;
+import org.apache.commons.configuration2.PropertiesConfiguration;
+import org.apache.commons.configuration2.SystemConfiguration;
+import org.apache.commons.configuration2.builder.fluent.Configurations;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-
 
 import com.winnovature.utils.utils.Constants;
 
@@ -36,9 +35,10 @@ public class GlobalPropertiesTon {
 				log.debug("Global Property File Location - " + globalPropertiesLocation);
 
 			/** Load the properties * */
-			globalConfiguration = new PropertiesConfiguration(globalPropertiesLocation);
-			globalConfiguration.setReloadingStrategy(new FileChangedReloadingStrategy());
-			if (log.isDebugEnabled())
+			 Configurations configs = new Configurations();
+			 globalConfiguration = configs.properties(globalPropertiesLocation);
+			 
+			    if (log.isDebugEnabled())
 				log.debug("GLOBAL PROPERTIES LOADED....");
 		} else {
 			throw new Exception("[GlobalPropertiesTon] COULD NOT LOCATE -Dglobal.properties.loc PARAMETER");
