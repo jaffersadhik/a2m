@@ -5,26 +5,25 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.drools.KnowledgeBase;
-import org.drools.KnowledgeBaseFactory;
-import org.drools.builder.KnowledgeBuilder;
-import org.drools.builder.KnowledgeBuilderError;
-import org.drools.builder.KnowledgeBuilderErrors;
-import org.drools.builder.KnowledgeBuilderFactory;
-import org.drools.builder.ResourceType;
-import org.drools.io.ResourceFactory;
-import org.drools.runtime.StatefulKnowledgeSession;
+import org.kie.api.KieBase;
+import org.kie.api.KieServices;
+import org.kie.api.builder.KieBuilder;
+import org.kie.api.builder.KieFileSystem;
+import org.kie.api.builder.KieRepository;
+import org.kie.api.builder.Message;
+import org.kie.api.builder.Results;
+import org.kie.api.io.Resource;
+import org.kie.api.io.ResourceType;
+import org.kie.api.runtime.KieContainer;
+import org.kie.api.runtime.KieSession;
 
 public class DroolsValidator
 {
-
     private static final Log log = LogFactory.getLog(DroolsValidator.class);
 
     private static class SingletonHolder
     {
-
         static final DroolsValidator INSTANCE = new DroolsValidator();
-
     }
 
     public static DroolsValidator getInstance()
@@ -32,40 +31,35 @@ public class DroolsValidator
         return SingletonHolder.INSTANCE;
     }
 
-    private final Map<String, KnowledgeBase> knowledgeBaseMap = new HashMap<>();
+    private final Map<String, KieBase> kieBaseMap = new HashMap<>();
+    private final KieServices kieServices = KieServices.Factory.get();
 
-    public boolean validate(
-            String aFilePath,
-            String aValue)
+    public boolean validate(String aFilePath, String aValue)
     {
-        final KnowledgeBase kbase = knowledgeBaseMap.computeIfAbsent(aFilePath, k -> getKnowledgeBase(aFilePath));
+        final KieBase kieBase = kieBaseMap.computeIfAbsent(aFilePath, k -> getKieBase(aFilePath));
 
-        if (kbase == null)
+        if (kieBase == null)
             return false;
 
         final Response response = new Response(aValue);
-        createSession(kbase, response);
+        createSession(kieBase, response);
         return response.isValidated();
     }
 
-    private static void createSession(
-            KnowledgeBase aKbase,
-            Response aResponse)
+    private static void createSession(KieBase aKieBase, Response aResponse)
     {
-        final StatefulKnowledgeSession ksession = aKbase.newStatefulKnowledgeSession();
+        final KieSession ksession = aKieBase.newKieSession();
 
         ksession.insert(aResponse);
         ksession.fireAllRules();
         ksession.dispose();
     }
 
-    private static KnowledgeBase getKnowledgeBase(
-            String aFilePath)
+    private KieBase getKieBase(String aFilePath)
     {
-
         try
         {
-            return readKnowledgeBase(aFilePath);
+            return readKieBase(aFilePath);
         }
         catch (final Exception e)
         {
@@ -74,25 +68,32 @@ public class DroolsValidator
         return null;
     }
 
-    private static KnowledgeBase readKnowledgeBase(
-            String aFilePath)
+    private KieBase readKieBase(String aFilePath)
     {
-        final KnowledgeBuilder kbuilder = KnowledgeBuilderFactory.newKnowledgeBuilder();
-        kbuilder.add(ResourceFactory.newFileResource(aFilePath), ResourceType.DRL);
+        // Read the DRL file as a resource
+        Resource resource = kieServices.getResources().newFileSystemResource(aFilePath)
+                .setResourceType(ResourceType.DRL);
 
-        final KnowledgeBuilderErrors errors = kbuilder.getErrors();
+        // Create KieFileSystem and add resource
+        KieFileSystem kfs = kieServices.newKieFileSystem();
+        kfs.write("src/main/resources/rules.drl", resource);
 
-        if (!errors.isEmpty())
+        // Build the KieModule
+        KieBuilder kieBuilder = kieServices.newKieBuilder(kfs).buildAll();
+
+        Results results = kieBuilder.getResults();
+        if (results.hasMessages(Message.Level.ERROR))
         {
-            for (final KnowledgeBuilderError error : errors)
-                log.error("Drools file : '" + aFilePath + "' Error : '" + error + "'");
-
+            for (Message message : results.getMessages(Message.Level.ERROR))
+            {
+                log.error("Drools file : '" + aFilePath + "' Error : '" + message.getText() + "'");
+            }
             throw new IllegalArgumentException("Could not parse knowledge.");
         }
 
-        final KnowledgeBase kbase = KnowledgeBaseFactory.newKnowledgeBase();
-        kbase.addKnowledgePackages(kbuilder.getKnowledgePackages());
-        return kbase;
+        // Get KieContainer and KieBase
+        KieRepository kieRepository = kieServices.getRepository();
+        KieContainer kieContainer = kieServices.newKieContainer(kieRepository.getDefaultReleaseId());
+        return kieContainer.getKieBase();
     }
-
 }

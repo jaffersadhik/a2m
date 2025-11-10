@@ -5,10 +5,6 @@ import java.util.Properties;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 
 import com.itextos.beacon.queryprocessor.databaseconnector.ConnectionPoolSingleton;
 

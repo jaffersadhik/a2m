@@ -1,6 +1,6 @@
 package com.itextos.beacon.interfaces.generichttpapi.processor.response;
 
-import javax.xml.bind.JAXBException;
+import jakarta.xml.bind.JAXBException;
 
 import com.itextos.beacon.http.generichttpapi.common.data.response.ResponseObject;
 import com.itextos.beacon.http.generichttpapi.common.utils.Utility;

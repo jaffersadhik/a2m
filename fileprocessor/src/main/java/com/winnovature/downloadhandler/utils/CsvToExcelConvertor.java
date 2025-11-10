@@ -23,223 +23,251 @@ import com.winnovature.downloadhandler.daos.DownloadReqDAO;
 import com.winnovature.logger.LogDonwloadLog;
 import com.winnovature.utils.utils.JsonUtility;
 
-import au.com.bytecode.opencsv.CSVReader;
+// Updated OpenCSV imports
+import com.opencsv.CSVReader;
+import com.opencsv.CSVReaderBuilder;
+import com.opencsv.exceptions.CsvException;
 import redis.clients.jedis.Jedis;
 
 public class CsvToExcelConvertor {
 
-	static LogDonwloadLog log =LogDonwloadLog.getInstance();
-//	static Log log = LogFactory.getLog(Constants.DownloadHandlerLogger);
-	private static final String className = "CsvToExcelConvertor";
+    static LogDonwloadLog log = LogDonwloadLog.getInstance();
+    private static final String className = "CsvToExcelConvertor";
 
-	int filesCount = 0;
-	int writtenRowsCount = 0;
-	int totalWrittenRowsCount = 0;
-	int rowsPerFile = 0;
+    int filesCount = 0;
+    int writtenRowsCount = 0;
+    int totalWrittenRowsCount = 0;
+    int rowsPerFile = 0;
 
-	public void process(Map<String, String> downloadReq) throws Exception {
-		String logname = className + " [process] ";
-		String zipFile = null;
-		List<String> excelFiles = null;
+    public void process(Map<String, String> downloadReq) throws Exception {
+        String logname = className + " [process] ";
+        String zipFile = null;
+        List<String> excelFiles = null;
 
-		if (log.isDebugEnabled()) {
-			log.debug(logname + " Begin, request info " + downloadReq);
-		}
+        if (log.isDebugEnabled()) {
+            log.debug(logname + " Begin, request info " + downloadReq);
+        }
 
-		try {
-			rowsPerFile = Integer.parseInt(downloadReq.get("excel_rows_limit"));
+        try {
+            rowsPerFile = Integer.parseInt(downloadReq.get("excel_rows_limit"));
 
-			String csvFile = downloadReq.get("csv_download_path");
-			String path = FilenameUtils.getFullPath(csvFile);
-			zipFile = path + FilenameUtils.getBaseName(csvFile) + ".zip";
+            String csvFile = downloadReq.get("csv_download_path");
+            String path = FilenameUtils.getFullPath(csvFile);
+            zipFile = path + FilenameUtils.getBaseName(csvFile) + ".zip";
 
-			excelFiles = convertCsvFileToExcel(csvFile);
+            excelFiles = convertCsvFileToExcel(csvFile);
 
-			ZipUtility.archive(excelFiles, zipFile);
+            ZipUtility.archive(excelFiles, zipFile);
 
-			new DownloadReqDAO().updateDownloadReqStatus(downloadReq.get("id"), Constants.PROCESS_STATUS_COMPLETED,
-					null, zipFile);
+            new DownloadReqDAO().updateDownloadReqStatus(downloadReq.get("id"), Constants.PROCESS_STATUS_COMPLETED,
+                    null, zipFile);
 
-			deleteFiles(excelFiles);
+            deleteFiles(excelFiles);
 
-		} catch (Exception e) {
-			log.error(logname + " Exception ", e);
-			deleteFiles(excelFiles);
-			throw e;
-		}
+        } catch (Exception e) {
+            log.error(logname + " Exception ", e);
+            deleteFiles(excelFiles);
+            throw e;
+        }
 
-		if (log.isDebugEnabled()) {
-			log.debug(logname + " End, Zip file " + zipFile);
-		}
+        if (log.isDebugEnabled()) {
+            log.debug(logname + " End, Zip file " + zipFile);
+        }
 
-	}
+    }
 
-	public List<String> convertCsvFileToExcel(String csvFile) throws Exception {
-		String logname = className + " [convertCsvFileToExcel] ";
-		CSVReader csvReader = null;
-		String[] headerRow = null;
-		boolean isHeaderRow = true;
-		List<String> splitFiles = new ArrayList<String>();
-		writtenRowsCount = 0;
-		totalWrittenRowsCount = 0;
-		filesCount = 0;
+    public List<String> convertCsvFileToExcel(String csvFile) throws Exception {
+        String logname = className + " [convertCsvFileToExcel] ";
+        CSVReader csvReader = null;
+        String[] headerRow = null;
+        boolean isHeaderRow = true;
+        List<String> splitFiles = new ArrayList<String>();
+        writtenRowsCount = 0;
+        totalWrittenRowsCount = 0;
+        filesCount = 0;
 
-		try {
-			Charset charset = java.nio.charset.Charset.forName("UTF-8");
-			if (StringUtils.isNotBlank(csvFile)) {
-				csvReader = new CSVReader(new FileReader(csvFile, charset), ',', '"', 0);
-			} else {
-				throw new Exception("No source file provided");
-			}
+        try {
+            Charset charset = java.nio.charset.Charset.forName("UTF-8");
+            if (StringUtils.isNotBlank(csvFile)) {
+                // Updated CSVReader initialization for OpenCSV 5.9
+                csvReader = new CSVReaderBuilder(new FileReader(csvFile, charset))
+                        .withSkipLines(0) // Start from first line
+                        .withCSVParser(new com.opencsv.CSVParserBuilder()
+                                .withSeparator(',')
+                                .withQuoteChar('"')
+                                .build())
+                        .build();
+            } else {
+                throw new Exception("No source file provided");
+            }
 
-			SXSSFWorkbook workbook = new SXSSFWorkbook();
-			SXSSFSheet spreadsheet = workbook.createSheet();
+            SXSSFWorkbook workbook = new SXSSFWorkbook();
+            SXSSFSheet spreadsheet = workbook.createSheet();
 
-			String[] row = null;
-			while ((row = csvReader.readNext()) != null) {
-				if (!isEmptyRow(row)) {
+            String[] row = null;
+            while ((row = csvReader.readNext()) != null) {
+                if (!isEmptyRow(row)) {
 
-					if (isHeaderRow) {
-						headerRow = row;
-						writeDataToExcel(spreadsheet, headerRow);
-						totalWrittenRowsCount--;
-						isHeaderRow = false;
-						continue;
-					}
+                    if (isHeaderRow) {
+                        headerRow = row;
+                        writeDataToExcel(spreadsheet, headerRow);
+                        totalWrittenRowsCount--;
+                        isHeaderRow = false;
+                        continue;
+                    }
 
-					if (writtenRowsCount > rowsPerFile) {
-						String newFileName = csvFile.substring(0, csvFile.length() - 4) + "_" + (++filesCount)
-								+ ".xlsx";
-						FileOutputStream out = new FileOutputStream(new File(newFileName));
-						workbook.write(out);
-						out.flush();
-						out.close();
-						workbook.close();
+                    if (writtenRowsCount > rowsPerFile) {
+                        String newFileName = csvFile.substring(0, csvFile.length() - 4) + "_" + (++filesCount)
+                                + ".xlsx";
+                        FileOutputStream out = new FileOutputStream(new File(newFileName));
+                        workbook.write(out);
+                        out.flush();
+                        out.close();
+                        workbook.close();
 
-						splitFiles.add(newFileName);
+                        splitFiles.add(newFileName);
 
-						workbook = new SXSSFWorkbook();
-						spreadsheet = workbook.createSheet();
+                        workbook = new SXSSFWorkbook();
+                        spreadsheet = workbook.createSheet();
 
-						writtenRowsCount = 0;
+                        writtenRowsCount = 0;
 
-						writeDataToExcel(spreadsheet, headerRow);
+                        writeDataToExcel(spreadsheet, headerRow);
 
-						totalWrittenRowsCount--;
-					}
+                        totalWrittenRowsCount--;
+                    }
 
-					writeDataToExcel(spreadsheet, row);
-				}
-			}
+                    writeDataToExcel(spreadsheet, row);
+                }
+            }
 
-			if (writtenRowsCount > 0) {
-				String newFileName = csvFile.substring(0, csvFile.length() - 4) + "_" + (++filesCount) + ".xlsx";
-				FileOutputStream out = new FileOutputStream(new File(newFileName));
-				workbook.write(out);
-				out.flush();
-				out.close();
-				workbook.close();
-				splitFiles.add(newFileName);
-			}
+            if (writtenRowsCount > 0) {
+                String newFileName = csvFile.substring(0, csvFile.length() - 4) + "_" + (++filesCount) + ".xlsx";
+                FileOutputStream out = new FileOutputStream(new File(newFileName));
+                workbook.write(out);
+                out.flush();
+                out.close();
+                workbook.close();
+                splitFiles.add(newFileName);
+            }
 
-		} catch (Exception e) {
-			throw e;
-		}
+        } catch (Exception e) {
+            throw e;
+        } finally {
+            if (csvReader != null) {
+                try {
+                    csvReader.close();
+                } catch (Exception e) {
+                    log.error(logname + "Error closing CSVReader", e);
+                }
+            }
+        }
 
-		if (log.isDebugEnabled()) {
-			log.debug(logname + " Excel (" + splitFiles.size() + ") files created " + splitFiles);
-		}
-		return splitFiles;
-	}
+        if (log.isDebugEnabled()) {
+            log.debug(logname + " Excel (" + splitFiles.size() + ") files created " + splitFiles);
+        }
+        return splitFiles;
+    }
 
-	public boolean isEmptyRow(String[] nextLine) {
-		String data = null;
-		try {
-			List<String> list = Arrays.asList(nextLine);
-			data = list.toString().replace("[", "").replaceAll("]", "");
-			data = data.replaceAll(",", "").trim();
-		} catch (Exception e) {
-		}
-		return StringUtils.isBlank(data);
-	}
+    public boolean isEmptyRow(String[] nextLine) {
+        String data = null;
+        try {
+            List<String> list = Arrays.asList(nextLine);
+            data = list.toString().replace("[", "").replaceAll("]", "");
+            data = data.replaceAll(",", "").trim();
+        } catch (Exception e) {
+            log.error("[CsvToExcelConvertor] isEmptyRow Exception", e);
+        }
+        return StringUtils.isBlank(data);
+    }
 
-	public void writeDataToExcel(SXSSFSheet spreadsheet, Object[] objectArr) throws Exception {
-		try {
-			SXSSFRow row = spreadsheet.createRow(writtenRowsCount);
-			int cellid = 0;
-			// writing the data into the sheets...
-			for (Object obj : objectArr) {
-				Cell cell = row.createCell(cellid++);
-				if (obj instanceof String) {
-					cell.setCellValue((String) obj);
-				} else if (obj instanceof Long) {
-					cell.setCellValue((Long) obj);
-				} else if (obj instanceof Double) {
-					cell.setCellValue((Double) obj);
-				}
-			}
-			writtenRowsCount++;
-			totalWrittenRowsCount++;
-		} catch (Exception e) {
-			throw e;
-		}
-	}
+    public void writeDataToExcel(SXSSFSheet spreadsheet, Object[] objectArr) throws Exception {
+        try {
+            SXSSFRow row = spreadsheet.createRow(writtenRowsCount);
+            int cellid = 0;
+            // writing the data into the sheets...
+            for (Object obj : objectArr) {
+                Cell cell = row.createCell(cellid++);
+                if (obj instanceof String) {
+                    cell.setCellValue((String) obj);
+                } else if (obj instanceof Long) {
+                    cell.setCellValue((Long) obj);
+                } else if (obj instanceof Double) {
+                    cell.setCellValue((Double) obj);
+                } else if (obj instanceof Integer) {
+                    cell.setCellValue((Integer) obj);
+                } else if (obj instanceof BigDecimal) {
+                    cell.setCellValue(((BigDecimal) obj).doubleValue());
+                }
+            }
+            writtenRowsCount++;
+            totalWrittenRowsCount++;
+        } catch (Exception e) {
+            throw e;
+        }
+    }
 
-	public String handleExponentialNumber(String mobile) {
-		try {
-			if (mobile.toUpperCase().contains("E+") || mobile.toUpperCase().contains("E-")) {
-				// could be exponential value. check if it is parsable double value.
-				Double.parseDouble(mobile);
-				mobile = new BigDecimal(mobile.trim()).toPlainString();
-			}
-		} catch (Exception e) {
-		}
-		return mobile;
-	}
+    public String handleExponentialNumber(String mobile) {
+        try {
+            if (mobile.toUpperCase().contains("E+") || mobile.toUpperCase().contains("E-")) {
+                // could be exponential value. check if it is parsable double value.
+                Double.parseDouble(mobile);
+                mobile = new BigDecimal(mobile.trim()).toPlainString();
+            }
+        } catch (Exception e) {
+            log.error("[CsvToExcelConvertor] handleExponentialNumber Exception", e);
+        }
+        return mobile;
+    }
 
-	public void pushBackToRedis(Map<String, String> downloadReq, Jedis jedis, String queueName, int retryLimit) {
-		String logname = className + " [pushBackToRedis] ";
+    public void pushBackToRedis(Map<String, String> downloadReq, Jedis jedis, String queueName, int retryLimit) {
+        String logname = className + " [pushBackToRedis] ";
 
-		if (log.isDebugEnabled()) {
-			log.debug(logname + " Begin, request info " + downloadReq);
-		}
-		int retryCount = 1;
-		try {
-			if (StringUtils.isNotBlank(downloadReq.get("retry_count"))) {
-				retryCount = Integer.parseInt(downloadReq.get("retry_count"));
-			}
+        if (log.isDebugEnabled()) {
+            log.debug(logname + " Begin, request info " + downloadReq);
+        }
+        int retryCount = 1;
+        try {
+            if (StringUtils.isNotBlank(downloadReq.get("retry_count"))) {
+                retryCount = Integer.parseInt(downloadReq.get("retry_count"));
+            }
 
-			if (retryCount <= retryLimit) {
-				retryCount++;
-				downloadReq.put("retry_count", retryCount + "");
-				String json = new JsonUtility().convertMapToJSON(downloadReq);
-				jedis.rpush(queueName, json);
-				if (log.isDebugEnabled()) {
-					log.debug(logname + "End, pushed back to Q[" + queueName + "], json=" + json);
-				}
-			} else {
-				new DownloadReqDAO().updateDownloadReqStatus(downloadReq.get("id"), Constants.PROCESS_STATUS_FAILED,
-						"Max retry reached", null);
+            if (retryCount <= retryLimit) {
+                retryCount++;
+                downloadReq.put("retry_count", retryCount + "");
+                String json = new JsonUtility().convertMapToJSON(downloadReq);
+                jedis.rpush(queueName, json);
+                if (log.isDebugEnabled()) {
+                    log.debug(logname + "End, pushed back to Q[" + queueName + "], json=" + json);
+                }
+            } else {
+                new DownloadReqDAO().updateDownloadReqStatus(downloadReq.get("id"), Constants.PROCESS_STATUS_FAILED,
+                        "Max retry reached", null);
 
-				if (log.isDebugEnabled()) {
-					log.debug(logname + "End, updated status to " + Constants.PROCESS_STATUS_FAILED
-							+ " in download_req since max retry (" + retryLimit + ") finished.");
-				}
-			}
+                if (log.isDebugEnabled()) {
+                    log.debug(logname + "End, updated status to " + Constants.PROCESS_STATUS_FAILED
+                            + " in download_req since max retry (" + retryLimit + ") finished.");
+                }
+            }
 
-		} catch (Exception e) {
-			log.error(logname + " Exception ", e);
-		}
-	}
+        } catch (Exception e) {
+            log.error(logname + " Exception ", e);
+        }
+    }
 
-	public void deleteFiles(List<String> excelFiles) {
-		try {
-			for (String xl : excelFiles) {
-				File file = new File(xl);
-				file.delete();
-			}
-		} catch (Exception e) {
-		}
-	}
-
+    public void deleteFiles(List<String> excelFiles) {
+        try {
+            for (String xl : excelFiles) {
+                File file = new File(xl);
+                if (file.exists()) {
+                    boolean deleted = file.delete();
+                    if (!deleted) {
+                        log.debug("Could not delete file: " + xl);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            log.error("[CsvToExcelConvertor] deleteFiles Exception", e);
+        }
+    }
 }

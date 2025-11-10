@@ -314,8 +314,8 @@ class XLSXFileHandler extends DefaultHandler {
 				String sstIndex = value.toString();
 				try {
 					int idx = Integer.parseInt(sstIndex);
-					XSSFRichTextString rtss = new XSSFRichTextString(sharedStringsTable.getEntryAt(idx));
-					thisStr = rtss.toString();
+					XSSFRichTextString rtss = new XSSFRichTextString(
+					        sharedStringsTable.getItemAt(idx).getString());					thisStr = rtss.toString();
 				} catch (NumberFormatException ex) {
 					log.error(loggerName + "Failed to parse SST index '" + sstIndex + "': " + ex.toString());
 				}

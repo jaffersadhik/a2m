@@ -1,34 +1,29 @@
 package com.itextos.beacon.commonlib.pwdencryption;
 
-import org.mindrot.jbcrypt.BCrypt;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 class BcryptHashing
 {
-
     private static final int DEFAULT_HASH_ROUNDS = 10;
+    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder(DEFAULT_HASH_ROUNDS);
 
     private BcryptHashing()
     {}
 
-    static EncryptedObject hash(
-            String aPassword)
+    static EncryptedObject hash(String aPassword)
     {
         return hash(aPassword, DEFAULT_HASH_ROUNDS);
     }
 
-    static EncryptedObject hash(
-            String aStringToHash,
-            int aDefaultHashRounds)
+    static EncryptedObject hash(String aStringToHash, int aDefaultHashRounds)
     {
-        final String hashed = BCrypt.hashpw(aStringToHash, BCrypt.gensalt(aDefaultHashRounds));
+        BCryptPasswordEncoder customEncoder = new BCryptPasswordEncoder(aDefaultHashRounds);
+        final String hashed = customEncoder.encode(aStringToHash);
         return new EncryptedObject(aStringToHash, hashed);
     }
 
-    static boolean isValidHash(
-            String aUserPassword,
-            String aDbHashValue)
+    static boolean isValidHash(String aUserPassword, String aDbHashValue)
     {
-        return BCrypt.checkpw(aUserPassword, aDbHashValue);
+        return encoder.matches(aUserPassword, aDbHashValue);
     }
-
 }
